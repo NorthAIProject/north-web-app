@@ -28,7 +28,7 @@ function formatArg(locale: string, value: unknown, kind: string, precision?: num
 			return typeof value === 'number' ? String(Math.trunc(value)) : String(value);
 		case 'f':
 		case 'e':
-			return localizeNumber(locale, typeof value === 'number' ? value.toFixed(precision ?? 6) : String(value));
+			return localizeNumber(locale, typeof value === 'number' ? toFixedGo(value, precision ?? 6) : String(value));
 		case 'g':
 			return localizeNumber(
 				locale,
@@ -52,13 +52,27 @@ function formatArg(locale: string, value: unknown, kind: string, precision?: num
 	}
 }
 
+/**
+ * toFixed with Go's tie rule: strconv rounds an exact half to even (2712.5 →
+ * "2712"), where toFixed rounds it away from zero ("2713"). Only exact ties
+ * differ, so everything else is toFixed's own answer.
+ */
+export function toFixedGo(value: number, precision: number): string {
+	const scale = 10 ** precision;
+	const magnitude = Math.abs(value);
+	const floor = Math.floor(magnitude * scale);
+	if ((floor + 0.5) / scale !== magnitude) return value.toFixed(precision);
+	const even = floor % 2 === 0 ? floor : floor + 1;
+	return (value < 0 && even !== 0 ? '-' : '') + (even / scale).toFixed(precision);
+}
+
 function localizeNumber(locale: string, formatted: string): string {
 	return usesDecimalComma(locale) ? formatted.replace('.', ',') : formatted;
 }
 
 /** Formats v to prec decimals with the locale's separator (Go: i18n.FormatDecimal). */
 export function formatDecimal(locale: string, value: number, precision: number): string {
-	return localizeNumber(locale, value.toFixed(precision));
+	return localizeNumber(locale, toFixedGo(value, precision));
 }
 
 /** Groups thousands with the locale's mark (Go: i18n.FormatThousands). */
