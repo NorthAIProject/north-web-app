@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { api, createUser, signIn } from './helpers';
+import { api, createUser, signIn, webUrl } from './helpers';
 
 const shots = process.env.E2E_SHOTS;
 
@@ -71,4 +71,30 @@ test('check-ins: history from another surface shows up', async ({ page, request 
 	await expect(page.locator('[data-mood-energy-chart] svg').first()).toBeVisible();
 	await expect(page.locator('#checkins-mood-heatmap[data-echarts-ready]')).toBeVisible();
 	if (shots) await page.screenshot({ path: `${shots}/checkins-history.png`, fullPage: true });
+});
+
+// Go's PATCH/DELETE /app/check-ins/{id}, which no page calls (see the route).
+test('a past check-in can be edited, refused field by field, and deleted by id', async ({ page, request }) => {
+	const user = await createUser(request);
+	const today = await api(request, user, 'PUT', '/check-ins/today', {
+		mood: 3, energy: 3, wins: '', challenges: '', notes: '', tags: []
+	});
+	await signIn(page, user, '/app/check-ins');
+	const headers = { origin: webUrl };
+
+	const edited = await page.request.patch(`/app/check-ins/${today.id}`, {
+		headers,
+		form: { mood: '5', energy: '4', wins: 'Edited later' }
+	});
+	expect(edited.status()).toBe(200);
+	expect((await edited.json()).saved.wins).toBe('Edited later');
+
+	const refused = await page.request.patch(`/app/check-ins/${today.id}`, { headers, form: { mood: '9', energy: '4' } });
+	expect(refused.status()).toBe(422);
+	expect(Object.keys((await refused.json()).errors)).toContain('mood');
+
+	const gone = await page.request.delete(`/app/check-ins/${today.id}`, { headers });
+	expect(gone.status()).toBe(204);
+	const again = await page.request.delete(`/app/check-ins/${today.id}`, { headers });
+	expect(again.status()).toBe(404);
 });

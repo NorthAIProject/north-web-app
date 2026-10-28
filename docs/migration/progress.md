@@ -32,8 +32,8 @@ Components: `src/lib/features/progress/` — `NewCheck.svelte` (form + Fields + 
   429 → the quota message, other → `progress.estimate.failed`, 422 → field errors.
 - A refused save keeps the chosen photos (Go's full re-render lost them).
 - Number inputs are `type=number`; the server-side `formInput` still accepts a comma.
-- Not exercised locally: estimate and compare need a photo-capable provider, and the local
-  stack runs the fake one (`/progress/assist` → unavailable), so the estimate box and compare
-  button are hidden there, as in Go.
+- Estimate and compare run in e2e against the provider stub (`tests/e2e/stubs/providers.ts`,
+  Anthropic shape). Without the stub the local stack has no photo-capable provider and the
+  estimate box and compare button are hidden, as in Go.
 - Photo uploads go through the SvelteKit action: a production adapter's body-size limit must
   allow three ≤1600px JPEGs (Go capped the request at 3 × the media cap + 1 MB).

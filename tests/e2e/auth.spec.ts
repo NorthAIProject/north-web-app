@@ -1,10 +1,12 @@
 import { createHash } from 'node:crypto';
-import { expect, test } from '@playwright/test';
-import { apiUrl, createUser, password, signIn, webHost } from './helpers';
+import { expect, test, type Page } from '@playwright/test';
+import { apiUrl, createUser, password, signIn, webHost, webUrl } from './helpers';
 
-// The auth port: sign-in, sign-up, password recovery, onboarding, sign-out and
-// the MCP consent screen. Google and passkeys need a real provider or device,
-// so their halves are covered by unit tests (passkey.spec.ts, Go api_web_test).
+// The auth port: sign-in, sign-up, passkeys, password recovery, onboarding,
+// sign-out and the MCP consent screen. Passkeys run against Chrome's virtual
+// authenticator; the API needs WEBAUTHN_RP_ORIGINS to list this origin. Google
+// needs a real Google account, so only its redirect and refusal halves run
+// here (the code exchange is Go's, covered by api_web_test).
 
 const goOrigin = apiUrl.replace(/\/api\/v1$/, '');
 
@@ -209,4 +211,95 @@ test('consent: a signed-in person can deny', async ({ page, request }) => {
 	await page.locator('button[name="decision"][value="deny"]').click();
 	callback = (await sent).url();
 	expect(callback).toContain('error=access_denied');
+});
+
+// --- Passkeys ----------------------------------------------------------------
+
+// A platform authenticator that says yes to every prompt, kept per page.
+async function virtualAuthenticator(page: Page) {
+	const cdp = await page.context().newCDPSession(page);
+	await cdp.send('WebAuthn.enable');
+	await cdp.send('WebAuthn.addVirtualAuthenticator', {
+		options: {
+			protocol: 'ctap2',
+			transport: 'internal',
+			hasResidentKey: true,
+			hasUserVerification: true,
+			isUserVerified: true,
+			automaticPresenceSimulation: true
+		}
+	});
+}
+
+test('passkeys: create an account with one, then sign in with it', async ({ page, request }) => {
+	const options = await (await request.get(`${apiUrl}/auth/options`)).json();
+	test.skip(!options.passkey, 'passkeys are off in this API');
+	await virtualAuthenticator(page);
+
+	const email = `e2e-passkey-${Date.now()}@khepri.local`;
+	await page.goto('/signup');
+	await page.waitForLoadState('networkidle');
+	await page.getByLabel('Name').fill('Passkey Tester');
+	await page.getByLabel('Email').fill(email);
+	await page.getByRole('button', { name: 'Create account with a passkey' }).click();
+	await expect(page).toHaveURL(/\/app\/onboarding$/);
+
+	await page.context().clearCookies();
+	await page.goto('/login');
+	await page.waitForLoadState('networkidle');
+	await page.getByRole('button', { name: 'Use a passkey' }).click();
+	await expect(page).toHaveURL(/\/app(\/|$)/);
+	// Signed in as the passkey's account.
+	expect(await (await page.request.get('/api/me')).text()).toContain(email);
+});
+
+test('passkeys: sign in on the consent screen, then approve', async ({ page, request }) => {
+	const options = await (await request.get(`${apiUrl}/auth/options`)).json();
+	test.skip(!options.passkey, 'passkeys are off in this API');
+	await virtualAuthenticator(page);
+
+	const email = `e2e-passkey-consent-${Date.now()}@khepri.local`;
+	await page.goto('/signup');
+	await page.waitForLoadState('networkidle');
+	await page.getByLabel('Name').fill('Passkey Consent');
+	await page.getByLabel('Email').fill(email);
+	await page.getByRole('button', { name: 'Create account with a passkey' }).click();
+	await expect(page).toHaveURL(/\/app\/onboarding$/);
+	await page.context().clearCookies();
+
+	const clientId = await registerClient(request);
+	await page.route('https://agent.example/**', (route) => route.fulfill({ status: 200, body: 'ok' }));
+	await page.goto(authorizeURL(clientId));
+	await expect(page).toHaveURL(/\/oauth\/authorize\?request_id=/);
+	// The screen opens on "create an account"; this person already has one.
+	await page.getByRole('link', { name: 'Sign in', exact: true }).click();
+	await expect(page.getByText('Sign in to continue')).toBeVisible();
+	await page.waitForLoadState('networkidle');
+	await page.getByRole('button', { name: 'Continue with a passkey' }).click();
+	await expect(page.getByText(email)).toBeVisible();
+	const sent = page.waitForRequest(/agent\.example\/callback/);
+	await page.locator('button[name="decision"][value="approve"]').click();
+	expect((await sent).url()).toContain('code=');
+});
+
+// --- Google: redirect and refusal ---------------------------------------------
+
+test('google: start redirects to Google with this site\'s callback; a bad return is refused', async ({
+	page,
+	request
+}) => {
+	const options = await (await request.get(`${apiUrl}/auth/options`)).json();
+	test.skip(!options.google, 'Google sign-in is off in this API');
+
+	const start = await page.request.get('/auth/google?next=/app/goals', { maxRedirects: 0 });
+	expect(start.status()).toBe(302);
+	const google = new URL(start.headers()['location']);
+	expect(google.host).toBe('accounts.google.com');
+	expect(google.searchParams.get('redirect_uri')).toBe(`${webUrl}/auth/google/callback`);
+	expect(google.searchParams.get('state')).toBeTruthy();
+
+	// A state this browser was never given, as a forged return would carry.
+	await page.goto('/auth/google/callback?state=forged&code=nope');
+	await expect(page).toHaveURL(/\/login\?google=/);
+	await expect(page.getByRole('alert')).toBeVisible();
 });

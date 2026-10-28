@@ -143,6 +143,8 @@ WEB_URL=http://localhost:8787 bunx playwright test --project desktop
    - iOS still works against `/api/v1`.
    - MCP OAuth: authorize goes to SvelteKit, token goes to Go.
    - Telegram webhook delivers.
+   - The three provider halves no local test reaches: a real Google sign-in, a Strava connect
+     and a Facebook connect (parity-gaps.md §2b).
    - AASA is served.
    - `/sw.js` is gone and `/service-worker.js` registers.
 7. **Tell north-60:** the Echo session then deletes `web/` from north-client.

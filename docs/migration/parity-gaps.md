@@ -1,20 +1,15 @@
 # Parity gaps: Go web → SvelteKit
 
 Audit of 2026-10-28 against `routes.md`, which was checked against `cmd/web/routes.go` and every
-`internal/*/handler.go` `Routes` method in north-client-api. Result: 373 web routes; 360 covered by
-SvelteKit, 11 kept by Go at the edge, 2 closed as dead (below). `/app` paths below are written in full.
+`internal/*/handler.go` `Routes` method in north-client-api. Result: 373 web routes; 362 covered by
+SvelteKit, 11 kept by Go at the edge (§3). `/app` paths below are written in full.
 
-## 1. Routes not ported (closed as dead)
+## 1. Routes not ported
 
-| Route | Go handler | What it does | Owner |
-| --- | --- | --- | --- |
-| `PATCH /app/check-ins/{id}` | `checkins.Handler.update` | Edits a past check-in from the wizard's form fields and re-renders the saved panel (422 re-renders the form). | checkins |
-| `DELETE /app/check-ins/{id}` | `checkins.Handler.delete` | Deletes a check-in. Over htmx it answers 204 and fires `checkin-saved` so live displays refresh. | checkins |
-
-Neither route is called by any Go template (`web/**/*.templ`), so a Go web user could never reach
-them. `checkins.md` records this as "not ported". The JSON API has `PATCH/DELETE /check-ins/{id}`,
-so wiring edit/delete onto the history rows later needs only front-end work. Decision (2026-10-28):
-closed as dead for the 1:1 port; editing a past check-in would be a new feature.
+None. `PATCH` and `DELETE /app/check-ins/{id}` were first closed as dead, because no Go template
+calls them, but that was never the owner's call. They are now ported 1:1 as
+`src/routes/(app)/app/check-ins/[id]/+server.ts` (JSON instead of htmx fragments) and covered by
+`checkins.spec.ts`. Editing a past check-in from the history rows is still a new feature, not parity.
 
 ## 2. Covered, with a difference a user would notice
 
@@ -33,7 +28,7 @@ Pure refactors (named actions instead of per-id URLs, components instead of frag
 - **Check-ins:** without JS, a save stays on the page with the saved panel instead of redirecting to `?saved=1`. The live region polls every 20 s instead of Go's version-204 probe. (checkins.md)
 - **Check-ins:** the coach reply loads only for today's check-in. (checkins.md)
 - **Coach:** a failed stream keeps its error in the bubble until the next action. Go's refresh wiped it at once. A reply the API refuses puts the typed text back in the composer. (coach.md)
-- **Coach / dictation:** the mic is hidden when `GET /voice` reports unavailable. The recorder path has never run in a browser. (coach.md)
+- **Coach / dictation:** the mic is hidden when `GET /voice` reports unavailable. The recorder runs in e2e with Chromium's fake microphone and the transcription stub (`dictation.spec.ts`). (coach.md)
 - **Crews:** role, remove and challenge failures land on SvelteKit's error page. Go showed a plain-text page. (crews.md)
 - **Crews:** a new total unread badge sits on the Crews nav item. Go had per-crew dots only. (crews.md, nudges.md)
 - **My Day:** write failures appear as a toast instead of an inline 422 fragment. (day.md)
@@ -63,6 +58,28 @@ Doc claims that the code has since fixed (the docs are stale, nothing to do):
 - crews.md: the "shell must mount" unread badge. `AppShell` mounts it.
 - activity, exercises, formcheck, lifts and profiles .md: "rail highlight lost". Each of those routes has a `+layout.ts` that sets `navActive`.
 - insights.md: has no section for sleep, cardio, patterns, coach, spend or metric. Those pages exist under `R/insights/*`.
+
+## 2b. Provider flows and how they are verified
+
+| Flow | Verified by | Not covered locally |
+| --- | --- | --- |
+| Passkeys (sign-up, sign-in, MCP consent) | `auth.spec.ts`, Chrome virtual authenticator | — |
+| Google sign-in | `auth.spec.ts`: redirect to Google with this site's callback; forged return refused | Google's code exchange (needs a Google account; Go's `api_web_test`) |
+| Dictation | `dictation.spec.ts`: fake mic → WAV → proxy → Go → transcription stub | — |
+| Progress estimate and compare (vision) | `progress.spec.ts` against the Anthropic-shaped stub | — |
+| Strava | `fitness.spec.ts`: unconfigured, cancelled, expired, sync and disconnect | Strava's consent and token exchange (hard-coded strava.com) |
+| Facebook friend finding | `social.spec.ts`: not found without a Meta app | Meta's consent and Graph calls (hard-coded graph.facebook.com) |
+
+Local stack for these: `bun tests/e2e/stubs/providers.ts` on :8099; API with `ANTHROPIC_API_KEY=stub`,
+`ANTHROPIC_BASE_URL=http://127.0.0.1:8099`, `TRANSCRIBE_PROVIDER_OPENAI_BASEURL=http://127.0.0.1:8099/v1`,
+`TRANSCRIBE_PROVIDER_OPENAI_MODEL=stub`, `WEBAUTHN_RP_ID=localhost`,
+`WEBAUTHN_RP_ORIGINS=http://localhost:5173,http://localhost:8787`, and dummy `GOOGLE_CLIENT_ID`/`SECRET`.
+Leave `ANTHROPIC_FIRST` unset so chat stays on the fake provider. The three uncovered halves
+belong on the post-deploy smoke list (hosting-cloudflare.md, runbook step 6).
+
+Bugs these found and fixed: Go asked for non-discoverable passkeys (option order in
+`internal/auth/webauthn.go`); the consent screen's passkey button failed after sign-in because
+`goto()` cannot target an endpoint; the passkey button lost fields typed before hydration.
 
 ## 3. Edge routing after cut-over
 

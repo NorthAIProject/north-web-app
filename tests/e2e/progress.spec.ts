@@ -1,6 +1,7 @@
 import { deflateSync } from 'node:zlib';
 import { expect, test, type APIRequestContext, type Page } from '@playwright/test';
 import { api, createUser, signIn, type TestUser } from './helpers';
+import { comparison, estimate } from './stubs/providers';
 
 // Go: internal/progresschecks/handler.go — GET /app/progress and its posts
 // (create, schedule, delete, compare).
@@ -136,9 +137,9 @@ test('two checks with photos offer the comparison card', async ({ page, request 
 	await expect(page.getByTestId('progress-compare')).toContainText(
 		'You have two checks with photos. Compare them to see what changed.'
 	);
-	// No provider may read photos on the local stack (fake AI): Go hides the
-	// button then too, and shows only the card.
-	await expect(page.getByTestId('progress-compare-button')).toHaveCount(0);
+	// The button shows only when some provider may read photos, as in Go.
+	const assist = await api(request, user, 'GET', '/progress/assist');
+	await expect(page.getByTestId('progress-compare-button')).toHaveCount(assist.available ? 1 : 0);
 	await expect(page.getByTestId('progress-check')).toHaveCount(2);
 	await expect(page.getByTestId('progress-check').first()).toContainText('−2');
 	await page.screenshot({ path: 'test-results/progress-compare.png', fullPage: true });
@@ -160,4 +161,49 @@ test('delete asks first, then removes the check', async ({ page, request }) => {
 	await page.getByRole('dialog').getByRole('button', { name: 'Delete' }).click();
 	await expect(page.getByTestId('progress-check')).toHaveCount(0);
 	await expect(page.getByTestId('progress-history')).toContainText('No checks yet');
+});
+
+// --- Reading photos: needs the API's vision client on the provider stub ------
+
+async function assistOn(request: APIRequestContext, user: TestUser) {
+	const assist = await api(request, user, 'GET', '/progress/assist');
+	test.skip(!assist.available, 'no provider may read photos in this API (start it with the provider stub)');
+}
+
+test('estimate from a photo fills the empty fields and keeps typed ones', async ({ page, request }) => {
+	const user = await createUser(request);
+	await assistOn(request, user);
+	await open(page, request, user);
+	await expect(page.getByTestId('progress-assist-consent')).toContainText('Sends these photos to');
+
+	await page.locator('#photo-front').setInputFiles({ name: 'front.png', mimeType: 'image/png', buffer: png() });
+	await page.locator('#m_hips').fill('100');
+	await page.getByTestId('progress-estimate').click();
+	const note = page.getByTestId('progress-estimate-note');
+	await expect(note).toContainText('Estimate, not a measurement');
+	await expect(note).toContainText(estimate.notes);
+	await expect(page.locator('#m_waist')).toHaveValue(String(estimate.waist_cm));
+	await expect(page.locator('#m_chest')).toHaveValue(String(estimate.chest_cm));
+	await expect(page.locator('#m_hips')).toHaveValue('100');
+	// The photo stays chosen, so the check can be saved with it.
+	await expect(page.getByTestId('pose-front').locator('label img')).toBeVisible();
+	await page.getByTestId('progress-save').click();
+	await expect(page.getByTestId('progress-check')).toHaveCount(1);
+	await expect(page.getByTestId('progress-check').first()).toContainText(`${estimate.waist_cm} cm`);
+});
+
+test('compare first and latest shows the saved observation', async ({ page, request }) => {
+	const user = await createUser(request);
+	await assistOn(request, user);
+	await apiCheck(request, user, { measuredOn: '2026-09-01', weightKg: 82 }, true);
+	await apiCheck(request, user, { weightKg: 80 }, true);
+	await open(page, request, user);
+	await page.getByTestId('progress-compare-button').click();
+	const card = page.getByTestId('progress-compare');
+	await expect(card).toContainText('First and latest, compared');
+	await expect(card).toContainText(comparison.summary);
+	await expect(card).toContainText('Observation from photos, not a measurement');
+	// Saved: it is still there after a reload.
+	await page.reload();
+	await expect(page.getByTestId('progress-compare')).toContainText(comparison.summary);
 });

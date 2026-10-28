@@ -95,10 +95,10 @@ Gaps and deviations: `parity-gaps.md`.
 
 ## checkins (5)
 
-- [x] `DELETE /check-ins/{id}` → not ported: no Go page called it (parity-gaps.md §1)
+- [x] `DELETE /check-ins/{id}` → `src/routes/(app)/app/check-ins/[id]/+server.ts` (no Go page called it; kept 1:1)
 - [x] `GET /check-ins` → R/check-ins
 - [x] `GET /check-ins/live` → F:checkins/LiveRegion.svelte (TanStack poll)
-- [x] `PATCH /check-ins/{id}` → not ported: no Go page called it (parity-gaps.md §1)
+- [x] `PATCH /check-ins/{id}` → `src/routes/(app)/app/check-ins/[id]/+server.ts` (no Go page called it; kept 1:1)
 - [x] `POST /check-ins` → R/check-ins `?/save`
 
 ## coach (9)

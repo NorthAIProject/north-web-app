@@ -8,7 +8,7 @@ Go: `web/checkins/*.templ`, `internal/checkins/handler.go`. API: `internal/check
 | `POST /app/check-ins`              | action `?/save`                                                            | `PUT /check-ins/today`               |
 | `GET /app/check-ins/live`          | TanStack `createQuery(['checkins', userId])`, 20 s poll + refetch on save  | `GET /check-ins`                     |
 | `GET /app/check-ins/today/reply`   | `SavedPanel.svelte` `reply` prop, fetched from the browser                 | `POST /check-ins/today/reply`        |
-| `PATCH/DELETE /app/check-ins/{id}` | not ported (no UI used them in Go)                                         | `PATCH/DELETE /check-ins/{id}` exist |
+| `PATCH/DELETE /app/check-ins/{id}` | `check-ins/[id]/+server.ts`, JSON instead of fragments (no UI used them in Go) | `PATCH/DELETE /check-ins/{id}` exist |
 
 Components in `src/lib/features/checkins/`: `CheckInWizard.svelte` (five steps, all panes stay in
 the form so every field submits), `ScalePicker.svelte`, `SavedPanel.svelte` (moment, receipt, run

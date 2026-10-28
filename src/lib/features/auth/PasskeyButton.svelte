@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { goto } from '$app/navigation';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import { passkeyErrorMessage, passkeysSupported, runPasskey, type PasskeyMode } from './passkey.js';
 
@@ -28,13 +27,29 @@
 		supported = passkeysSupported();
 	});
 
+	// What the page holds at the click. Like passkey.js, read #email and
+	// #display_name off the DOM first: that catches text typed or autofilled
+	// before hydration, which the page's bound state never saw.
+	function current() {
+		const given = fields();
+		const value = (id: string) =>
+			(document.getElementById(id) as HTMLInputElement | null)?.value.trim() || undefined;
+		return {
+			email: value('email') ?? given.email,
+			displayName: value('display_name') ?? given.displayName,
+			timezone: given.timezone || value('timezone')
+		};
+	}
+
 	async function start() {
 		onerror('');
 		busy = true;
 		try {
-			const destination = await runPasskey({ mode, next, ...fields() });
-			// The session cookie was just set: reload the layout's user too.
-			await goto(destination, { invalidateAll: true });
+			const destination = await runPasskey({ mode, next, ...current() });
+			// The session cookie was just set, so load the next page in full, as
+			// passkey.js did. goto() cannot: the consent screen's way back
+			// (/oauth/authorize/resume) is an endpoint, not a page.
+			window.location.assign(destination);
 		} catch (err) {
 			onerror(passkeyErrorMessage(err));
 		} finally {
