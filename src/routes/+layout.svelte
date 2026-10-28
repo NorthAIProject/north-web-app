@@ -3,9 +3,15 @@
 	import { Toaster } from '#lib/components/ui/sonner/index.js';
 	import { createTranslator, setI18n } from '#lib/i18n/index.js';
 	import { themeColorDark, themeColorLight } from '#lib/theme.js';
+	import Analytics from '#lib/features/analytics/Analytics.svelte';
+	import SeoMeta from '#lib/features/landing/SeoMeta.svelte';
+	import { QueryClientProvider } from '@tanstack/svelte-query';
+	import { createAppQueryClient } from '#lib/query.js';
 	import type { LayoutProps } from './$types';
 
 	let { data, children }: LayoutProps = $props();
+
+	const queryClient = createAppQueryClient();
 
 	const translator = $derived(createTranslator(data.locale, data.messages, data.fallback));
 	setI18n(() => translator);
@@ -23,5 +29,10 @@
 	<meta name="apple-mobile-web-app-status-bar-style" content={data.appearance === 'dark' ? 'black-translucent' : 'default'} />
 </svelte:head>
 
-{@render children()}
+<SeoMeta />
+
+<QueryClientProvider client={queryClient}>
+	{@render children()}
+</QueryClientProvider>
 <Toaster richColors position="bottom-right" theme={data.appearance} />
+<Analytics identity={data.user?.id} />
