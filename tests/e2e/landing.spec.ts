@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { createUser, signIn } from './helpers';
+import { createUser, signIn, webUrl } from './helpers';
 
 // The marketing page (north-client web/landing). Its demos are canned and run
 // in the browser, so each is exercised here rather than only rendered.
@@ -37,7 +37,7 @@ test('landing tells a signed-in visitor to open the app', async ({ page, request
 });
 
 test('landing speaks the visitor language', async ({ page, context }) => {
-	await context.addCookies([{ name: 'locale', value: 'es', url: 'http://localhost:5173' }]);
+	await context.addCookies([{ name: 'locale', value: 'es', url: webUrl }]);
 	await page.goto('/');
 	await expect(page.getByRole('heading', { level: 1 })).toContainText('Casi toda la IA se ha olvidado de ti para el martes.');
 });

@@ -111,9 +111,10 @@ A blanket `/oauth/*`, `/.well-known/*` or `/api/*` rule breaks consent, AASA or 
   of 512 KB would refuse uploads before they reach the API: form-check videos (need at least 201M),
   Hevy imports (at least 11 MB), progress photos and knowledge uploads. (formcheck.md, lifts.md, progress.md)
   On Cloudflare the platform caps a request body too (100 MB on Free/Pro plans), so 201 MB videos
-  cannot pass through a Worker at all: they must go straight to the API or to storage. Decide in
-  the hosting step.
+  cannot pass through the proxied zone at all, from the web or from iOS. Plan: presigned PUT
+  straight to `media.kheprios.com` (DNS-only), before the DNS move. See
+  `docs/architecture/hosting-cloudflare.md`.
 - ~~**Session cookie renamed.**~~ Fixed: SvelteKit now uses Go's `north_session` cookie (same
   token, path and flags), so signed-in users stay signed in across the cut-over.
-- **SvelteKit health probe.** SvelteKit has no `/healthz`. Its pod needs a probe path of its own
-  (`/` works, or add a route).
+- **SvelteKit health probe.** SvelteKit has no `/healthz` (that path stays Go's). On Workers there
+  is no pod; probe `/login` for 200 (hosting-cloudflare.md).

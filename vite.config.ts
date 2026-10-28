@@ -4,12 +4,11 @@ import { enhancedImages } from '@sveltejs/enhanced-img';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'vitest/config';
 import { playwright } from '@vitest/browser-playwright';
-import adapter from '@sveltejs/adapter-auto';
+import adapter from '@sveltejs/adapter-cloudflare';
 import { sveltekit } from '@sveltejs/kit/vite';
 
-// Hosting (Cloudflare) is decided once the app reaches parity with the Go web
-// app; until then adapter-auto keeps `vite dev` and `vite build` working
-// everywhere without committing to a platform.
+// Hosted on Cloudflare Workers (wrangler.jsonc; plan in
+// docs/architecture/hosting-cloudflare.md).
 export default defineConfig({
 	plugins: [
 		enhancedImages(),

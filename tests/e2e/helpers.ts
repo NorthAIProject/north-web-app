@@ -1,6 +1,9 @@
 import type { APIRequestContext, Page } from '@playwright/test';
 
 export const apiUrl = process.env.NORTH_API_URL ?? 'http://localhost:8090/api/v1';
+// The app under test, as playwright.config.ts's baseURL sees it (vite dev or wrangler dev).
+export const webUrl = process.env.WEB_URL ?? 'http://localhost:5173';
+export const webHost = new URL(webUrl).host.replace(/[.]/g, '\\.');
 export const password = 'correct horse battery staple';
 
 export type TestUser = { email: string; token: string; id: string };

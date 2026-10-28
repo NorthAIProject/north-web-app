@@ -6,6 +6,13 @@ export const variables = defineEnvVars({
 			"north-client's JSON API as this server sees it. Locally the Go process on :8090; in production the cluster's khepri-web.",
 		schema: (value) => (value || 'http://localhost:8090/api/v1').replace(/\/$/, '')
 	},
+	// On Cloudflare the Worker answers for the whole host; requests for the paths
+	// Go keeps (src/lib/server/edge.ts) are passed to this origin. Empty = no
+	// passthrough, which is right for local dev where Go has its own port.
+	GO_ORIGIN: {
+		description: 'Origin that serves the Go-owned paths (/api/v1, /mcp, /oauth/token, …). Empty disables the passthrough.',
+		schema: (value) => (value ?? '').trim().replace(/\/$/, '')
+	},
 	// PostHog (north-client web/shared/analytics). Same names as the Go
 	// deployment's env, so the cluster secret carries over unchanged. Empty key
 	// = no snippet, no script, nothing reported.

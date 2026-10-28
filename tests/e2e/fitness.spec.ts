@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { api, createUser, signIn } from './helpers';
+import { api, createUser, signIn, webUrl } from './helpers';
 
 // Go: web/fitness/{fitness,activities}.templ + internal/fitness/handler.go.
 // Strava has no credentials locally, so the Strava card and the activities page
@@ -99,14 +99,14 @@ test('Strava sync and disconnect post back to the hub with a notice', async ({ p
 	await signIn(page, user, '/app/fitness');
 
 	const sync = await page.request.post('/app/fitness/strava/sync', {
-		headers: { origin: 'http://localhost:5173' },
+		headers: { origin: webUrl },
 		maxRedirects: 0
 	});
 	expect(sync.status()).toBe(303);
 	expect(sync.headers()['location']).toMatch(/^\/app\/fitness\?notice=(sync-first|sync-failed)$/);
 
 	const off = await page.request.post('/app/fitness/strava/disconnect', {
-		headers: { origin: 'http://localhost:5173' },
+		headers: { origin: webUrl },
 		maxRedirects: 0
 	});
 	expect(off.status()).toBe(303);

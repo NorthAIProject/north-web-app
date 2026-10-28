@@ -1,6 +1,6 @@
 import { expect, test, type APIRequestContext, type Page } from '@playwright/test';
 import path from 'node:path';
-import { api, createUser, signIn, type TestUser } from './helpers';
+import { api, createUser, signIn, webUrl, type TestUser } from './helpers';
 
 // Go: web/planimport (meal side) — upload, review, save, and AI generation.
 
@@ -61,7 +61,7 @@ test('meal plan import refuses a missing file', async ({ page, request }) => {
 	const user = await createUser(request);
 	await signIn(page, user, '/app/nutrition/import');
 	const res = await page.request.post('/app/nutrition/import', {
-		headers: { origin: 'http://localhost:5173', 'x-sveltekit-action': 'true' },
+		headers: { origin: webUrl, 'x-sveltekit-action': 'true' },
 		multipart: { other: 'x' }
 	});
 	expect(await res.text()).toContain('planimport.err.nofile');

@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { webUrl } from './helpers';
 
 // The policies (north-client web/legal): public, English in every language.
 
@@ -25,7 +26,7 @@ test('privacy links its contact address', async ({ page }) => {
 });
 
 test('a non-English reader is told why the policy is in English', async ({ page, context }) => {
-	await context.addCookies([{ name: 'locale', value: 'es', url: 'http://localhost:5173' }]);
+	await context.addCookies([{ name: 'locale', value: 'es', url: webUrl }]);
 	await page.goto('/terms');
 	await expect(page.getByText('Esta página solo está disponible en inglés.')).toBeVisible();
 	await expect(page.getByRole('heading', { level: 1 })).toHaveText('Terms of service');

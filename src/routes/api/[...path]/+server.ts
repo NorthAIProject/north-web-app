@@ -59,6 +59,9 @@ export const fallback: RequestHandler = async ({ request, params, url, locals, c
 		const value = upstream.headers.get(name);
 		if (value) responseHeaders.set(name, value);
 	}
+	// fetch hands back a decoded body, so a compressed reply's length is wrong
+	// for what we send on (north-client gzips /api/v1 replies over 1 KB).
+	if (upstream.headers.has('content-encoding')) responseHeaders.delete('content-length');
 	if (upstream.headers.get('content-type')?.startsWith('text/event-stream')) {
 		// Tell any buffering proxy in front of this one to pass events through as they come.
 		responseHeaders.set('cache-control', 'no-cache');

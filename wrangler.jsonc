@@ -1,0 +1,33 @@
+// Khepri web (SvelteKit) on Cloudflare Workers with static assets.
+// Hosting plan, routing and cut-over: docs/architecture/hosting-cloudflare.md.
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "khepri-web",
+	"main": ".svelte-kit/cloudflare/_worker.js",
+	"compatibility_date": "2026-10-28",
+	"compatibility_flags": ["nodejs_compat"],
+	"assets": {
+		"binding": "ASSETS",
+		"directory": ".svelte-kit/cloudflare"
+	},
+	"observability": {
+		"enabled": true
+	},
+	// The workers.dev URL is for trying a build before kheprios.com moves over.
+	// Production routes are added once the kheprios.com zone is on Cloudflare:
+	//   "routes": [{ "pattern": "kheprios.com/*", "zone_name": "kheprios.com" },
+	//              { "pattern": "www.kheprios.com/*", "zone_name": "kheprios.com" }]
+	"workers_dev": true,
+	"vars": {
+		// north-client's JSON API as the Worker reaches it.
+		"NORTH_API_URL": "https://kheprios.com/api/v1",
+		// Where requests for Go-owned paths (/api/v1, /mcp, /oauth/token, …) are
+		// passed through to. Unset means no passthrough (local dev).
+		"GO_ORIGIN": "https://kheprios.com",
+		// Same values as the Go deployment (apps/khepri/web in the infra repo).
+		"APPLE_TEAM_ID": "84X9WYBF36",
+		"APPLE_BUNDLE_ID": "com.fernandocorreia.khepri,com.fernandocorreia.khepri.beta",
+		"POSTHOG_HOST": "https://us.i.posthog.com"
+		// POSTHOG_API_KEY is set per environment (it is public, but differs by project).
+	}
+}

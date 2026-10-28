@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { expect, test } from '@playwright/test';
-import { apiUrl, createUser, password, signIn } from './helpers';
+import { apiUrl, createUser, password, signIn, webHost } from './helpers';
 
 // The auth port: sign-in, sign-up, password recovery, onboarding, sign-out and
 // the MCP consent screen. Google and passkeys need a real provider or device,
@@ -34,7 +34,7 @@ test('login: success honours next, and the page offers what the API enables', as
 test('login: a next pointing off-site is ignored', async ({ page, request }) => {
 	const user = await createUser(request);
 	await signIn(page, user, '//evil.example/');
-	await expect(page).toHaveURL(/localhost:5173\/app/);
+	await expect(page).toHaveURL(new RegExp(`${webHost}/app`));
 });
 
 test('signup: a field error, then an account that lands in onboarding', async ({ page }) => {
@@ -164,7 +164,7 @@ test('consent: an unregistered destination is shown, never redirected to', async
 	expect(res?.status()).toBe(400);
 	expect(res?.headers()['x-frame-options']).toBe('DENY');
 	await expect(page.getByText('That request cannot be completed')).toBeVisible();
-	await expect(page).toHaveURL(/localhost:5173\/oauth\/authorize/);
+	await expect(page).toHaveURL(new RegExp(`${webHost}/oauth/authorize`));
 });
 
 test('consent: create the account on the screen, then approve', async ({ page, request }) => {

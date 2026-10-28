@@ -1,6 +1,6 @@
 import { execFileSync } from 'node:child_process';
 import { expect, test } from '@playwright/test';
-import { createUser, signIn, type TestUser } from './helpers';
+import { createUser, signIn, webUrl, type TestUser } from './helpers';
 
 // The header widgets: the agent pill and the awards unlock host.
 
@@ -77,6 +77,8 @@ test('the settings push row stays hidden when push is not configured', async ({
 });
 
 test('a browserApi write is detected without the page announcing it', async ({ page, request }) => {
+	// The page script imports a source module, which only vite dev serves.
+	test.skip(webUrl !== 'http://localhost:5173', 'needs vite dev');
 	const user = await createUser(request);
 	await signIn(page, user, '/app/overview');
 	await expect(page.getByRole('heading', { name: /Hello/ })).toBeVisible();

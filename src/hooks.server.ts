@@ -3,7 +3,8 @@ import { createApi } from '#lib/api/client.js';
 import { isApiError } from '#lib/api/errors.js';
 import { isLocale, negotiate } from '#lib/i18n/locales.js';
 import { defaultAppearance, isAppearance } from '#lib/theme.js';
-import { apiBaseUrl } from '#lib/server/config.js';
+import { apiBaseUrl, goOrigin } from '#lib/server/config.js';
+import { isGoPath, toGo } from '#lib/server/edge.js';
 import { clearSession, readSession } from '#lib/server/session.js';
 import { readAppearanceCookie, readLocaleCookie } from '#lib/server/preferences.js';
 
@@ -12,6 +13,10 @@ import { readAppearanceCookie, readLocaleCookie } from '#lib/server/preferences.
 // Go pages. The account's own settings win over a visitor's cookies, which
 // win over the browser's Accept-Language.
 export const handle: Handle = async ({ event, resolve }) => {
+	// Paths north-client still owns go straight to it, untouched (edge.ts).
+	const origin = goOrigin();
+	if (origin && isGoPath(event.url.pathname)) return toGo(event.request, origin);
+
 	const token = readSession(event.cookies);
 	const proxied = event.url.pathname.startsWith('/api/');
 
