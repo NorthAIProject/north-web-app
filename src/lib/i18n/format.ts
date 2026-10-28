@@ -6,12 +6,15 @@ import { usesDecimalComma } from './locales';
 // Float arguments come out with the locale's decimal separator, as Go's
 // i18n.localizeArgs does. Integers and strings are untouched.
 
-const verb = /%(?:\[(\d+)\])?([-+# 0]*)(\d+)?(?:\.(\d+))?([sdvqgfeTt%])/g;
+// Go takes an explicit argument index either right after the % ("%[1].1f") or
+// right before the verb ("%.1[1]f"); the catalogues use both.
+const verb = /%(?:\[(\d+)\])?([-+# 0]*)(\d+)?(?:\.(\d+))?(?:\[(\d+)\])?([sdvqgfeTt%])/g;
 
 export function sprintf(locale: string, format: string, args: unknown[]): string {
 	let next = 0;
-	return format.replace(verb, (match, index, _flags, _width, precision, kind: string) => {
+	return format.replace(verb, (match, lead, _flags, _width, precision, trail, kind: string) => {
 		if (kind === '%') return '%';
+		const index = trail ?? lead;
 		const at = index ? Number(index) - 1 : next;
 		next = at + 1;
 		if (at >= args.length) return `%!${kind}(MISSING)`;

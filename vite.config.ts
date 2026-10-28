@@ -25,6 +25,10 @@ export default defineConfig({
 			extensions: ['.svelte', '.svx', '.md']
 		})
 	],
+	ssr: {
+		// LayerChart ships .svelte files that Node cannot import as-is during SSR.
+		noExternal: ['layerchart']
+	},
 	server: {
 		port: 5173,
 		strictPort: true
