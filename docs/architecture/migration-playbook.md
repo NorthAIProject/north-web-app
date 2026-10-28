@@ -93,6 +93,36 @@ Go code (not the catalogue), port the logic to a helper with the same keys. Date
 - Wide pages (Go `layout.AppWide`): return `{ wide: true }` from the page's load.
 - Feature components take typed data and callbacks; no API URLs inside presentational components.
 
+## Libraries
+
+UI primitives come from shadcn-svelte (https://shadcn-svelte.com/docs/installation/sveltekit).
+A primitive that is missing from `src/lib/components/ui/` is added with
+`bun x shadcn-svelte@latest add <name>`, then restyled to the templUI look. Do not hand-write it.
+If the CLI would install a new npm package for it (Drawer → vaul-svelte, Resizable → paneforge,
+Data Table → TanStack Table), treat it like the libraries below.
+Charts use shadcn-svelte's Chart (LayerChart); Go's ECharts charts stay on
+`components/khepri/EChart.svelte`. Client-side fetching that polls, caches or shares state
+uses TanStack Query (`@tanstack/svelte-query`).
+
+The ecosystem picks below are added only when a feature actually needs one. During a feature
+port, **do not `bun add` packages** (parallel agents race on `bun.lock`). Where one would fit,
+list it under "Library candidates" in `docs/migration/<feature>.md`, saying where and why. They are
+installed in one pass at the end.
+
+| Need | Library |
+| --- | --- |
+| Motion / transitions | Motion (or `svelte/motion` and `svelte/transition`, built in) |
+| Advanced timeline animation | GSAP |
+| Headless components | Bits UI (already in), Melt UI |
+| Interactive charts | LayerChart (via shadcn Chart), ECharts |
+| Node/graph editors | Svelte Flow |
+| Complex tables | TanStack Table (shadcn Data Table) |
+| Maps | MapLibre GL, deck.gl |
+| 3D | Threlte (three is already in) |
+| Drag and drop | svelte-dnd-action |
+| Resizable panels | Paneforge (shadcn Resizable) |
+| Icons | `@lucide/svelte` (already in) |
+
 ## Done means
 
 1. Every Go route of the feature (page + every form/htmx endpoint it serves) has a SvelteKit
