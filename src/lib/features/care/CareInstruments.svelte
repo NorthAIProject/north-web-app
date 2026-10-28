@@ -5,7 +5,9 @@
 	import KpiStrip from '#lib/components/khepri/KpiStrip.svelte';
 	import KpiCell from '#lib/components/khepri/KpiCell.svelte';
 	import { useI18n } from '#lib/i18n/index.js';
-	import { habitGaugeOption, hydrationOption, sleepOption } from './charts.js';
+	import { SpecChart } from '#lib/components/ui/chart/index.js';
+	import { bar, singleLine } from '#lib/features/viz/chartjs.js';
+	import { gaugeOption } from '#lib/features/viz/echarts.js';
 	import { litres, sleepDuration, type Care } from './format.js';
 
 	let { care }: { care: Care } = $props();
@@ -44,7 +46,14 @@
 		</Card.Header>
 		<Card.Content>
 			{#if hasHydration}
-				<EChart id="care-hydration" option={hydrationOption(care.waterWeek)} class="min-h-48 w-full" />
+				<SpecChart
+					{...bar(
+						'care-hydration',
+						'Water (ml)',
+						care.waterWeek.map((p) => p.label),
+						care.waterWeek.map((p) => p.value)
+					)}
+				/>
 			{:else}
 				<p class="text-muted-foreground text-sm">{i18n.t('care.inst.hydration.empty')}</p>
 			{/if}
@@ -56,7 +65,14 @@
 		</Card.Header>
 		<Card.Content>
 			{#if hasSleep}
-				<EChart id="care-sleep" option={sleepOption(care.sleepWeek)} class="min-h-48 w-full" />
+				<SpecChart
+					{...singleLine(
+						'care-sleep',
+						'Hours',
+						care.sleepWeek.map((p) => p.label),
+						care.sleepWeek.map((p) => p.value)
+					)}
+				/>
 			{:else}
 				<p class="text-muted-foreground text-sm">{i18n.t('care.inst.sleep.empty')}</p>
 			{/if}
@@ -68,7 +84,7 @@
 		</Card.Header>
 		<Card.Content>
 			{#if hasHabits}
-				<EChart id="care-habit-gauge" option={habitGaugeOption(care.habitRate)} class="min-h-40 w-full" />
+				<EChart id="care-habit-gauge" option={gaugeOption('Adherence', care.habitRate)} class="min-h-40 w-full" />
 			{:else}
 				<p class="text-muted-foreground text-sm">{i18n.t('care.inst.habits.empty')}</p>
 			{/if}
