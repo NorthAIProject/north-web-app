@@ -15,7 +15,9 @@
 		"test:unit": "vitest",
 		"test": "npm run test:unit -- --run",
 		"storybook": "storybook dev -p 6006",
-		"build-storybook": "storybook build"
+		"build-storybook": "storybook build",
+		"api:types": "openapi-typescript ${NORTH_OPENAPI:-../north-client-api/docs/api/openapi.yaml} -o src/lib/api/generated/schema.d.ts",
+		"test:e2e": "playwright test"
 	},
 	"devDependencies": {
 		"@chromatic-com/storybook": "latest",
