@@ -7,8 +7,9 @@ export default defineConfig({
 	testDir: 'tests/e2e',
 	fullyParallel: true,
 	// Each run cleans its output dir first, so concurrent runs (several specs at
-	// once) need their own or they delete each other's artefacts mid-test.
-	outputDir: `test-results/run-${process.pid}`,
+	// once) need their own or they delete each other's artefacts mid-test. Workers
+	// re-load this file in their own processes, so the id travels in the env.
+	outputDir: `test-results/run-${(process.env.PW_RUN_ID ??= String(process.pid))}`,
 	timeout: 30_000,
 	use: {
 		baseURL: process.env.WEB_URL ?? 'http://localhost:5173',
