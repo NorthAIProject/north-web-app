@@ -183,6 +183,184 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/auth/options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Which optional sign-in methods this deployment has switched on */
+        get: operations["getAuthOptions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/reset-password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Set a new password from an emailed reset link, and sign in
+         * @description The token is the `token` query parameter of the emailed
+         *     `/reset-password?token=…` link. Every other session of the account is
+         *     revoked. 404 when this deployment cannot deliver reset mail.
+         */
+        post: operations["resetPassword"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/google/start": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Begin Google's web redirect flow for a front end that serves the callback
+         * @description Returns Google's consent URL and the opaque state. The front end keeps
+         *     the state (an HttpOnly cookie, ten minutes) and compares it with the
+         *     callback's `state` before calling /auth/google/code. The client secret
+         *     stays on the server. 404 when Google web sign-in is not configured.
+         */
+        post: operations["startGoogleWebSignIn"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/google/code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Exchange the callback's code, find or create the account, and sign in
+         * @description Links an existing account with the same email, as the Go callback does.
+         */
+        post: operations["finishGoogleWebSignIn"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/oauth/authorize": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Park an MCP OAuth authorization request for the consent screen
+         * @description The query string of `/oauth/authorize`, as JSON. 201 parks it and returns
+         *     the verifier the front end keeps in its `north_oauth_req` cookie
+         *     (HttpOnly, path /oauth). 200 with `redirect` means the request was bad in
+         *     a way the client should hear about: send the browser there. 400 means
+         *     it was too bad to redirect anywhere; show `error.message`.
+         */
+        post: operations["beginMCPAuthorization"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/oauth/requests/{requestID}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A parked authorization request, for the consent screen */
+        get: operations["getMCPConsentRequest"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/oauth/requests/{requestID}/account": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create an account or sign in from the consent screen
+         * @description mode signup (default) creates an onboarded account, as the Go screen
+         *     does; mode login signs in. Returns a session like every sign-in route.
+         */
+        post: operations["consentAccount"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/oauth/requests/{requestID}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Approve a parked request as the signed-in user */
+        post: operations["approveMCPConsent"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/oauth/requests/{requestID}/deny": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Refuse a parked request */
+        post: operations["denyMCPConsent"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/conversations": {
         parameters: {
             query?: never;
@@ -221,6 +399,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/conversations/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Thread count and this week's messages, for the coach page */
+        get: operations["getCoachStats"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/conversations/{id}/attachments/{mediaID}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["ConversationID"];
+                mediaID: string;
+            };
+            cookie?: never;
+        };
+        /**
+         * Redirect to a file a turn carried
+         * @description Answers 302 to a short-lived URL for the stored file. Only this account's files resolve.
+         */
+        get: operations["getChatAttachment"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/conversations/{id}/reply": {
         parameters: {
             query?: never;
@@ -242,6 +460,7 @@ export interface paths {
          *     | `token`     | `ReplyTokenEvent`            |
          *     | `exercises` | `ReplyExercisesEvent`        |
          *     | `approval`  | `Approval`                   |
+         *     | `status`    | `ReplyStatusEvent`           |
          *     | `error`     | `ReplyErrorEvent`            |
          *     | `done`      | `ReplyDoneEvent`, always last |
          *
@@ -340,6 +559,43 @@ export interface paths {
         /** Say whether a coach reply helped */
         put: operations["rateMessage"];
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/voice": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Whether this server can transcribe dictation, and its limits */
+        get: operations["getVoiceCapabilities"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/voice/transcribe": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Turn a recording into text for a text box
+         * @description Answers with the words only; nothing is submitted. Spends the voice capture quota. Silence answers 422 with a message to show.
+         */
+        post: operations["transcribeVoice"];
         delete?: never;
         options?: never;
         head?: never;
@@ -465,7 +721,8 @@ export interface paths {
             };
             cookie?: never;
         };
-        get?: never;
+        /** One agent connection (polled while waiting for its first use) */
+        get: operations["getConnection"];
         put?: never;
         post?: never;
         /** Revoke an agent's token */
@@ -648,6 +905,23 @@ export interface paths {
         };
         /** The last intake, for prefilling a new one */
         get: operations["getLatestIntake"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/training/overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** This week's latest workout and the body's readiness, for the plan page */
+        get: operations["getTrainingOverview"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1281,6 +1555,68 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/reports/generate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Ask for this week's review now
+         * @description Creates or reuses this week's review and queues writing it. Answers at once with the report, pending until the text is written. A 409 with code cooldown means one was already generated this hour.
+         */
+        post: operations["generateReport"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/reports/briefing": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Ask for today's briefing now
+         * @description Queues today's daily briefing, as the dashboard button does. A 409 with code cooldown means one was already generated this hour.
+         */
+        post: operations["generateBriefing"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/reports/{reportID}/regenerate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                reportID: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Write a report again
+         * @description Queues the report's week again. The answer may be a different report, the one now being written in its place. A 409 carries code archived (the report is archived) or cooldown (generated this hour).
+         */
+        post: operations["regenerateReport"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/reports/{reportID}/archive": {
         parameters: {
             query?: never;
@@ -1331,6 +1667,25 @@ export interface paths {
         put?: never;
         /** Tell the coach something to remember */
         post: operations["createMemory"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/memories/for/{conversationID}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                conversationID: string;
+            };
+            cookie?: never;
+        };
+        /** What the coach proposed to remember from one conversation, still waiting for a verdict */
+        get: operations["listConversationMemories"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -1473,6 +1828,43 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/knowledge/passages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The passages a coach reply cited
+         * @description Resolves a message's evidenceRefs. Only chunk refs resolve, and only the caller's own; refs that no longer resolve are left out.
+         */
+        get: operations["knowledgePassages"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/knowledge/retry-embeddings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Queue meaning search for passages still waiting on it */
+        post: operations["retryKnowledgeEmbeddings"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/knowledge/notes": {
         parameters: {
             query?: never;
@@ -1595,6 +1987,28 @@ export interface paths {
         };
         /** One form check, with its result once done */
         get: operations["getFormCheck"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/media/{mediaID}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                mediaID: string;
+            };
+            cookie?: never;
+        };
+        /**
+         * A short-lived signed link to one of your stored files
+         * @description The web's /app/media/{id} as JSON. Photos, progress photos and form clips; fetch the bytes from url directly.
+         */
+        get: operations["getMediaLink"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2231,6 +2645,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/nutrition/log/meal-options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The meals that can be logged today, as the web log page's picker offers them
+         * @description Every option of every meal of each plan, labelled "Plan – Meal · Option". A plan with a day for today offers only that day; one without offers all its days, labelled with the weekday. An optional meal says so.
+         */
+        get: operations["listLoggableMeals"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/nutrition/log/ingredients": {
         parameters: {
             query?: never;
@@ -2408,6 +2842,42 @@ export interface paths {
         put?: never;
         /** Dismiss a notification */
         post: operations["dismissNudge"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/settings/vault": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The linked notes-vault folder (local/dev deployments only) */
+        get: operations["getVault"];
+        /** Link a vault folder on the server's own filesystem and queue a sync */
+        put: operations["connectVault"];
+        post?: never;
+        /** Unlink the vault folder */
+        delete: operations["disconnectVault"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/settings/vault/sync": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Queue a vault sync now */
+        post: operations["syncVault"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2805,6 +3275,28 @@ export interface paths {
          * @description Names and descriptions come in the request's language. Locked badges carry `progress`.
          */
         get: operations["getAwards"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/profiles/{handle}/awards": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                handle: string;
+            };
+            cookie?: never;
+        };
+        /**
+         * One person's awards as you may see them
+         * @description The web's awards page for a handle. Your own handle gets locked badges and the month's challenge too; anyone else's gets their public badges and monthly medals, only when they share awards (`shared`). An unknown handle or a block either way is 404.
+         */
+        get: operations["getPersonAwards"];
         put?: never;
         post?: never;
         delete?: never;
@@ -3300,7 +3792,7 @@ export interface paths {
             };
             cookie?: never;
         };
-        /** The crew behind a join link */
+        /** The crew behind a join link. Public, for the signed-out landing page. */
         get: operations["previewCrew"];
         put?: never;
         /** Join a crew by its link; joining twice changes nothing */
@@ -3385,6 +3877,73 @@ export interface paths {
         put?: never;
         /** Accept the current community terms */
         post: operations["acceptModerationTerms"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ops/moderation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The operator queue of open reports
+         * @description Every subject with open reports, oldest first. Only for operators (OPERATOR_USER_IDS); anyone else gets 404.
+         */
+        get: operations["getModerationQueue"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ops/moderation/users/{userID}/suspend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userID: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Stop someone posting
+         * @description For `hours`, or until lifted when it is 0 or absent. Operators only; anyone else gets 404.
+         */
+        post: operations["suspendUser"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ops/moderation/{kind}/{subjectID}/{action}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                kind: string;
+                subjectID: string;
+                /** @description hide, unhide or dismiss. */
+                action: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Decide a reported subject
+         * @description Every decision closes the subject's open reports; hide and unhide also change what people see. Operators only; anyone else gets 404.
+         */
+        post: operations["decideModerationReport"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3727,6 +4286,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/social/phone/countries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The calling codes offered beside a national number
+         * @description defaultDial is read from the account's timezone and language (empty when neither says). name is English; show social.country.<dial> from the catalogue when there is one.
+         */
+        get: operations["getPhoneCountries"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/social/phone/verification": {
         parameters: {
             query?: never;
@@ -3809,6 +4388,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/social/facebook/web": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Begin connecting Facebook from a web Friends page
+         * @description Returns Facebook's consent URL and the OAuth state. The web front end keeps the state in its own short-lived cookie (expiresIn seconds), sends the browser to url, and on /app/friends/facebook/callback compares the returned state before posting the code to /social/facebook/web/callback. 404 when this deployment has no Meta app.
+         */
+        post: operations["startFacebookWeb"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/social/facebook/web/callback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Finish a web Facebook connection with the code Facebook returned
+         * @description Connects the Facebook account behind code and imports which of its friends are here. 409 when that Facebook account is connected to another Khepri account.
+         */
+        post: operations["finishFacebookWeb"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/social/facebook/callback": {
         parameters: {
             query?: never;
@@ -3841,6 +4460,63 @@ export interface paths {
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/news/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The news ticker switch and the feeds you follow */
+        get: operations["getNewsSettings"];
+        /** Turn the news ticker on or off */
+        put: operations["setNewsSettings"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/news/feeds": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Follow an RSS or Atom feed
+         * @description A refused address is 422 with `fields.url`.
+         */
+        post: operations["addNewsFeed"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/news/feeds/{feedID}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                feedID: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Stop following a feed; one already gone is still 204 */
+        delete: operations["removeNewsFeed"];
         options?: never;
         head?: never;
         patch?: never;
@@ -4069,6 +4745,60 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/insights/sleep": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The sleep page — nights, schedule, stages and extremes, localised
+         * @description The web's sleep view. /stats/sleep carries the same numbers raw; this is the rows, bars and chart a page draws. 404 when stats are not available.
+         */
+        get: operations["getInsightsSleep"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/insights/cardio": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The cardio page — sessions, weekly volume, kinds, runs and heart, localised */
+        get: operations["getInsightsCardio"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/insights/patterns": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The patterns page — what moves with what in your logs, localised */
+        get: operations["getInsightsPatterns"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/insights/areas": {
         parameters: {
             query?: never;
@@ -4181,6 +4911,97 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/fitness/strava/connect/web": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Begin connecting Strava from the web app
+         * @description Returns Strava's consent URL, sending Strava back to the web app's own /app/fitness/strava/callback page (callbackUrl, absolute). That page finishes with /fitness/strava/connect/web/finish.
+         */
+        post: operations["connectStravaWeb"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/fitness/strava/connect/web/finish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Finish a web Strava connection with the callback's state and code
+         * @description The state must have been issued to the signed-in person.
+         */
+        post: operations["finishStravaWeb"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/fitness/hub": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The web fitness hub - week, recent sessions, cards and Strava status */
+        get: operations["getFitnessHub"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/fitness/activities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The Strava activities page - training trend and one page of sessions */
+        get: operations["getFitnessActivities"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/fitness/activities/sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One page of imported Strava sessions, newest first */
+        get: operations["listFitnessActivitySessions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health/samples": {
         parameters: {
             query?: never;
@@ -4226,10 +5047,31 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /** The choices the first-run questionnaire offers */
+        get: operations["getOnboardingForm"];
         put?: never;
         /** Save first-run answers and open the first coach thread */
         post: operations["completeOnboarding"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/onboarding/skip": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Finish onboarding without answers
+         * @description Idempotent; an onboarded account comes back unchanged.
+         */
+        post: operations["skipOnboarding"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4248,6 +5090,81 @@ export interface paths {
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The web overview page for a time range
+         * @description The Today snapshot plus what only the web overview draws (chart series, the plan's next session, the check-in version its live region polls with). /today keeps its shape for the app.
+         */
+        get: operations["getOverview"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/overview/version": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The check-in fingerprint, for polling whether the overview's Today card changed */
+        get: operations["getOverviewVersion"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/push/config": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Whether Web Push is available, its VAPID key, and how many of your browsers listen */
+        get: operations["getPushConfig"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/push/subscriptions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Keep a browser's Web Push subscription (PushSubscription.toJSON())
+         * @description Unknown fields are allowed. 404 when this deployment does not send Web Push.
+         */
+        post: operations["subscribeWebPush"];
+        /** Forget one browser's subscription; an endpoint already gone is still 204 */
+        delete: operations["unsubscribeWebPush"];
         options?: never;
         head?: never;
         patch?: never;
@@ -4279,6 +5196,28 @@ export interface paths {
         };
         /** Trend cards for the Overview — weight, blood pressure, energy, sleep, caffeine, recent fasts */
         get: operations["getDayTrends"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/day/checkin": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The streak tile alone, for a live poll
+         * @description The streak and today's check-in. Pass the version the client holds as
+         *     `v`; when nothing changed the answer is 204 with no body, so polling
+         *     every 20 seconds costs one small query.
+         */
+        get: operations["getDayCheckIn"];
         put?: never;
         post?: never;
         delete?: never;
@@ -4623,6 +5562,23 @@ export interface paths {
         };
         /** The last workout's sets for each exercise asked about */
         get: operations["getLastLifts"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/lifts/today": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Today's sets and recently done exercise names, for a set logger */
+        get: operations["getLiftsToday"];
         put?: never;
         post?: never;
         delete?: never;
@@ -5221,6 +6177,21 @@ export interface components {
             /** Format: date-time */
             importedAt?: string;
         };
+        FacebookWebStart: {
+            url: string;
+            state: string;
+            expiresIn: number;
+        };
+        FacebookWebCode: {
+            code: string;
+        };
+        PhoneCountries: {
+            defaultDial: string;
+            countries: {
+                dial: string;
+                name: string;
+            }[];
+        };
         FacebookConnect: {
             authorizeUrl: string;
         };
@@ -5430,6 +6401,8 @@ export interface components {
             choice?: "lighter" | "keep";
             /** @description Who chose, person or coach, as an open string. coach is a low morning the coach lightened itself; undo it with PUT choice=keep. */
             source?: string;
+            /** @description Today's coach message already speaks about recovery with the same answers, so the web card stays out of the way. Absent means false. */
+            covered?: boolean;
         };
         FirstWeek: {
             /** @description active, finished, skipped, abandoned, or none when the person never had a first week. An open string. */
@@ -5745,6 +6718,46 @@ export interface components {
             locked: components["schemas"]["AwardView"][];
             /** @description This local month's challenge, created on first view. `earned` also lists monthly medals, with the badges, oldest first; counts such as "N of 31" stay badges only. */
             monthlyChallenge?: components["schemas"]["MonthlyChallengeView"];
+            /** @description Your own handle; absent when you have none. */
+            handle?: string;
+        };
+        PersonAwards: {
+            displayName: string;
+            handle: string;
+            self: boolean;
+            /** @description Whether the person shows their awards; always true for your own. When false, earned and locked are empty. */
+            shared: boolean;
+            earned: components["schemas"]["AwardView"][];
+            /** @description Only on your own page. */
+            locked: components["schemas"]["AwardView"][];
+            /** @description Only on your own page. */
+            monthlyChallenge?: components["schemas"]["MonthlyChallengeView"];
+        };
+        ModerationQueue: {
+            reports: components["schemas"]["ModerationReportGroup"][];
+        };
+        ModerationReportGroup: {
+            /** @description The subject's kind, such as crew_message. Open-ended. */
+            kind: string;
+            /** Format: uuid */
+            subjectId: string;
+            /** Format: uuid */
+            authorId?: string;
+            reasons: {
+                reason: string;
+                count: number;
+            }[];
+            count: number;
+            hidden: boolean;
+            excerpt: string;
+            /** Format: date-time */
+            firstAt: string;
+            /** @description The decisions offered, in order. Open strings (hide, unhide, dismiss today). */
+            actions: string[];
+        };
+        SuspendRequest: {
+            /** @description 0 or absent suspends until lifted. */
+            hours?: number;
         };
         UnseenAwards: {
             awards: components["schemas"]["AwardView"][];
@@ -6103,10 +7116,17 @@ export interface components {
             days: number;
             findings: components["schemas"]["StatsFinding"][];
         };
+        LiftToday: {
+            /** @description Sets logged since local midnight, oldest first. */
+            sets: components["schemas"]["LiftSet"][];
+            /** @description Exercise names done in the last fortnight, most recent first. */
+            recent: string[];
+        };
         LiftSetInput: {
             exerciseName: string;
             /** @description The catalog slug, when the exercise came from the catalog. */
             exerciseSlug?: string;
+            /** @description 1 to 50. 0 asks the server to number it as the next set of this exercise today and, when exerciseSlug is absent, to match the name to the catalog (the web set logger's behaviour). */
             setNumber: number;
             /** @description 0 for bodyweight. */
             weightKg: number;
@@ -6323,6 +7343,11 @@ export interface components {
             pose: string;
             /** @description A signed link to the private photo, valid for two hours. */
             url: string;
+            /**
+             * Format: uuid
+             * @description The stored photo, for linking it through GET /media/{mediaID}, which signs a fresh link each time.
+             */
+            mediaId: string;
         };
         ProgressCheck: {
             /** Format: uuid */
@@ -6703,6 +7728,37 @@ export interface components {
             milestones: components["schemas"]["DayMilestone"][];
             timeline: components["schemas"]["DayTimelineEntry"][];
             markers: components["schemas"]["DayMarker"][];
+            /** @description The timeline from the evening before the date to the small hours after it, for a rail that shows nearby entries faded beside the date. Absent when only the date itself was read. */
+            around?: components["schemas"]["DayTimelineEntry"][];
+            /** @description Every fast touching that wider window, for the rail's bands. */
+            fasts?: components["schemas"]["DayFast"][];
+            checkIn?: components["schemas"]["DayStreakTile"];
+            presets?: components["schemas"]["DayPresets"];
+        };
+        /** @description The streak card's face. Send version back to GET /day/checkin as ?v=; an unchanged tile answers 204. */
+        DayStreakTile: {
+            streak: number;
+            version: string;
+            today?: components["schemas"]["DayTodayCheckIn"];
+        };
+        /** @description Today's check-in; absent until there is one. */
+        DayTodayCheckIn: {
+            mood: number;
+            energy: number;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        /** @description The quick-add choices. Keys are open strings. */
+        DayPresets: {
+            caffeine: {
+                key: string;
+                mg: number;
+            }[];
+            supplements: {
+                key: string;
+                name: string;
+            }[];
+            sorenessRegions: string[];
         };
         /** @description Absent fields were not measured. */
         DayVitals: {
@@ -6784,6 +7840,8 @@ export interface components {
             detail?: string;
             href?: string;
             icon: string;
+            /** @description The caffeine preset a drink was logged from (espresso, coffee…), so a client can name it in the reader's language. An open string; absent for anything else. */
+            presetKey?: string;
         };
         DayMarker: {
             kind: string;
@@ -7148,6 +8206,94 @@ export interface components {
              */
             firstWeekTemplate?: string;
         };
+        AuthOptionsResponse: {
+            /** @description Google web sign-in (/auth/google/start) is configured. */
+            google: boolean;
+            passkey: boolean;
+            /** @description Reset mail can be delivered; hide "forgot password" when false. */
+            passwordReset: boolean;
+        };
+        ResetPasswordRequest: {
+            token: string;
+            password: string;
+            passwordConfirmation: string;
+        };
+        GoogleStartRequest: {
+            /**
+             * @description The front end's https://<host>/auth/google/callback (http only on
+             *     localhost). Empty means this server's own callback.
+             */
+            redirectUri?: string;
+        };
+        GoogleStartResponse: {
+            url: string;
+            state: string;
+        };
+        GoogleCodeRequest: {
+            code: string;
+            /** @description The same redirectUri the flow was started with. */
+            redirectUri?: string;
+        };
+        MCPAuthorizeRequest: {
+            clientId?: string;
+            redirectUri?: string;
+            responseType?: string;
+            state?: string;
+            scope?: string;
+            codeChallenge?: string;
+            codeChallengeMethod?: string;
+            resource?: string;
+            /** @description Whether the browser had a session. Analytics only. */
+            signedIn?: boolean;
+        };
+        MCPAuthorizeResponse: {
+            request?: components["schemas"]["MCPConsentRequest"];
+            /** @description The north_oauth_req cookie value; quote it back on every consent call. */
+            verifier?: string;
+            /** @description Set instead of request when the browser goes back to the client. */
+            redirect?: string;
+        };
+        MCPConsentRequest: {
+            /** Format: uuid */
+            id: string;
+            /** @description Chosen by the client's registrant; always show beside redirectHost. */
+            clientName: string;
+            redirectHost: string;
+            isLoopback: boolean;
+            readOnlyRequested: boolean;
+            accountCreated: boolean;
+            /** Format: date-time */
+            expiresAt: string;
+        };
+        MCPConsentAccountRequest: {
+            verifier: string;
+            /** @description signup (default) or login, as an open string. */
+            mode?: string;
+            email: string;
+            password: string;
+            displayName?: string;
+            timezone?: string;
+        };
+        MCPConsentDecisionRequest: {
+            verifier: string;
+            /** @description Narrow the grant to read access. Cannot widen it. */
+            readOnly?: boolean;
+        };
+        MCPConsentDecisionResponse: {
+            redirect: string;
+        };
+        OnboardingFormResponse: {
+            needsOnboarding: boolean;
+            /** @description Open strings, in the order offered. */
+            focusAreas: string[];
+            coachingStyles: string[];
+            /** @description Completing starts a first week; offer firstWeekTemplates. */
+            firstWeek: boolean;
+            firstWeekTemplates: string[];
+        };
+        OnboardingSkipResponse: {
+            user: components["schemas"]["User"];
+        };
         OnboardingResponse: {
             user: components["schemas"]["User"];
             /**
@@ -7159,6 +8305,76 @@ export interface components {
         TodayResponse: {
             user: components["schemas"]["User"];
             snapshot: components["schemas"]["TodaySnapshot"];
+        };
+        OverviewResponse: {
+            snapshot: components["schemas"]["TodaySnapshot"];
+            newsTickerEnabled: boolean;
+            /** @description Opaque; compare with /overview/version. */
+            checkInVersion: string;
+            /**
+             * Format: uuid
+             * @description The active training plan; absent without one.
+             */
+            planId?: string;
+            nextSession?: components["schemas"]["OverviewPlanDay"];
+            doneToday?: components["schemas"]["OverviewPlanDay"];
+            /** @description nextSession falls on the reader's local today. */
+            sessionToday: boolean;
+            /** @description Mood and energy per chart bucket; 0 is no check-in. */
+            checkIns: {
+                label: string;
+                mood: number;
+                energy: number;
+            }[];
+            habits: {
+                hasHabits: boolean;
+                rate: number;
+                kept: number;
+                scheduled: number;
+                bestStreak: number;
+            };
+            hydrationDays: {
+                label: string;
+                totalML: number;
+                targetML: number;
+            }[];
+        };
+        OverviewPlanDay: {
+            /** @description English weekday name, as the plan stores it. */
+            weekday: string;
+            focus: string;
+            /** @description HH:MM local; absent for whenever. */
+            startTime?: string;
+            exerciseCount: number;
+        };
+        OverviewVersion: {
+            checkInVersion: string;
+        };
+        PushConfig: {
+            enabled: boolean;
+            /** @description VAPID applicationServerKey, base64url; empty when not enabled. */
+            publicKey: string;
+            devices: number;
+        };
+        WebPushSubscription: {
+            endpoint: string;
+            keys: {
+                p256dh: string;
+                auth: string;
+            };
+            /** @description The browser's user agent, for a client calling through a proxy. */
+            userAgent?: string;
+        };
+        NewsSettings: {
+            enabled: boolean;
+            feeds: {
+                /** Format: uuid */
+                id: string;
+                /** @description The feed's own name once fetched; empty before. */
+                title: string;
+                url: string;
+            }[];
+            maxFeeds: number;
         };
         TodaySnapshot: {
             range: string;
@@ -7328,6 +8544,16 @@ export interface components {
             helpful?: boolean;
             /** Format: date-time */
             createdAt: string;
+            /** @description A coach turn that called tools; the web transcript leaves it out. */
+            toolTurn?: boolean;
+            /** @description A turn nobody asked for (briefing, standing task, check-in). */
+            proactive?: boolean;
+            /** @description What sent a proactive turn; an open string ("Daily briefing", "Standing task", a skill name). */
+            sourceLabel?: string;
+            /** @description Refs to pass to GET /knowledge/passages for this reply's sources. Absent when none is a document passage. */
+            evidenceRefs?: string[];
+            /** @description How many document passages the reply drew on. */
+            sourceCount?: number;
         };
         ChatAttachment: {
             /** Format: uuid */
@@ -7346,6 +8572,35 @@ export interface components {
             name: string;
             /** @description The call in words a person can judge. */
             summary: string;
+            watch?: components["schemas"]["WatchProposal"];
+        };
+        /** @description A standing task create_watch proposes, set when its arguments parse. */
+        WatchProposal: {
+            title: string;
+            condition: string;
+            spec: string;
+            /** @description "daily" or "weekly"; an open string. */
+            cadence: string;
+            /** @description 0 (Sunday) to 6; read only for a weekly watch. */
+            weekday: number;
+            /** @description Local time of day, "8:00". */
+            clock: string;
+        };
+        CoachStats: {
+            threadCount: number;
+            messagesThisWeek: number;
+        };
+        ReplyStatusEvent: {
+            /** @description What the coach is doing while tools run, in the reader's language ("is checking your goals"). */
+            line: string;
+        };
+        VoiceCapabilities: {
+            available: boolean;
+            maxSeconds: number;
+            maxBytes: number;
+        };
+        VoiceTranscript: {
+            text: string;
         };
         ReplyRequest: {
             text?: string;
@@ -7391,6 +8646,8 @@ export interface components {
             primaryMuscles: string[];
             secondaryMuscles: string[];
             art?: components["schemas"]["ExerciseArt"];
+            /** @description Names the artwork's frames under /assets/exercises/{illustrationSlug}/frame-N.svg; absent without artwork. */
+            illustrationSlug?: string;
         };
         ExerciseArt: {
             /** @description The frames are drawn in a size×size square. */
@@ -7458,6 +8715,10 @@ export interface components {
             defaultModel?: string;
             /** @description What a key for this provider looks like. */
             keyHint?: string;
+            /** @description One line under the option, in the request's language. */
+            note?: string;
+            /** @description The backend has no public address; the person names their gateway in baseUrl. */
+            requiresBaseUrl?: boolean;
         };
         AICurrent: {
             provider: string;
@@ -7490,10 +8751,19 @@ export interface components {
             createdAt: string;
             /** Format: date-time */
             lastUsedAt?: string;
+            /** @description The client as written for a person ("Claude Code"). */
+            kindLabel: string;
+            /**
+             * Format: date-time
+             * @description Set for an OAuth grant; a past value means the token needs refreshing, not that it is gone.
+             */
+            expiresAt?: string;
         };
         ConnectionList: {
             connections: components["schemas"]["Connection"][];
             connectorUrl: string;
+            /** @description The setup for each client, in the order offered, with a placeholder where the key goes. */
+            previews: components["schemas"]["ConnectionSetup"][];
         };
         CreateConnectionRequest: {
             name: string;
@@ -7513,6 +8783,21 @@ export interface components {
             config?: string;
             export?: string;
             prompt?: string;
+            /** @description The client this setup is for (claude_code, codex, hermes, other). */
+            kind?: string;
+            kindLabel?: string;
+            safeLabel?: string;
+            safeLang?: string;
+            /** @description The configuration reading the token from an environment variable, which export sets. */
+            safe?: string;
+            safeNote?: string;
+        };
+        VaultStatus: {
+            /** @description Empty when no folder is linked. */
+            rootPath: string;
+            /** Format: date-time */
+            lastSyncAt?: string;
+            lastError?: string;
         };
         ActivityList: {
             executions: components["schemas"]["Execution"][];
@@ -7692,8 +8977,29 @@ export interface components {
             substitute?: string;
             catalogSlug?: string;
             hasArt: boolean;
+            /** @description Names the pose artwork's frames (/assets/exercises/{slug}/frame-N.svg); absent when hasArt is false. */
+            illustrationSlug?: string;
             primaryMuscles: string[];
             secondaryMuscles: string[];
+            stabilizerMuscles?: string[];
+        };
+        /** @description Each part is absent until there is something to show. */
+        TrainingOverview: {
+            recap?: components["schemas"]["LiftRecap"];
+            readiness?: components["schemas"]["TrainingReadiness"];
+        };
+        TrainingReadiness: {
+            fatigued: string[];
+            recovering: string[];
+            /** @description Muscles trained this past week that have already recovered. */
+            fresh: string[];
+            /** @description Muscles going untrained, longest gap first. */
+            stale: {
+                name: string;
+                days: number;
+            }[];
+            /** Format: date-time */
+            lastSession: string;
         };
         TrainingIntake: {
             goal: string;
@@ -7734,8 +9040,12 @@ export interface components {
             difficulty: string;
             primaryMuscles: string[];
             hasArt: boolean;
+            /** @description Names the artwork's frames under /assets/exercises/{illustrationSlug}/frame-N.svg; absent without artwork. */
+            illustrationSlug?: string;
         };
         ActivityOverview: {
+            /** @description Calories completed sessions burned since local midnight. */
+            todayCalories: number;
             active?: components["schemas"]["ActivitySession"];
             recent: components["schemas"]["ActivitySession"][];
             kinds: components["schemas"]["ActivityKind"][];
@@ -7794,6 +9104,8 @@ export interface components {
             /** Format: uuid */
             id: string;
             title: string;
+            /** @description Why the goal matters. Absent when blank. */
+            motivation?: string;
             category: string;
             /** @enum {string} */
             status: "active" | "achieved" | "paused" | "abandoned";
@@ -7808,6 +9120,8 @@ export interface components {
         GoalList: {
             goals: components["schemas"]["GoalSummary"][];
             categories: string[];
+            /** @description Open milestones past their date, across all goals. */
+            overdueMilestones?: number;
         };
         GoalDetail: components["schemas"]["GoalSummary"] & {
             motivation: string;
@@ -7868,6 +9182,8 @@ export interface components {
             restDaysHeld: number;
             /** @description Rest days the current run has spent. */
             restDaysUsed: number;
+            /** @description Length of the run before the current one. */
+            previousRun?: number;
             /** @description Every day of this week so far checked in, today checked or still open. A rest day keeps the run, not the perfect week. */
             perfectWeek: boolean;
             /** @description Monday to Sunday of the current week, always seven days. */
@@ -7910,7 +9226,7 @@ export interface components {
             stress?: number;
             sleepQuality?: number;
             tags?: string[];
-            /** @description Where the check-in was filed - ios, siri, widget or notification. Anything else is recorded as ios. */
+            /** @description Where the check-in was filed - ios, siri, widget, notification or web. Anything else is recorded as ios. */
             source?: string;
         };
         ReportSummary: {
@@ -7954,8 +9270,23 @@ export interface components {
             source: string;
             /** Format: uuid */
             sourceConversationId?: string;
+            /**
+             * Format: uuid
+             * @description Set on a proposal that would replace an existing fact; approving it retires that fact.
+             */
+            supersedesId?: string;
+            /**
+             * Format: date-time
+             * @description Set once a newer fact replaced this one. A retired fact never reaches the coach.
+             */
+            validTo?: string;
             /** Format: date-time */
             createdAt: string;
+            /** Format: date-time */
+            updatedAt?: string;
+        };
+        ConversationMemories: {
+            pending: components["schemas"]["Memory"][];
         };
         MemoryList: {
             pending: components["schemas"]["Memory"][];
@@ -7984,9 +9315,19 @@ export interface components {
             indexedAt?: string;
             /** Format: date-time */
             createdAt: string;
+            /** @description Lines the reader numbered; 0 before the first read. */
+            lineCount?: number;
+            /** @description Ready, but the text changed after it was last read. */
+            stale?: boolean;
         };
         KnowledgeDocumentDetail: components["schemas"]["KnowledgeDocument"] & {
             text: string;
+            /** @description Section markers, each with its one-based line in text. */
+            headings?: {
+                level: number;
+                text: string;
+                line: number;
+            }[];
         };
         KnowledgeList: {
             documents: components["schemas"]["KnowledgeDocument"][];
@@ -7995,9 +9336,36 @@ export interface components {
                 pending: number;
                 failed: number;
                 stale: number;
+                /** @description Passages the coach can search. */
+                chunks?: number;
+            };
+            /** @description Documents that need something done to them, worst first. */
+            problems?: {
+                /** Format: uuid */
+                documentId: string;
+                title: string;
+                /** @description failed, empty, stale, old-reader or stuck (open set). */
+                kind: string;
+                detail: string;
+            }[];
+            /** @description Passages searchable by word but not yet by meaning. */
+            embeddingGap?: number;
+            /** @description The most recent indexing pass; absent when there never was one. */
+            lastRun?: {
+                /** Format: date-time */
+                startedAt: string;
+                /** Format: date-time */
+                completedAt?: string;
+                seen: number;
+                added: number;
+                updated: number;
+                unchanged: number;
+                failed: number;
             };
         };
         KnowledgeSearchResults: {
+            /** @description A further page exists past offset+limit. */
+            hasMore?: boolean;
             hits: {
                 /** Format: uuid */
                 documentId: string;
@@ -8011,6 +9379,7 @@ export interface components {
                     matched: boolean;
                 }[];
                 startLine: number;
+                endLine?: number;
             }[];
         };
         KnowledgeNoteRequest: {
@@ -8045,6 +9414,18 @@ export interface components {
         };
         FormCheckList: {
             checks: components["schemas"]["FormCheck"][];
+        };
+        MediaLink: {
+            /** Format: uuid */
+            id: string;
+            /**
+             * Format: uri
+             * @description Short-lived signed link to the bytes.
+             */
+            url: string;
+            /** @description image, video or file. Open set. */
+            kind: string;
+            mimeType: string;
         };
         CarePoint: {
             label: string;
@@ -8413,6 +9794,16 @@ export interface components {
                 recommendation?: string;
             };
         };
+        LoggableMealList: {
+            options: {
+                /**
+                 * Format: uuid
+                 * @description The meal option's id, for POST /nutrition/log/meals.
+                 */
+                id: string;
+                label: string;
+            }[];
+        };
         Decision: {
             /** Format: uuid */
             id: string;
@@ -8471,6 +9862,8 @@ export interface components {
                 heightCm: number;
                 dateOfBirth: string;
                 sex: string;
+                /** @description The age the measurements are worked out at, today. */
+                ageYears: number;
             };
             goal?: {
                 activityLevel: string;
@@ -8484,6 +9877,11 @@ export interface components {
                 carbG: number;
                 /** Format: date-time */
                 createdAt: string;
+                /** @description Every objective's daily calories at this TDEE, in the order options.goals lists them. */
+                comparison: {
+                    goal: string;
+                    calorieGoal: number;
+                }[];
             };
             options: {
                 activityLevels: string[];
@@ -8560,6 +9958,15 @@ export interface components {
             onTrack: number;
             judged: number;
             empty: boolean;
+            /** @description The window one day at a time (a mark per metric per day); empty for a window longer than a month or not counted in days. */
+            days: {
+                label: string;
+                cells: {
+                    label: string;
+                    value: string;
+                    filled: boolean;
+                }[];
+            }[];
         };
         InsightMetric: {
             range: components["schemas"]["InsightsRange"];
@@ -8588,6 +9995,53 @@ export interface components {
             /** @description True for a metric synced from a health provider such as Apple Health. */
             health?: boolean;
             usual?: components["schemas"]["InsightsUsualRange"];
+            /** @description The web page of the domain this metric belongs to, such as /app/insights/body; empty when none. */
+            href: string;
+        };
+        InsightsStatsRow: {
+            label: string;
+            value: string;
+            note: string;
+        };
+        /** @description One horizontal bar; pct is its width, 0-100. */
+        InsightsStatsBar: {
+            label: string;
+            value: string;
+            pct: number;
+        };
+        /** @description The sleep page as the web shows it, localised. */
+        InsightsSleep: {
+            range: components["schemas"]["InsightsRange"];
+            hasData: boolean;
+            tiles: components["schemas"]["InsightsStatsRow"][];
+            nights: components["schemas"]["InsightsChart"];
+            stages: components["schemas"]["InsightsStatsBar"][];
+            schedule: components["schemas"]["InsightsStatsRow"][];
+            extremes: components["schemas"]["InsightsStatsRow"][];
+        };
+        /** @description The cardio page as the web shows it, localised. */
+        InsightsCardio: {
+            range: components["schemas"]["InsightsRange"];
+            hasData: boolean;
+            tiles: components["schemas"]["InsightsStatsRow"][];
+            weekly: components["schemas"]["InsightsChart"];
+            weeklyTitle: string;
+            kinds: components["schemas"]["InsightsStatsBar"][];
+            runs: components["schemas"]["InsightsStatsRow"][];
+            hasRuns: boolean;
+            recent: components["schemas"]["InsightsStatsRow"][];
+            heart: components["schemas"]["InsightsStatsRow"][];
+        };
+        /** @description The patterns page as the web shows it, localised. */
+        InsightsPatterns: {
+            range: components["schemas"]["InsightsRange"];
+            days: number;
+            findings: {
+                title: string;
+                detail: string;
+                a: components["schemas"]["InsightsStatsBar"];
+                b: components["schemas"]["InsightsStatsBar"];
+            }[];
         };
         /**
          * @description The latest day of a metric against the person's usual range over the 28 days before it:
@@ -8683,6 +10137,10 @@ export interface components {
             at: string;
             title: string;
             detail: string;
+            /** @description The entry's own page; absent when it has none. */
+            href?: string;
+            /** @description A lucide icon name. An open string. */
+            icon?: string;
         };
         InsightsTimelineFilter: {
             key: string;
@@ -8747,6 +10205,7 @@ export interface components {
             overdue: boolean;
         };
         InsightsTraining: {
+            lifting: components["schemas"]["InsightsLifting"];
             range: components["schemas"]["InsightsRange"];
             sessions: components["schemas"]["InsightsSession"][];
             burn: components["schemas"]["InsightsChart"];
@@ -8792,7 +10251,48 @@ export interface components {
             pct: number;
             hasPrior: boolean;
         };
+        /** @description What the window's logged sets add up to, worded as the web shows it. hasSets is false before the first set. */
+        InsightsLifting: {
+            hasSets: boolean;
+            volume: string;
+            delta: components["schemas"]["InsightsDelta"];
+            sets: number;
+            workouts: number;
+            hasWeekly: boolean;
+            weekly: components["schemas"]["InsightsChart"];
+            exercises: {
+                name: string;
+                sets: number;
+                best: string;
+                e1rm: string;
+                volume: string;
+                /** @description The estimated max's movement across the window. */
+                changeKg: number;
+            }[];
+            records: {
+                exercise: string;
+                lift: string;
+                e1rm: string;
+                gain: string;
+                on: string;
+            }[];
+            muscles: {
+                name: string;
+                sets: number;
+                /** @description Against the most-trained muscle, 0-100. */
+                pct: number;
+            }[];
+        };
+        /** @description The eating-habits section of the nutrition page. hasData is false without a logged day. */
+        InsightsEating: {
+            hasData: boolean;
+            tiles: components["schemas"]["InsightsStatsRow"][];
+            slots: components["schemas"]["InsightsStatsBar"][];
+            foods: components["schemas"]["InsightsStatsRow"][];
+            notes: components["schemas"]["InsightsStatsRow"][];
+        };
         InsightsNutrition: {
+            eating: components["schemas"]["InsightsEating"];
             range: components["schemas"]["InsightsRange"];
             avgCalories: string;
             avgProtein: string;
@@ -8848,6 +10348,8 @@ export interface components {
         };
         StravaStatus: {
             configured: boolean;
+            /** @description The connection could not be read; offer no Connect. */
+            unavailable?: boolean;
             connected: boolean;
             /** Format: date-time */
             lastSyncedAt?: string;
@@ -8858,6 +10360,157 @@ export interface components {
         };
         StravaConnect: {
             authorizeUrl: string;
+        };
+        StravaWebConnectRequest: {
+            /** @description Absolute URL of the web app's /app/fitness/strava/callback. */
+            callbackUrl: string;
+        };
+        StravaWebFinishRequest: {
+            state: string;
+            code: string;
+        };
+        StravaConnectResult: {
+            /** @description connected, expired, unverified or failed (open set). */
+            result: string;
+        };
+        FitnessHub: {
+            strava: components["schemas"]["StravaStatus"];
+            week: {
+                days: {
+                    /** Format: date */
+                    date: string;
+                    minutes: number;
+                    isToday: boolean;
+                }[];
+                sessions: number;
+                minutes: number;
+                distanceKm: number;
+                calories: number;
+            };
+            recent: {
+                activityCode: string;
+                name: string;
+                category: string;
+                source: string;
+                /** Format: date-time */
+                endedAt: string;
+                durationSeconds: number;
+                distanceKm: number;
+                calories: number;
+            }[];
+            /** @description Daily step totals, oldest first; empty when no device pushed any. */
+            steps: components["schemas"]["FitnessDayValue"][];
+            vo2: components["schemas"]["FitnessDayValue"][];
+            weight?: {
+                kg: number;
+                deltaKg?: number;
+                /** Format: date-time */
+                at: string;
+            };
+            strength?: {
+                workouts: number;
+                sets: number;
+                volumeKg: number;
+                exercises: {
+                    name: string;
+                    bestKg: number;
+                    e1rmKg: number;
+                    changeKg: number;
+                }[];
+                record?: {
+                    exercise: string;
+                    weightKg: number;
+                    reps: number;
+                    e1rmKg: number;
+                    /** Format: date */
+                    on: string;
+                };
+            };
+            cardio?: {
+                sessions: number;
+                minutes: number;
+                distanceKm: number;
+                runs: number;
+                bestPaceSeconds: number;
+                best5kSeconds: number;
+                longestKm: number;
+                restingHr: number;
+            };
+            /** Format: uuid */
+            planId?: string;
+            nextSession?: components["schemas"]["FitnessPlanDay"];
+            doneToday?: components["schemas"]["FitnessPlanDay"];
+            meals?: {
+                logged: components["schemas"]["FitnessMacros"];
+                goal: components["schemas"]["FitnessMacros"];
+            };
+            deviceReadings: string[];
+        };
+        FitnessDayValue: {
+            /** Format: date */
+            date: string;
+            value: number;
+        };
+        FitnessPlanDay: {
+            /** @description English weekday name, as the plan stores it. */
+            weekday: string;
+            startTime?: string;
+            focus?: string;
+            exerciseCount: number;
+        };
+        FitnessMacros: {
+            calories: number;
+            proteinG: number;
+            carbG: number;
+            fatG: number;
+        };
+        FitnessActivities: {
+            strava: components["schemas"]["StravaStatus"];
+            trend?: components["schemas"]["TrainingTrend"];
+            sessions?: components["schemas"]["StravaSessionPage"];
+        };
+        TrainingTrend: {
+            days: {
+                /** Format: date */
+                date: string;
+                minutes: number;
+                future: boolean;
+            }[];
+            bands: {
+                /** @description run, ride, swim, walk, strength or other (open set). */
+                family: string;
+                values: number[];
+            }[];
+            normal: number[];
+            recentMinutes: number;
+            normalMinutes: number;
+            ratio: number;
+            streakWeeks: number;
+            /** @description no_history, too_new, well_down, easier, steady, building or big_week (open set). */
+            shape: string;
+            sessions: number;
+            distanceM: number;
+            elevationM: number;
+            activeDays: number;
+            countedDays: number;
+        };
+        StravaSessionPage: {
+            sessions: {
+                /** Format: int64 */
+                stravaId?: number;
+                name: string;
+                sport: string;
+                family: string;
+                distanceM: number;
+                elevationM: number;
+                movingTimeS: number;
+                /** Format: date-time */
+                startedAt?: string;
+            }[];
+            page: number;
+            perPage: number;
+            totalPages: number;
+            total: number;
         };
         HealthSyncRequest: {
             readings?: components["schemas"]["HealthReading"][];
@@ -8907,7 +10560,7 @@ export interface components {
         };
     };
     responses: {
-        /** @description This kind of request's quota is spent for now; see Retry-After. */
+        /** @description This kind of request's quota is spent for now; see Retry-After. A quota refusal carries code `quota_exceeded`, with `fields.action` (the quota's wire name, such as coach_message) and `fields.retryAfter` (seconds). */
         TooManyRequests: {
             headers: {
                 [name: string]: unknown;
@@ -9045,6 +10698,7 @@ export interface components {
         };
     };
     parameters: {
+        MCPRequestID: string;
         /** @description next for next week; this week otherwise. */
         WeekParam: "next";
         /** @description A range key from the response's range.options (today, yesterday, week, month, quarter or year). Defaults to today. */
@@ -9256,6 +10910,236 @@ export interface operations {
             503: components["responses"]["Unavailable"];
         };
     };
+    getAuthOptions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The enabled methods */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuthOptionsResponse"];
+                };
+            };
+        };
+    };
+    resetPassword: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResetPasswordRequest"];
+            };
+        };
+        responses: {
+            200: components["responses"]["Authenticated"];
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["ValidationError"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    startGoogleWebSignIn: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["GoogleStartRequest"];
+            };
+        };
+        responses: {
+            /** @description Where to send the browser */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GoogleStartResponse"];
+                };
+            };
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["ValidationError"];
+        };
+    };
+    finishGoogleWebSignIn: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GoogleCodeRequest"];
+            };
+        };
+        responses: {
+            200: components["responses"]["Authenticated"];
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["ValidationError"];
+        };
+    };
+    beginMCPAuthorization: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MCPAuthorizeRequest"];
+            };
+        };
+        responses: {
+            /** @description Redirect the browser to the client's callback */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MCPAuthorizeResponse"];
+                };
+            };
+            /** @description Parked */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MCPAuthorizeResponse"];
+                };
+            };
+            /** @description Not redirectable; show the message */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    getMCPConsentRequest: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-OAuth-Request-Verifier": string;
+            };
+            path: {
+                requestID: components["parameters"]["MCPRequestID"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The request */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MCPConsentRequest"];
+                };
+            };
+            404: components["responses"]["NotFound"];
+        };
+    };
+    consentAccount: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                requestID: components["parameters"]["MCPRequestID"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MCPConsentAccountRequest"];
+            };
+        };
+        responses: {
+            200: components["responses"]["Authenticated"];
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["ValidationError"];
+        };
+    };
+    approveMCPConsent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                requestID: components["parameters"]["MCPRequestID"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MCPConsentDecisionRequest"];
+            };
+        };
+        responses: {
+            /** @description The client's callback with the code on it */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MCPConsentDecisionResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    denyMCPConsent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                requestID: components["parameters"]["MCPRequestID"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MCPConsentDecisionRequest"];
+            };
+        };
+        responses: {
+            /** @description The client's callback with access_denied on it */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MCPConsentDecisionResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+        };
+    };
     listConversations: {
         parameters: {
             query?: never;
@@ -9340,6 +11224,50 @@ export interface operations {
         responses: {
             /** @description Deleted */
             204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    getCoachStats: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The counters */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CoachStats"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    getChatAttachment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["ConversationID"];
+                mediaID: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Redirect to the file */
+            302: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -9479,6 +11407,72 @@ export interface operations {
             };
             401: components["responses"]["Unauthorized"];
             404: components["responses"]["NotFound"];
+        };
+    };
+    getVoiceCapabilities: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Dictation capabilities */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VoiceCapabilities"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    transcribeVoice: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /**
+                     * Format: binary
+                     * @description WAV, OGG/Opus, m4a, mp3 or webm, up to maxBytes.
+                     */
+                    audio: string;
+                    /** @description Spend label; "capture" or empty for dictation. */
+                    surface?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description The words heard */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VoiceTranscript"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            413: components["responses"]["ContentTooLarge"];
+            422: components["responses"]["ValidationError"];
+            429: components["responses"]["RateLimited"];
+            /** @description No transcriber on this server */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
         };
     };
     getExercise: {
@@ -9758,6 +11752,30 @@ export interface operations {
             };
             401: components["responses"]["Unauthorized"];
             422: components["responses"]["ValidationError"];
+        };
+    };
+    getConnection: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                connectionID: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Connection"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
         };
     };
     revokeConnection: {
@@ -10136,6 +12154,27 @@ export interface operations {
             404: components["responses"]["NotFound"];
         };
     };
+    getTrainingOverview: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TrainingOverview"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
     getPlan: {
         parameters: {
             query?: never;
@@ -10333,7 +12372,10 @@ export interface operations {
     };
     suggestExercisesForDay: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description A typed search over the catalog, among the equipment the person has; absent or empty answers with the ranked suggestions. */
+                q?: string;
+            };
             header?: never;
             path: {
                 planID: string;
@@ -10553,7 +12595,10 @@ export interface operations {
     };
     suggestReplacements: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description A typed search over the catalog, among the equipment the person has; absent or empty answers with the ranked suggestions. */
+                q?: string;
+            };
             header?: never;
             path: {
                 planID: string;
@@ -11246,6 +13291,78 @@ export interface operations {
             404: components["responses"]["NotFound"];
         };
     };
+    generateReport: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Queued */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReportDetail"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            409: components["responses"]["Conflict"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    generateBriefing: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Queued */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReportDetail"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            409: components["responses"]["Conflict"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    regenerateReport: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                reportID: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Queued */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReportDetail"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
     archiveReport: {
         parameters: {
             query?: never;
@@ -11341,6 +13458,30 @@ export interface operations {
             };
             401: components["responses"]["Unauthorized"];
             422: components["responses"]["ValidationError"];
+        };
+    };
+    listConversationMemories: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                conversationID: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConversationMemories"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
         };
     };
     updateMemory: {
@@ -11524,6 +13665,8 @@ export interface operations {
             query: {
                 q: string;
                 limit?: number;
+                /** @description Hits to skip, for the next page; see hasMore. */
+                offset?: number;
             };
             header?: never;
             path?: never;
@@ -11541,6 +13684,49 @@ export interface operations {
                 };
             };
             401: components["responses"]["Unauthorized"];
+        };
+    };
+    knowledgePassages: {
+        parameters: {
+            query?: {
+                ref?: string[];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["KnowledgeSearchResults"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    retryKnowledgeEmbeddings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Queued */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["Unauthorized"];
+            429: components["responses"]["TooManyRequests"];
         };
     };
     createKnowledgeNote: {
@@ -11764,6 +13950,30 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["FormCheck"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    getMediaLink: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                mediaID: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MediaLink"];
                 };
             };
             401: components["responses"]["Unauthorized"];
@@ -12074,6 +14284,8 @@ export interface operations {
         parameters: {
             query?: {
                 q?: string;
+                /** @description How many to return, 1–200; 60 when absent. */
+                limit?: number;
             };
             header?: never;
             path?: never;
@@ -12757,6 +14969,27 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
         };
     };
+    listLoggableMeals: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LoggableMealList"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
     logFood: {
         parameters: {
             query?: never;
@@ -13071,6 +15304,94 @@ export interface operations {
             };
             401: components["responses"]["Unauthorized"];
             404: components["responses"]["NotFound"];
+        };
+    };
+    getVault: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VaultStatus"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    connectVault: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    rootPath: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VaultStatus"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            422: components["responses"]["ValidationError"];
+        };
+    };
+    disconnectVault: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Done */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    syncVault: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Queued */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["Unauthorized"];
         };
     };
     exportAccount: {
@@ -13591,6 +15912,30 @@ export interface operations {
                 };
             };
             401: components["responses"]["Unauthorized"];
+        };
+    };
+    getPersonAwards: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                handle: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PersonAwards"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
         };
     };
     getUnseenAwards: {
@@ -14313,7 +16658,6 @@ export interface operations {
                     "application/json": components["schemas"]["Crew"];
                 };
             };
-            401: components["responses"]["Unauthorized"];
             404: components["responses"]["NotFound"];
         };
     };
@@ -14457,6 +16801,80 @@ export interface operations {
                 content?: never;
             };
             401: components["responses"]["Unauthorized"];
+        };
+    };
+    getModerationQueue: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModerationQueue"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    suspendUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userID: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["SuspendRequest"];
+            };
+        };
+        responses: {
+            /** @description Suspended */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    decideModerationReport: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                kind: string;
+                subjectID: string;
+                /** @description hide, unhide or dismiss. */
+                action: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Decided */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["ValidationError"];
         };
     };
     listCrewUnread: {
@@ -15099,6 +17517,27 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
         };
     };
+    getPhoneCountries: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PhoneCountries"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
     startPhoneVerification: {
         parameters: {
             query?: never;
@@ -15239,6 +17678,55 @@ export interface operations {
             404: components["responses"]["NotFound"];
         };
     };
+    startFacebookWeb: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FacebookWebStart"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    finishFacebookWeb: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FacebookWebCode"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FacebookFriends"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+        };
+    };
     facebookCallback: {
         parameters: {
             query?: {
@@ -15280,6 +17768,107 @@ export interface operations {
                 };
             };
             401: components["responses"]["Unauthorized"];
+        };
+    };
+    getNewsSettings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NewsSettings"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    setNewsSettings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    enabled: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Saved */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NewsSettings"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    addNewsFeed: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    url: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Followed */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NewsSettings"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["ValidationError"];
+        };
+    };
+    removeNewsFeed: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                feedID: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Removed */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
         };
     };
     getInsights: {
@@ -15567,6 +18156,81 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
         };
     };
+    getInsightsSleep: {
+        parameters: {
+            query?: {
+                /** @description A range key from the response's range.options (today, yesterday, week, month, quarter or year). Defaults to today. */
+                range?: components["parameters"]["InsightsRange"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InsightsSleep"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    getInsightsCardio: {
+        parameters: {
+            query?: {
+                /** @description A range key from the response's range.options (today, yesterday, week, month, quarter or year). Defaults to today. */
+                range?: components["parameters"]["InsightsRange"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InsightsCardio"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    getInsightsPatterns: {
+        parameters: {
+            query?: {
+                /** @description A range key from the response's range.options (today, yesterday, week, month, quarter or year). Defaults to today. */
+                range?: components["parameters"]["InsightsRange"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InsightsPatterns"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+        };
+    };
     getInsightsAreas: {
         parameters: {
             query?: {
@@ -15719,6 +18383,126 @@ export interface operations {
             };
         };
     };
+    connectStravaWeb: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StravaWebConnectRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StravaConnect"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["ValidationError"];
+        };
+    };
+    finishStravaWeb: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StravaWebFinishRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StravaConnectResult"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    getFitnessHub: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FitnessHub"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    getFitnessActivities: {
+        parameters: {
+            query?: {
+                page?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FitnessActivities"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    listFitnessActivitySessions: {
+        parameters: {
+            query?: {
+                page?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StravaSessionPage"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
     syncHealth: {
         parameters: {
             query?: never;
@@ -15786,6 +18570,27 @@ export interface operations {
             500: components["responses"]["InternalError"];
         };
     };
+    getOnboardingForm: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The form's choices */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OnboardingFormResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
     completeOnboarding: {
         parameters: {
             query?: never;
@@ -15813,6 +18618,28 @@ export interface operations {
             500: components["responses"]["InternalError"];
         };
     };
+    skipOnboarding: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The account after skipping */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OnboardingSkipResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            500: components["responses"]["InternalError"];
+        };
+    };
     getToday: {
         parameters: {
             query?: {
@@ -15836,6 +18663,124 @@ export interface operations {
             };
             401: components["responses"]["Unauthorized"];
             500: components["responses"]["InternalError"];
+        };
+    };
+    getOverview: {
+        parameters: {
+            query?: {
+                /** @description Range key (`today`, `yesterday`, `week`, `month`, `quarter`, `year`). Unknown values are today. */
+                range?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OverviewResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getOverviewVersion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OverviewVersion"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    getPushConfig: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PushConfig"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    subscribeWebPush: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WebPushSubscription"];
+            };
+        };
+        responses: {
+            /** @description Kept */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["ValidationError"];
+        };
+    };
+    unsubscribeWebPush: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    endpoint: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Forgotten */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["Unauthorized"];
+            422: components["responses"]["ValidationError"];
         };
     };
     getDay: {
@@ -15880,6 +18825,38 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["DayTrends"];
                 };
+            };
+            401: components["responses"]["Unauthorized"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getDayCheckIn: {
+        parameters: {
+            query?: {
+                /** @description The version from the last streak tile. */
+                v?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The tile */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DayStreakTile"];
+                };
+            };
+            /** @description Unchanged since v */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             401: components["responses"]["Unauthorized"];
             500: components["responses"]["InternalError"];
@@ -16400,6 +19377,28 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["LiftLast"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getLiftsToday: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LiftToday"];
                 };
             };
             401: components["responses"]["Unauthorized"];
