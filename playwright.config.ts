@@ -6,6 +6,9 @@ import { defineConfig, devices } from '@playwright/test';
 export default defineConfig({
 	testDir: 'tests/e2e',
 	fullyParallel: true,
+	// Each run cleans its output dir first, so concurrent runs (several specs at
+	// once) need their own or they delete each other's artefacts mid-test.
+	outputDir: `test-results/run-${process.pid}`,
 	timeout: 30_000,
 	use: {
 		baseURL: process.env.WEB_URL ?? 'http://localhost:5173',
