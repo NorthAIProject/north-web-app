@@ -10,7 +10,10 @@ export default defineConfig({
 	// once) need their own or they delete each other's artefacts mid-test. Workers
 	// re-load this file in their own processes, so the id travels in the env.
 	outputDir: `test-results/run-${(process.env.PW_RUN_ID ??= String(process.pid))}`,
-	timeout: 30_000,
+	// vite dev compiles a route on its first visit, and under four workers that
+	// alone can take most of 30 s (sign-in waits for the next page to load). A
+	// built app (wrangler dev, WEB_URL) never compiles at request time.
+	timeout: 60_000,
 	use: {
 		baseURL: process.env.WEB_URL ?? 'http://localhost:5173',
 		trace: 'retain-on-failure'
