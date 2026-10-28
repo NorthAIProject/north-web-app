@@ -16,6 +16,8 @@
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Card from '#lib/components/ui/card/index.js';
 	import { Progress } from '#lib/components/ui/progress/index.js';
+	import Trends from '#lib/features/day/Trends.svelte';
+	import LighterDayCard from '#lib/features/lighterday/LighterDayCard.svelte';
 	import NewsTicker from '#lib/features/news/NewsTicker.svelte';
 	import NudgeCard from '#lib/features/nudges/NudgeCard.svelte';
 	import QuotaPanel from '#lib/features/quota/QuotaPanel.svelte';
@@ -160,6 +162,8 @@
 				</p>
 			{/if}
 			{#if overview.planId}
+				<!-- The lighter-day offer, when this morning calls for one. -->
+				<LighterDayCard />
 				{#if overview.nextSession}
 					<p class="text-sm font-medium">{overview.nextSession.weekday} — {overview.nextSession.focus}</p>
 					<p class="text-muted-foreground mt-1 mb-3 text-sm">
@@ -227,6 +231,10 @@
 		{@render kpiWithDelta(i18n.t('dash.kpi.sleep'), sleepKPI(s), '/app/care', i18n.t('dash.kpi.logsleep'), s.deltas.sleepHours)}
 		{@render kpiWithDelta(i18n.t('dash.kpi.burned'), caloriesKPI(s), '/app/fitness', i18n.t('dash.kpi.activity'), s.deltas.calories)}
 	</KpiStrip>
+
+	<!-- My Day's trend cards, loaded after the page: twelve weeks of readings
+	     is the slowest thing here and should not hold it up. -->
+	<Trends timeZone={timezone || 'UTC'} />
 
 	<div class="grid gap-4 lg:grid-cols-3">
 		<div class="lg:col-span-2">

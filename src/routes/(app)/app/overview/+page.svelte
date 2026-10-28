@@ -4,6 +4,7 @@
 	import { pageTitle } from '#lib/brand.js';
 	import MonoLabel from '#lib/components/khepri/MonoLabel.svelte';
 	import { onCheckInSaved } from '#lib/components/khepri/live.js';
+	import FirstWeekCard from '#lib/features/firstweek/FirstWeekCard.svelte';
 	import NextStepCard from '#lib/features/overview/NextStepCard.svelte';
 	import OverviewPanels from '#lib/features/overview/OverviewPanels.svelte';
 	import TodayCard from '#lib/features/overview/TodayCard.svelte';
@@ -81,6 +82,10 @@
 	{#if step && step.kind === NEXT_STEP_PUSH}
 		<NextStepCard {step} />
 	{/if}
+
+	<!-- The first week's day card, while a new person's week runs. Outside the
+	     live region, so a check-in refresh does not reload it. -->
+	<FirstWeekCard week={data.firstWeek} />
 
 	<div id="dashboard-today" class="space-y-6">
 		{#if step && step.kind !== NEXT_STEP_PUSH}

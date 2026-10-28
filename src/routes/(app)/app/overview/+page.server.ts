@@ -10,8 +10,13 @@ import type { Actions, PageServerLoad } from './$types';
 export const load: PageServerLoad = async (event) => {
 	event.depends('north:overview');
 	const range = event.url.searchParams.get('range') ?? '';
-	const { data } = await serverApi(event).GET('/overview', { params: { query: range ? { range } : {} } });
-	return { overview: data! };
+	const api = serverApi(event);
+	// The first week's day card rides along; a failed read just leaves it out.
+	const [{ data }, firstWeek] = await Promise.all([
+		api.GET('/overview', { params: { query: range ? { range } : {} } }),
+		api.GET('/first-week').then((r) => r.data ?? null, () => null)
+	]);
+	return { overview: data!, firstWeek };
 };
 
 // "Write today's briefing" (Go POST /app/reports/briefing, which returns to
