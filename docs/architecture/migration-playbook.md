@@ -91,6 +91,9 @@ Go code (not the catalogue), port the logic to a helper with the same keys. Date
 - Page `<title>`: `<svelte:head><title>{pageTitle(i18n.t('…'))}</title></svelte:head>` with
   `pageTitle` from `#lib/brand.js` (Go passed the same string to `layout.App`).
 - Wide pages (Go `layout.AppWide`): return `{ wide: true }` from the page's load.
+- Active sidebar link: the shell matches the URL to the longest nav href. When the Go handler
+  passed a different `active` to `layout.App` (e.g. profiles → `/app/friends`), return
+  `{ navActive: '/app/…' }` from the load.
 - Feature components take typed data and callbacks; no API URLs inside presentational components.
 
 ## Libraries

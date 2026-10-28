@@ -17,7 +17,10 @@ declare global {
 			locale: Locale;
 			appearance: Appearance;
 		}
-		// interface PageData {}
+		interface PageData {
+			/** Sidebar link to mark active when the URL alone does not say (Go passed it to layout.App). */
+			navActive?: string;
+		}
 		// interface PageState {}
 		// interface Platform {}
 	}
