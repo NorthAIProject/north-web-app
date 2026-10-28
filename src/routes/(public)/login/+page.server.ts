@@ -3,14 +3,23 @@ import { isApiError } from '#lib/api/errors.js';
 import { serverApi } from '#lib/server/api.js';
 import { safeNext } from '#lib/server/redirect.js';
 import { writeSession } from '#lib/server/session.js';
-import { noAuthOptions } from '#lib/features/auth/options.js';
+import { fetchAuthOptions, googleErrorKeys } from '#lib/features/auth/options.js';
 import type { Actions, PageServerLoad } from './$types';
 
-export const load: PageServerLoad = ({ locals, url }) => {
+// GET /login (Go: auth.Handler.showLogin). A signed-in visitor goes home; a
+// next that is not a local path is dropped, as SafeRedirect drops it.
+export const load: PageServerLoad = async (event) => {
+	const { locals, url } = event;
 	if (locals.session?.user) redirect(303, safeNext(url.searchParams.get('next'), '/app'));
-	return { next: url.searchParams.get('next') ?? '', authOptions: noAuthOptions };
+	return {
+		next: safeNext(url.searchParams.get('next'), ''),
+		authOptions: await fetchAuthOptions(serverApi(event)),
+		// A Google round trip that failed comes back here with its reason.
+		googleError: googleErrorKeys[url.searchParams.get('google') ?? ''] ?? ''
+	};
 };
 
+// POST /login (Go: auth.Handler.submitLogin).
 export const actions: Actions = {
 	default: async (event) => {
 		const form = await event.request.formData();

@@ -1,9 +1,9 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import { pageTitle } from '#lib/brand.js';
 	import { useI18n } from '#lib/i18n/index.js';
 	import BrandLockup from '#lib/components/brand/BrandLockup.svelte';
 	import MonoLabel from '#lib/components/khepri/MonoLabel.svelte';
+	import PageTitle from '#lib/features/landing/PageTitle.svelte';
 	import LanguageSwitcher from './LanguageSwitcher.svelte';
 
 	// The signed-out pages: one centred card and nothing else to do. The short
@@ -12,9 +12,8 @@
 	const i18n = useI18n();
 </script>
 
-<svelte:head>
-	<title>{pageTitle(title)}</title>
-</svelte:head>
+<!-- Title plus og:/twitter:title, so a shared /login or /signup link previews right. -->
+<PageTitle {title} />
 
 <div class="flex min-h-full flex-col items-center justify-center px-4 py-12">
 	<div class={['w-full', wide ? 'max-w-lg' : 'max-w-sm']}>

@@ -13,6 +13,10 @@
 	let { data, form }: PageProps = $props();
 	const i18n = useI18n();
 	let submitting = $state(false);
+	// svelte-ignore state_referenced_locally
+	let email = $state(form?.email ?? '');
+	let passkeyError = $state('');
+	const error = $derived(form?.error ?? (data.googleError ? i18n.t(data.googleError) : ''));
 </script>
 
 <AuthShell title={i18n.t('auth.signin.page')}>
@@ -22,12 +26,17 @@
 			<Card.Description>{i18n.t('auth.signin.desc')}</Card.Description>
 		</Card.Header>
 		<Card.Content>
-			{#if form?.error}
+			{#if error}
 				<Alert.Root variant="destructive" class="mb-4">
-					<Alert.Description>{form.error}</Alert.Description>
+					<Alert.Description>{error}</Alert.Description>
 				</Alert.Root>
 			{/if}
-			<AltAuthButtons options={data.authOptions} next={data.next} mode="login" />
+			<AltAuthButtons
+				options={data.authOptions}
+				next={data.next}
+				fields={() => ({ email })}
+				onpasskeyerror={(message) => (passkeyError = message)}
+			/>
 			<form
 				method="post"
 				class="space-y-4"
@@ -46,7 +55,7 @@
 				<div class="space-y-2">
 					<Label for="email">{i18n.t('auth.field.email')}</Label>
 					<!-- svelte-ignore a11y_autofocus -->
-					<Input id="email" name="email" type="email" value={form?.email ?? ''} required autocomplete="email" autofocus />
+					<Input id="email" name="email" type="email" bind:value={email} required autocomplete="email" autofocus />
 				</div>
 				<div class="space-y-2">
 					<div class="flex items-center justify-between gap-2">
@@ -66,6 +75,9 @@
 					{i18n.t('auth.signin.submit')}
 				</Button>
 			</form>
+			{#if passkeyError}
+				<p id="passkey-error" class="mt-3 text-sm text-destructive" role="alert">{passkeyError}</p>
+			{/if}
 		</Card.Content>
 	</Card.Root>
 	<p class="mt-6 text-center text-sm text-muted-foreground">
