@@ -357,14 +357,28 @@
 	</Sheet.Content>
 </Sheet.Root>
 
-<!-- The crew rules, asked for before a first post. Accepting returns to this page. -->
+<!-- The crew rules, asked for before a first post. Accepting closes the dialog
+     in place, so the message waiting in the composer is still there to send;
+     without JS the action redirects back to this page, as Go did. -->
 <Dialog.Root bind:open={termsOpen}>
 	<Dialog.Content>
 		<Dialog.Header>
 			<Dialog.Title>{i18n.t('moderation.terms.title')}</Dialog.Title>
 			<Dialog.Description>{i18n.t('moderation.terms.body')}</Dialog.Description>
 		</Dialog.Header>
-		<form method="post" action="?/terms">
+		<form
+			method="post"
+			action="?/terms"
+			use:enhance={() =>
+				async ({ result, update }) => {
+					if (result.type === 'redirect' || result.type === 'success') {
+						termsOpen = false;
+						await invalidate('north:crew');
+						return;
+					}
+					await update();
+				}}
+		>
 			<Dialog.Footer>
 				<Button type="submit">{i18n.t('moderation.terms.agree')}</Button>
 			</Dialog.Footer>

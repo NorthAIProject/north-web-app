@@ -1,6 +1,14 @@
 import { expect, test, type APIRequestContext } from '@playwright/test';
 import { api, createUser, signIn, type TestUser } from './helpers';
 
+// Following earns medals (First Follower); the shell's unlock dialog then opens
+// over the page, as in Go. Close it so the next click lands.
+test.beforeEach(async ({ page }) => {
+	await page.addLocatorHandler(page.getByTestId('awards-unlock'), async () => {
+		await page.keyboard.press('Escape');
+	});
+});
+
 // The social slice: /app/friends and every form on it, the phone card (the
 // local API runs the dev verifier, which accepts 000000), Facebook unconfigured,
 // the invite and crew landing pages, and /app redeeming their cookies.
