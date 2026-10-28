@@ -14,6 +14,7 @@
 	import { Textarea } from '#lib/components/ui/textarea/index.js';
 	import { useI18n } from '#lib/i18n/index.js';
 	import { appearances, isAppearance } from '#lib/theme.js';
+	import DictateField from '#lib/features/voice/DictateField.svelte';
 	import FieldDescription from './FieldDescription.svelte';
 	import FieldMessage from './FieldMessage.svelte';
 	import FormSelect from './FormSelect.svelte';
@@ -146,13 +147,15 @@
 			</div>
 			<div class="space-y-2">
 				<Label for="coaching_style">{i18n.t('settings.profile.style')}</Label>
-				<Textarea
-					id="coaching_style"
-					name="coaching_style"
-					rows={3}
-					placeholder={i18n.t('settings.profile.style.placeholder')}
-					value={values.coachingStyle}
-				/>
+				<DictateField target="coaching_style" surface="settings">
+					<Textarea
+						id="coaching_style"
+						name="coaching_style"
+						rows={3}
+						placeholder={i18n.t('settings.profile.style.placeholder')}
+						value={values.coachingStyle}
+					/>
+				</DictateField>
 				<FieldMessage message={errors.coaching_style} />
 			</div>
 			<Button type="submit" class="bg-signal text-background hover:bg-signal/90">{i18n.t('settings.profile.save')}</Button>
