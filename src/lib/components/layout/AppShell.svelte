@@ -12,6 +12,7 @@
 	import { buildNav, type NavItem } from '#lib/nav/nav.js';
 	import CommandPalette from './CommandPalette.svelte';
 	import ShellWidgets from './ShellWidgets.svelte';
+	import CrewsUnreadBadge from '#lib/features/crews/CrewsUnreadBadge.svelte';
 
 	// The shell for every signed-in page (Go: layout.App / layout.AppWide).
 	// A wide page lays out its own panes edge to edge (a crew's chat): the
@@ -30,7 +31,7 @@
 	} = $props();
 
 	const i18n = useI18n();
-	const nav = $derived(buildNav(i18n, page.url.pathname, simpleNav));
+	const nav = $derived(buildNav(i18n, page.data.navActive ?? page.url.pathname, simpleNav));
 </script>
 
 <Sidebar.Provider open={!wide} class={wide ? 'h-dvh overflow-hidden' : 'min-h-dvh'}>
@@ -123,6 +124,10 @@
 						<item.icon class="size-4" />
 					{/if}
 					<span>{item.label}</span>
+					{#if item.href === '/app/crews'}
+						<!-- Unread crew messages (iOS has the same badge; Go had only the rail dots). -->
+						<CrewsUnreadBadge class="ml-auto" />
+					{/if}
 				</a>
 			{/snippet}
 		</Sidebar.MenuButton>

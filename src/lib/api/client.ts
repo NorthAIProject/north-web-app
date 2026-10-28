@@ -1,6 +1,7 @@
 import createClient, { type Client, type Middleware } from 'openapi-fetch';
 import type { paths } from './generated/schema.js';
 import { apiErrorFrom } from './errors.js';
+import { announceWrite } from '#lib/features/awards/writes.js';
 
 // The one typed boundary to north-client's /api/v1.
 //
@@ -42,9 +43,22 @@ export function createApi({ fetch, baseUrl, token, locale }: ApiOptions): Api {
 	return client;
 }
 
+/**
+ * Announces every successful browser write, so the awards host can check for
+ * new badges (Go: htmx:after:request on any non-GET). Pages need do nothing.
+ */
+const announceWrites: Middleware = {
+	async onResponse({ request, response }) {
+		if (response.ok && request.method !== 'GET' && request.method !== 'HEAD') announceWrite();
+		return undefined;
+	}
+};
+
 /** The client browser code uses: same-origin, through the proxy. */
 export function browserApi(fetchImpl: Fetch = fetch): Api {
-	return createApi({ fetch: fetchImpl, baseUrl: '/api' });
+	const client = createApi({ fetch: fetchImpl, baseUrl: '/api' });
+	client.use(announceWrites);
+	return client;
 }
 
 /**

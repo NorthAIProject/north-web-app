@@ -7,6 +7,7 @@
 	import { Label } from '#lib/components/ui/label/index.js';
 	import { Separator } from '#lib/components/ui/separator/index.js';
 	import { Switch } from '#lib/components/ui/switch/index.js';
+	import PushRow from '#lib/features/push/PushRow.svelte';
 	import { useI18n } from '#lib/i18n/index.js';
 	import FieldDescription from './FieldDescription.svelte';
 	import FieldMessage from './FieldMessage.svelte';
@@ -158,5 +159,7 @@
 			</div>
 			<Button type="submit" class="bg-signal text-background hover:bg-signal/90">{i18n.t('settings.notif.save')}</Button>
 		</form>
+		<!-- Go: if f.PushEnabled { @pushRow(f) }; PushRow hides itself otherwise. -->
+		<PushRow />
 	</Card.Content>
 </Card.Root>

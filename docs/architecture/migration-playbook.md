@@ -141,3 +141,28 @@ installed in one pass at the end.
 4. Pages visually checked: take a screenshot of each page (Playwright `page.screenshot`) and
    compare with the Go page rendered by the same API — the Go app is served at
    http://localhost:8090 (same database), log in there with the same test user.
+
+## Writes, awards and quota (shared hooks)
+
+The header's `AwardsHost` (in `ShellWidgets.svelte`) asks `GET /awards/unseen` after every write
+and opens the unlock dialog. Closing the dialog posts each badge as seen. Go did this with htmx's
+`afterRequest` on any non-GET. **Detection is automatic, and pages need nothing:**
+
+- **Browser writes.** Every `browserApi()` call that is not GET/HEAD and succeeds is announced by a
+  middleware in `#lib/api/client.ts`. Raw `fetch('/api/…')` writes are not announced, so use `browserApi()`.
+- **Form actions.** Every enhanced action result updates `page.form`. `AwardsHost` checks whenever it
+  changes and `page.status < 400`.
+- **Navigations** (plain form posts, redirects, links). The host checks after each one.
+
+`notifyWrite()`, `withWriteNotify()` and `writing()` in `#lib/features/awards/writes.js` are kept as
+no-ops for older call sites. Do not add new ones. `onWrite(fn)` is the subscription the host uses.
+
+**Quota.** A 429 from a metered endpoint carries `code: "quota_exceeded"` and
+`fields: {action, retryAfter}`. Turn it into a panel with `quotaRefusal(err)` from
+`#lib/features/quota/quota.js` (it returns `null` for anything else), return it from the action as
+`fail(429, { quota })`, and render `<QuotaPanel {...form.quota} />`
+(`#lib/features/quota/QuotaPanel.svelte`).
+
+**Ready-made pieces for other pages.**
+- `#lib/features/push/PushRow.svelte` is the settings Web Push row. It hides itself when push is not configured.
+- `#lib/features/outreach/OutreachCard.svelte` is the coach outreach card for My Day. It loads itself.
