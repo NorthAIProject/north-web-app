@@ -1,5 +1,6 @@
 import { redirect } from '@sveltejs/kit';
 import { serverApi } from '#lib/server/api.js';
+import { redeemLinkCookies } from '#lib/features/social/invite-cookies.server.js';
 import type { LayoutServerLoad } from './$types';
 
 // Everything under /app needs a session (Go: authMW.RequireAuth), and an
@@ -9,6 +10,12 @@ export const load: LayoutServerLoad = async (event) => {
 	const { locals, url } = event;
 	const user = locals.session?.user;
 	if (!user) redirect(303, `/login?next=${encodeURIComponent(url.pathname + url.search)}`);
+
+	// Social slice (Go: socialHandler.RedeemInvite + crewHandler.JoinFromCookie,
+	// right after RequireAuth and before RequireOnboarded): a code carried from
+	// /i/<code> or /i/c/<code> is redeemed on the first signed-in page, then its
+	// cookie is dropped. Never fails the page.
+	await redeemLinkCookies(event);
 
 	const onboarding = url.pathname.startsWith('/app/onboarding');
 	if (user.needsOnboarding && !onboarding) redirect(303, '/app/onboarding');
