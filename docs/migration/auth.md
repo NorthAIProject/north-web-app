@@ -8,7 +8,7 @@ forgot-password,reset-password,auth,oauth}/**`, `src/routes/(app)/app/onboarding
 
 The session token never reaches page JavaScript. Every route that ends in a session (password,
 Google, passkey finish, consent account) is a SvelteKit server action or `+server.ts`, and it writes
-the HttpOnly `khepri_session` cookie with `writeSession`.
+the HttpOnly `north_session` cookie (Go's own name, so sessions survive the cut-over) with `writeSession`.
 
 ## Pages and forms
 

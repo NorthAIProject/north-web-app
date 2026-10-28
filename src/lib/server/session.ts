@@ -5,7 +5,11 @@ import { secureCookies } from './config';
 // page JavaScript can never read it. Server code reads it to call the API; the
 // /api proxy reads it to forward browser requests.
 
-export const sessionCookie = 'khepri_session';
+// Same name, path and flags as the Go web app's cookie (internal/auth
+// SessionCookieName): its value is the same kind of session token, so a person
+// signed in on the Go pages stays signed in when this app takes over the
+// domain, and the two can run side by side during the cut-over.
+export const sessionCookie = 'north_session';
 
 export function readSession(cookies: Cookies): string | undefined {
 	return cookies.get(sessionCookie) || undefined;
