@@ -102,7 +102,8 @@ If the CLI would install a new npm package for it (Drawer → vaul-svelte, Resiz
 Data Table → TanStack Table), treat it like the libraries below.
 Charts use shadcn-svelte's Chart (LayerChart); Go's ECharts charts stay on
 `components/khepri/EChart.svelte`. Client-side fetching that polls, caches or shares state
-uses TanStack Query (`@tanstack/svelte-query`).
+uses TanStack Query (`@tanstack/svelte-query`). The root layout provides the one app-wide
+client (`src/lib/query.ts`). Use `useQueryClient()` / `createQuery` and never make another.
 
 The ecosystem picks below are added only when a feature actually needs one. During a feature
 port, **do not `bun add` packages** (parallel agents race on `bun.lock`). Where one would fit,
