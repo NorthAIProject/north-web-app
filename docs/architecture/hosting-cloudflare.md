@@ -121,6 +121,14 @@ WEB_URL=http://localhost:8787 bunx playwright test --project desktop
 
 ## Cut-over runbook
 
+**Status (2026-10-29): live.** Zone Active 19:12 WET; universal certificate issued;
+`kheprios.com/*` attached to `khepri-web` (version 80e44647) with the 11 Go
+routes Worker-less. Checked through the edge: pages from SvelteKit
+(`/service-worker.js` 200, `/sw.js` 404), `/healthz`, `/api/v1`, `/mcp`,
+`/oauth/token`, `/.well-known/*` and `/webhooks/telegram` from Go, www → apex 301.
+Open: a signed-in session through the edge, and the Google/Strava/Facebook
+real-account halves.
+
 1. **Uploads:** the 90 MB API cap is live, and the iOS build that shrinks clips
    is approved.
 2. **First deploy (account):** `bun x wrangler login`, then `bun x wrangler
