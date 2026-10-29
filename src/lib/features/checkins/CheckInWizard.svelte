@@ -13,7 +13,7 @@
 	import * as Card from '#lib/components/ui/card/index.js';
 	import { Input } from '#lib/components/ui/input/index.js';
 	import { Label } from '#lib/components/ui/label/index.js';
-	import * as Select from '#lib/components/ui/select/index.js';
+	import SearchSelect from '#lib/components/khepri/SearchSelect.svelte';
 	import { Textarea } from '#lib/components/ui/textarea/index.js';
 	import { useI18n } from '#lib/i18n/index.js';
 	import { firstErrorStep, type CheckInForm } from './checkins.js';
@@ -61,7 +61,6 @@
 		{ value: '', label: i18n.t('checkins.goal.none') },
 		...activeGoals.map((g) => ({ value: g.id, label: g.title }))
 	]);
-	const goalLabel = $derived(goalItems.find((g) => g.value === goalId && g.value !== '')?.label);
 </script>
 
 {#snippet fieldMessage(msg: string | undefined)}
@@ -221,18 +220,13 @@
 				{#if activeGoals.length > 0}
 					<div class="space-y-2">
 						<Label for="related_goal_id">{i18n.t('checkins.goal')}</Label>
-						<Select.Root type="single" name="related_goal_id" bind:value={goalId} items={goalItems}>
-							<Select.Trigger id="related_goal_id">
-								<span data-slot="select-value" class={['block truncate', !goalLabel && 'text-muted-foreground']}>
-									{goalLabel ?? i18n.t('checkins.goal.none')}
-								</span>
-							</Select.Trigger>
-							<Select.Content>
-								{#each goalItems as g (g.value)}
-									<Select.Item value={g.value} label={g.label} />
-								{/each}
-							</Select.Content>
-						</Select.Root>
+						<SearchSelect
+							id="related_goal_id"
+							name="related_goal_id"
+							bind:value={goalId}
+							items={goalItems}
+							placeholder={i18n.t('checkins.goal.none')}
+						/>
 						{@render fieldMessage(errors.related_goal_id)}
 					</div>
 				{/if}

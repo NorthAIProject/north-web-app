@@ -8,7 +8,7 @@
 	import { Input } from '#lib/components/ui/input/index.js';
 	import { Label } from '#lib/components/ui/label/index.js';
 	import { Progress } from '#lib/components/ui/progress/index.js';
-	import * as Select from '#lib/components/ui/select/index.js';
+	import SearchSelect from '#lib/components/khepri/SearchSelect.svelte';
 	import { useI18n } from '#lib/i18n/index.js';
 	import {
 		canManage,
@@ -32,7 +32,6 @@
 	]);
 	// svelte-ignore state_referenced_locally
 	let kind = $state(b.challenge?.kind ?? 'none');
-	const kindLabel = $derived(kinds.find((k) => k.value === kind)?.label ?? i18n.t('crews.challenge.choose'));
 </script>
 
 <div class="mx-auto w-full max-w-3xl space-y-6 p-6 md:p-8">
@@ -117,14 +116,14 @@
 				<form method="post" action="?/challenge" class="flex flex-wrap items-end gap-2" use:enhance>
 					<div class="space-y-2">
 						<Label for="kind">{i18n.t('crews.challenge.what')}</Label>
-						<Select.Root type="single" name="kind" bind:value={kind}>
-							<Select.Trigger id="kind" class="min-w-40">{kindLabel}</Select.Trigger>
-							<Select.Content>
-								{#each kinds as k (k.value)}
-									<Select.Item value={k.value} label={k.label}>{k.label}</Select.Item>
-								{/each}
-							</Select.Content>
-						</Select.Root>
+						<SearchSelect
+								id="kind"
+								name="kind"
+								bind:value={kind}
+								items={kinds}
+								placeholder={i18n.t('crews.challenge.choose')}
+								class="min-w-40"
+							/>
 					</div>
 					<div class="space-y-2">
 						<Label for="target">{i18n.t('crews.challenge.times')}</Label>

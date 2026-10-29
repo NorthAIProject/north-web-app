@@ -6,7 +6,7 @@
 	import { Input } from '#lib/components/ui/input/index.js';
 	import * as InputOTP from '#lib/components/ui/inputotp/index.js';
 	import { Label } from '#lib/components/ui/label/index.js';
-	import * as Select from '#lib/components/ui/select/index.js';
+	import SearchSelect from '#lib/components/khepri/SearchSelect.svelte';
 	import { useI18n } from '#lib/i18n/index.js';
 	import FieldError from './FieldError.svelte';
 	import PostForm from './PostForm.svelte';
@@ -25,7 +25,6 @@
 	// What the select shows: what was just submitted, else the account's best guess (Go: countryValue).
 	// svelte-ignore state_referenced_locally
 	let dial = $state(form.country || countries.defaultDial);
-	const chosen = $derived(countries.countries.find((c) => c.dial === dial));
 	let busy = $state(false);
 	const submit = () => {
 		busy = true;
@@ -92,21 +91,15 @@
 							<Label for="countryCode" error={err('countryCode')}
 								>{i18n.t('social.phone.country')}</Label
 							>
-							<Select.Root type="single" name="countryCode" bind:value={dial}>
-								<Select.Trigger
-									id="countryCode"
-									aria-invalid={err('countryCode') ? 'true' : undefined}
-								>
-									{chosen
-										? `${countryName(i18n, chosen)} (+${chosen.dial})`
-										: i18n.t('social.phone.choose')}
-								</Select.Trigger>
-								<Select.Content>
-									{#each countries.countries as c (c.dial)}
-										<Select.Item value={c.dial} label="{countryName(i18n, c)} (+{c.dial})" />
-									{/each}
-								</Select.Content>
-							</Select.Root>
+							<SearchSelect
+								id="countryCode"
+								name="countryCode"
+								bind:value={dial}
+								items={countries.countries.map((c) => ({ value: c.dial, label: `${countryName(i18n, c)} (+${c.dial})` }))}
+								placeholder={i18n.t('social.phone.choose')}
+								searchPlaceholder={i18n.t('social.phone.search')}
+								invalid={Boolean(err('countryCode'))}
+							/>
 							<FieldError message={err('countryCode')} />
 						</div>
 						<div class="flex-1 space-y-2">

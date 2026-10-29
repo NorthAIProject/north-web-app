@@ -8,7 +8,7 @@
 	import * as Card from '#lib/components/ui/card/index.js';
 	import { Input } from '#lib/components/ui/input/index.js';
 	import { Label } from '#lib/components/ui/label/index.js';
-	import * as Select from '#lib/components/ui/select/index.js';
+	import SearchSelect from '#lib/components/khepri/SearchSelect.svelte';
 	import FieldMessage from '#lib/features/nutrition/FieldMessage.svelte';
 	import { clearOnSuccess } from '#lib/features/nutrition/enhance.js';
 	import { CATEGORIES, categoryLabel, whole } from '#lib/features/nutrition/view.js';
@@ -53,16 +53,13 @@
 				</div>
 				<div class="space-y-2">
 					<Label>{i18n.t('nutrition.field.category')}</Label>
-					<Select.Root type="single" name="category" bind:value={category} items={categoryItems}>
-						<Select.Trigger id="category">
-							<Select.Value placeholder={i18n.t('nutrition.category.other')} />
-						</Select.Trigger>
-						<Select.Content>
-							{#each categoryItems as c (c.value)}
-								<Select.Item value={c.value} label={c.label}>{c.label}</Select.Item>
-							{/each}
-						</Select.Content>
-					</Select.Root>
+					<SearchSelect
+						id="category"
+						name="category"
+						bind:value={category}
+						items={categoryItems}
+						placeholder={i18n.t('nutrition.category.other')}
+					/>
 					<FieldMessage message={errors.category} />
 				</div>
 				<div class="grid grid-cols-2 gap-4">

@@ -15,7 +15,7 @@
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Card from '#lib/components/ui/card/index.js';
 	import { Checkbox } from '#lib/components/ui/checkbox/index.js';
-	import * as Select from '#lib/components/ui/select/index.js';
+	import SearchSelect from '#lib/components/khepri/SearchSelect.svelte';
 	import { Textarea } from '#lib/components/ui/textarea/index.js';
 	import Dictate from '#lib/features/voice/Dictate.svelte';
 	import { useI18n } from '#lib/i18n/index.js';
@@ -91,21 +91,12 @@
 								<div class="flex flex-wrap items-center gap-2">
 									{#if line.candidates.length > 0}
 										<div class="min-w-0 flex-1">
-											<Select.Root
-												type="single"
+											<SearchSelect
 												name="ingredient_id_{n}"
 												bind:value={chosen[n]}
 												items={line.candidates.map((c) => ({ value: c.id, label: c.name }))}
-											>
-												<Select.Trigger>
-													<Select.Value placeholder={tf(i18n, 'capture.foods.which', line.query)} />
-												</Select.Trigger>
-												<Select.Content>
-													{#each line.candidates as c (c.id)}
-														<Select.Item value={c.id} label={c.name}>{c.name}</Select.Item>
-													{/each}
-												</Select.Content>
-											</Select.Root>
+												placeholder={tf(i18n, 'capture.foods.which', line.query)}
+											/>
 										</div>
 										<div class="flex items-center gap-1">
 											<input

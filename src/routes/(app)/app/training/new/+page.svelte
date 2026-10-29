@@ -7,7 +7,7 @@
 	import { Checkbox } from '#lib/components/ui/checkbox/index.js';
 	import { Input } from '#lib/components/ui/input/index.js';
 	import { Label } from '#lib/components/ui/label/index.js';
-	import * as Select from '#lib/components/ui/select/index.js';
+	import SearchSelect from '#lib/components/khepri/SearchSelect.svelte';
 	import { Textarea } from '#lib/components/ui/textarea/index.js';
 	import { EQUIPMENT_OPTIONS, EXPERIENCE_OPTIONS } from '#lib/features/training/intake.js';
 	import { WEEKDAYS, weekdayShort } from '#lib/features/training/weekday.js';
@@ -78,16 +78,14 @@
 				</div>
 				<div class="space-y-2">
 					<Label for="experience" error={errors.experience}>{i18n.t('workouts.intake.experience')}</Label>
-					<Select.Root type="single" name="experience" value={f.experience} items={experienceItems}>
-						<Select.Trigger id="experience" aria-invalid={errors.experience ? true : undefined}>
-							<Select.Value placeholder={i18n.t('workouts.intake.experience.ph')} />
-						</Select.Trigger>
-						<Select.Content>
-							{#each experienceItems as o (o.value)}
-								<Select.Item value={o.value} label={o.label}>{o.label}</Select.Item>
-							{/each}
-						</Select.Content>
-					</Select.Root>
+					<SearchSelect
+						id="experience"
+						name="experience"
+						value={f.experience}
+						items={experienceItems}
+						placeholder={i18n.t('workouts.intake.experience.ph')}
+						invalid={Boolean(errors.experience)}
+					/>
 					{@render fieldMessage('experience')}
 				</div>
 				<div class="grid gap-5 sm:grid-cols-2">

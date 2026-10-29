@@ -8,7 +8,7 @@
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Card from '#lib/components/ui/card/index.js';
 	import { Label } from '#lib/components/ui/label/index.js';
-	import * as Select from '#lib/components/ui/select/index.js';
+	import SearchSelect from '#lib/components/khepri/SearchSelect.svelte';
 	import { Textarea } from '#lib/components/ui/textarea/index.js';
 	import DictateField from '#lib/features/checkins/DictateField.svelte';
 	import MoodEnergyChart from '#lib/features/checkins/MoodEnergyChart.svelte';
@@ -112,18 +112,7 @@
 				</div>
 				<div class="space-y-2">
 					<Label for="mood">{i18n.t('mind.form.mood')}</Label>
-					<Select.Root type="single" name="mood" bind:value={mood} items={moodItems}>
-						<Select.Trigger id="mood">
-							<span data-slot="select-value" class={['block truncate', !mood && 'text-muted-foreground']}>
-								{mood ? `${mood}/5` : i18n.t('mind.form.no_rating')}
-							</span>
-						</Select.Trigger>
-						<Select.Content>
-							{#each moodItems as item (item.value)}
-								<Select.Item value={item.value} label={item.label} />
-							{/each}
-						</Select.Content>
-					</Select.Root>
+					<SearchSelect id="mood" name="mood" bind:value={mood} items={moodItems} placeholder={i18n.t('mind.form.no_rating')} />
 					{#if errors.mood}
 						<p class="text-[0.8rem] font-medium text-red-500">{errors.mood}</p>
 					{/if}

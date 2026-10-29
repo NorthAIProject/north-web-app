@@ -3,7 +3,7 @@
 	import type { Snippet } from 'svelte';
 	import { Input } from '#lib/components/ui/input/index.js';
 	import { Label } from '#lib/components/ui/label/index.js';
-	import * as Select from '#lib/components/ui/select/index.js';
+	import SearchSelect from '#lib/components/khepri/SearchSelect.svelte';
 	import { Textarea } from '#lib/components/ui/textarea/index.js';
 	import DictateField from '#lib/features/checkins/DictateField.svelte';
 	import { useI18n } from '#lib/i18n/index.js';
@@ -75,18 +75,14 @@
 <div class="grid gap-4 sm:grid-cols-2">
 	<div class="space-y-2">
 		<Label for="category" error={errors.category}>{i18n.t('goals.f.category')}</Label>
-		<Select.Root type="single" name="category" bind:value={category} {items}>
-			<Select.Trigger id="category" aria-invalid={errors.category ? 'true' : undefined}>
-				<span data-slot="select-value" class={['block truncate', !category && 'text-muted-foreground']}>
-					{category ? categoryLabel(i18n, category) : i18n.t('goals.f.category.ph')}
-				</span>
-			</Select.Trigger>
-			<Select.Content>
-				{#each items as item (item.value)}
-					<Select.Item value={item.value} label={item.label} />
-				{/each}
-			</Select.Content>
-		</Select.Root>
+		<SearchSelect
+			id="category"
+			name="category"
+			bind:value={category}
+			{items}
+			placeholder={i18n.t('goals.f.category.ph')}
+			invalid={Boolean(errors.category)}
+		/>
 		{@render message(errors.category)}
 	</div>
 	<div class="space-y-2">

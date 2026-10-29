@@ -6,7 +6,7 @@
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Card from '#lib/components/ui/card/index.js';
 	import { Input } from '#lib/components/ui/input/index.js';
-	import * as Select from '#lib/components/ui/select/index.js';
+	import SearchSelect from '#lib/components/khepri/SearchSelect.svelte';
 	import { clearOnSuccess } from '#lib/features/nutrition/enhance.js';
 	import { kcal } from '#lib/features/nutrition/view.js';
 	import { useI18n } from '#lib/i18n/index.js';
@@ -62,16 +62,13 @@
 		<Card.Content>
 			<form method="post" action="?/ingredient" class="flex items-end gap-2" use:enhance={clearOnSuccess(() => (ingredientId = ''))}>
 				<div class="min-w-0 flex-1">
-					<Select.Root type="single" name="ingredient_id" bind:value={ingredientId} items={ingredientItems}>
-						<Select.Trigger aria-label={i18n.t('nutrition.ingredient.choose')}>
-							<Select.Value placeholder={i18n.t('nutrition.ingredient.choose')} />
-						</Select.Trigger>
-						<Select.Content>
-							{#each ingredientItems as item (item.value)}
-								<Select.Item value={item.value} label={item.label}>{item.label}</Select.Item>
-							{/each}
-						</Select.Content>
-					</Select.Root>
+					<SearchSelect
+						name="ingredient_id"
+						bind:value={ingredientId}
+						items={ingredientItems}
+						placeholder={i18n.t('nutrition.ingredient.choose')}
+						aria-label={i18n.t('nutrition.ingredient.choose')}
+					/>
 				</div>
 				<div class="w-24">
 					<Input name="quantity_grams" type="number" placeholder={i18n.t('nutrition.grams')} aria-label={i18n.t('nutrition.grams')} />
@@ -88,16 +85,13 @@
 			<Card.Content>
 				<form method="post" action="?/meal" class="flex items-end gap-2" use:enhance={clearOnSuccess(() => (mealId = ''))}>
 					<div class="min-w-0 flex-1">
-						<Select.Root type="single" name="meal_id" bind:value={mealId} items={mealItems}>
-							<Select.Trigger aria-label={i18n.t('nutrition.log.meal.choose')}>
-								<Select.Value placeholder={i18n.t('nutrition.log.meal.choose')} />
-							</Select.Trigger>
-							<Select.Content>
-								{#each mealItems as item (item.value)}
-									<Select.Item value={item.value} label={item.label}>{item.label}</Select.Item>
-								{/each}
-							</Select.Content>
-						</Select.Root>
+						<SearchSelect
+							name="meal_id"
+							bind:value={mealId}
+							items={mealItems}
+							placeholder={i18n.t('nutrition.log.meal.choose')}
+							aria-label={i18n.t('nutrition.log.meal.choose')}
+						/>
 					</div>
 					<Button type="submit" variant="outline">{i18n.t('nutrition.log.submit')}</Button>
 				</form>

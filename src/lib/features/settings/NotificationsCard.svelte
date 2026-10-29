@@ -97,6 +97,7 @@
 				<FormSelect
 					id="photo_every_days"
 					name="photo_every_days"
+					search={false}
 					value={every}
 					placeholder={i18n.t('settings.notif.photo.week2')}
 					groups={everyGroups}
@@ -107,6 +108,7 @@
 				<FormSelect
 					id="photo_reminder_days"
 					name="photo_reminder_days"
+					search={false}
 					value={String(values.photoReminderDays)}
 					placeholder={i18n.t('settings.notif.photo.days2')}
 					groups={remindGroups}

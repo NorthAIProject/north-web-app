@@ -4,7 +4,7 @@
 	import MonoLabel from '#lib/components/khepri/MonoLabel.svelte';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Card from '#lib/components/ui/card/index.js';
-	import * as Select from '#lib/components/ui/select/index.js';
+	import SearchSelect from '#lib/components/khepri/SearchSelect.svelte';
 	import { Textarea } from '#lib/components/ui/textarea/index.js';
 	import { suggestionLabel } from '#lib/features/inbox/inbox.js';
 	import { useI18n } from '#lib/i18n/index.js';
@@ -89,22 +89,14 @@
 						<form method="post" action="?/file" class="flex items-end gap-2" use:enhance>
 							<input type="hidden" name="item" value={it.id} />
 							<input type="hidden" name="destination" value="goal_note" />
-							<Select.Root
-								type="single"
+							<SearchSelect
+								id="goal-{it.id}"
 								name="goal_id"
 								items={goalItems}
 								value={picked[it.id] ?? ''}
+								placeholder={i18n.t('inbox.goal_ph')}
 								onValueChange={(v) => (picked[it.id] = v)}
-							>
-								<Select.Trigger id="goal-{it.id}">
-									<Select.Value placeholder={i18n.t('inbox.goal_ph')} />
-								</Select.Trigger>
-								<Select.Content>
-									{#each goalItems as g (g.value)}
-										<Select.Item value={g.value} label={g.label}>{g.label}</Select.Item>
-									{/each}
-								</Select.Content>
-							</Select.Root>
+							/>
 							<Button type="submit" variant="outline" size="sm">{i18n.t('inbox.dest.goal')}</Button>
 						</form>
 					{/if}

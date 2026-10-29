@@ -12,6 +12,7 @@
 	import * as Card from '#lib/components/ui/card/index.js';
 	import * as Collapsible from '#lib/components/ui/collapsible/index.js';
 	import { Input } from '#lib/components/ui/input/index.js';
+	import SearchSelect from '#lib/components/khepri/SearchSelect.svelte';
 	import * as Select from '#lib/components/ui/select/index.js';
 	import * as Table from '#lib/components/ui/table/index.js';
 	import { tf } from '#lib/features/nutrition/view.js';
@@ -57,7 +58,10 @@
 	let busy = $state(false);
 </script>
 
-{#snippet picker(name: string, items: { value: string; label: string }[], selected: string, placeholder: string, invalid: boolean, cls = '')}
+{#snippet picker(name: string, items: { value: string; label: string }[], selected: string, placeholder: string, invalid: boolean, cls = '', search = false)}
+	{#if search}
+		<SearchSelect {name} value={selected} {items} {placeholder} {invalid} class={cls} />
+	{:else}
 	<Select.Root type="single" {name} value={selected} {items}>
 		<Select.Trigger class={cls} aria-invalid={invalid ? true : undefined}>
 			<Select.Value {placeholder} />
@@ -68,6 +72,7 @@
 			{/each}
 		</Select.Content>
 	</Select.Root>
+	{/if}
 {/snippet}
 
 <div class="mx-auto w-full max-w-5xl space-y-6 p-6 md:p-8">
@@ -307,7 +312,9 @@
 																ingredientItems,
 																ingredientValue(f),
 																i18n.t('planimport.meal.choose_ingredient'),
-																ingredientValue(f) === ''
+																ingredientValue(f) === '',
+																'',
+																true
 															)}
 														</Table.Cell>
 														<Table.Cell class="align-top">

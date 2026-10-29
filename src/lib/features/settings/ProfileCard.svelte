@@ -101,6 +101,7 @@
 				<FormSelect
 					id="timezone"
 					name="timezone"
+					searchPlaceholder={i18n.t('settings.profile.timezone.search')}
 					value={values.timezone}
 					placeholder={i18n.t('settings.profile.timezone.choose')}
 					groups={zones}
@@ -125,6 +126,7 @@
 				<FormSelect
 					id="appearance"
 					name="appearance"
+					search={false}
 					value={values.appearance ?? ''}
 					placeholder={i18n.t('appearance.' + shownAppearance)}
 					groups={appearanceGroups}
@@ -138,6 +140,7 @@
 				<FormSelect
 					id="coaching_tone"
 					name="coaching_tone"
+					search={false}
 					value={toneOrDefault(values.coachingTone)}
 					placeholder={i18n.t('tone.direct')}
 					groups={toneGroups}

@@ -44,6 +44,25 @@ test('profile save: name, language re-renders, appearance applies', async ({ pag
 	expect((await api(request, user, 'GET', '/settings/profile')).locale).toBe('pt-PT');
 });
 
+test('timezone picker searches by label and clears', async ({ page, request }) => {
+	const user = await createUser(request);
+	await signIn(page, user, '/app/settings');
+	await page.waitForLoadState('networkidle');
+	// templUI selectbox: a search box over the list, and a ⊗ once a value is picked.
+	await page.locator('#timezone').click();
+	await page.getByPlaceholder('Search timezones...').fill('lisb');
+	await expect(page.getByRole('option')).toHaveCount(1);
+	await page.getByRole('option', { name: 'Europe/Lisbon', exact: true }).click();
+	await expect(page.locator('#timezone')).toContainText('Europe/Lisbon');
+	await page.getByRole('button', { name: 'Save profile' }).click();
+	await expect.poll(async () => (await api(request, user, 'GET', '/settings/profile')).timezone).toBe('Europe/Lisbon');
+
+	await page.waitForLoadState('networkidle');
+	await page.locator('#timezone').getByRole('button', { name: 'Clear selection' }).click();
+	await expect(page.locator('input[type=hidden][name=timezone]')).toHaveValue('');
+	await expect(page.locator('#timezone')).not.toContainText('Europe/Lisbon');
+});
+
 test('profile rejects an empty name with the field message', async ({ page, request }) => {
 	const user = await createUser(request);
 	await signIn(page, user, '/app/settings');

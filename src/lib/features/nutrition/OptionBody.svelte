@@ -8,7 +8,7 @@
 	import { Badge } from '#lib/components/ui/badge/index.js';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import { Input } from '#lib/components/ui/input/index.js';
-	import * as Select from '#lib/components/ui/select/index.js';
+	import SearchSelect from '#lib/components/khepri/SearchSelect.svelte';
 	import { useI18n } from '#lib/i18n/index.js';
 	import { clearOnSuccess } from './enhance.js';
 	import FieldMessage from './FieldMessage.svelte';
@@ -77,19 +77,14 @@
 		<input type="hidden" name="meal_id" value={option.id} />
 		<div class="flex items-end gap-2">
 			<div class="min-w-0 flex-1">
-				<Select.Root type="single" name="ingredient_id" bind:value={ingredientId} {items}>
-					<Select.Trigger
-						aria-label={i18n.t('nutrition.ingredient.choose')}
-						aria-invalid={errorFor(page, scope, 'ingredient_id') ? 'true' : undefined}
-					>
-						<Select.Value placeholder={i18n.t('nutrition.ingredient.choose')} />
-					</Select.Trigger>
-					<Select.Content>
-						{#each items as item (item.value)}
-							<Select.Item value={item.value} label={item.label}>{item.label}</Select.Item>
-						{/each}
-					</Select.Content>
-				</Select.Root>
+				<SearchSelect
+					name="ingredient_id"
+					bind:value={ingredientId}
+					{items}
+					placeholder={i18n.t('nutrition.ingredient.choose')}
+					aria-label={i18n.t('nutrition.ingredient.choose')}
+					invalid={Boolean(errorFor(page, scope, 'ingredient_id'))}
+				/>
 			</div>
 			<div class="w-24">
 				<Input

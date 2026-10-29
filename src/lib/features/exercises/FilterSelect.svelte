@@ -1,6 +1,6 @@
 <!-- One select of the browse filter form, submitted as a plain GET field (Go: selectbox in filterForm). -->
 <script lang="ts">
-	import * as Select from '#lib/components/ui/select/index.js';
+	import SearchSelect from '#lib/components/khepri/SearchSelect.svelte';
 
 	let {
 		id,
@@ -18,13 +18,4 @@
 	});
 </script>
 
-<Select.Root type="single" {name} bind:value={selected} items={options}>
-	<Select.Trigger {id} aria-label={placeholder}>
-		<Select.Value {placeholder} />
-	</Select.Trigger>
-	<Select.Content>
-		{#each options as option (option.value)}
-			<Select.Item value={option.value} label={option.label} />
-		{/each}
-	</Select.Content>
-</Select.Root>
+<SearchSelect {id} {name} bind:value={selected} items={options} {placeholder} aria-label={placeholder} />
