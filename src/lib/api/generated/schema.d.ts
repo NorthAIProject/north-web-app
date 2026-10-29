@@ -13911,7 +13911,7 @@ export interface operations {
                 "multipart/form-data": {
                     /**
                      * Format: binary
-                     * @description A video up to 200 MB.
+                     * @description A video up to 90 MB.
                      */
                     video: string;
                 };

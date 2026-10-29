@@ -1406,7 +1406,7 @@
 	"form.status.failed.desc": "Algo ha fallado al analizar ese vídeo.",
 	"form.status.watching": "Khepri está mirando tu serie. Suele tardar menos de un minuto.",
 	"form.title": "Revisión de técnica",
-	"form.upload.help": "MP4, MOV o WebM, de menos de 200 MB. Graba de lado, con el cuerpo entero en el plano, una sola serie.",
+	"form.upload.help": "MP4, MOV o WebM, de menos de 90 MB. Graba de lado, con el cuerpo entero en el plano, una sola serie.",
 	"form.upload.submit": "Analizar mi técnica",
 	"goal.status.abandoned": "Abandonado",
 	"goal.status.achieved": "Logrado",

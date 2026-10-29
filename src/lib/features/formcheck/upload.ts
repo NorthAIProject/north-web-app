@@ -13,7 +13,7 @@ export type UploadResult =
 	| { ok: false; refused: false; message: string };
 
 /** Go's own sentence for an empty or oversized upload (handler.upload). */
-export const CHOOSE_VIDEO = 'Choose a video to upload. Clips must be under 200 MB.';
+export const CHOOSE_VIDEO = 'Choose a video to upload. Clips must be under 90 MB.';
 /** Go: the sentence for a storage failure. */
 export const STORE_FAILED = 'Something went wrong storing that video. Try again.';
 

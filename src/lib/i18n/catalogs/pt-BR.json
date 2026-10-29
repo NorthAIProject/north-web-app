@@ -1406,7 +1406,7 @@
 	"form.status.failed.desc": "Algo deu errado ao analisar esse vídeo.",
 	"form.status.watching": "O Khepri está assistindo à sua série. Isso costuma levar menos de um minuto.",
 	"form.title": "Análise de execução",
-	"form.upload.help": "MP4, MOV ou WebM, com menos de 200 MB. Grave de lado, com o corpo inteiro no quadro, uma única série.",
+	"form.upload.help": "MP4, MOV ou WebM, com menos de 90 MB. Grave de lado, com o corpo inteiro no quadro, uma única série.",
 	"form.upload.submit": "Analisar minha execução",
 	"goal.status.abandoned": "Abandonado",
 	"goal.status.achieved": "Alcançado",
