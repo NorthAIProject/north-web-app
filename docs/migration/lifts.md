@@ -19,6 +19,8 @@ message keys, `loadLabel`, `rirLabel`, `shortDecimal` = `i18n.Decimal(v, -1)`).
 
 ## API changes (north-client-api)
 
+- `POST /lifts/import/hevy` that fails part way answers 500 `LiftImportPartial { error (code
+  `import_partial`), imported: LiftImport }`; the page shows the counts above `lifts.err.partial`, as Go did.
 - `GET /lifts/today` → `LiftToday { sets: LiftSet[] (today, oldest first), recent: string[] }`,
   wrapping `Service.Today` exactly as the web handler did.
 - `POST /lifts/sets`: `setNumber: 0` now means "the web form's set": the server numbers it as the
@@ -30,10 +32,8 @@ message keys, `loadLabel`, `rirLabel`, `shortDecimal` = `i18n.Decimal(v, -1)`).
 
 - `/app/lifts/today` is a real page here (Go's was a bare fragment), so the URL leads somewhere and
   the card can be tested on its own.
-- A failed import that half-saved (Go: 500 with the counts and `lifts.err.partial`) shows
-  `lifts.err.generic`: the API's error does not carry the partial counts.
-- Uploads go through a SvelteKit form action; production `BODY_SIZE_LIMIT` (adapter-node defaults to
-  512 KB) must be raised to ≥ 11 MB for 10 MB Hevy exports.
+- Uploads go through a SvelteKit form action. adapter-cloudflare sets no body limit of its own, so
+  10 MB Hevy exports pass (see `docs/architecture/hosting-cloudflare.md`).
 - Rail highlight: Go lit "Fitness" (`BuildNav(ctx, "/app/fitness")`); the shell highlights by URL.
 
 ## Library candidates

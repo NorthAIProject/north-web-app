@@ -25,6 +25,7 @@ Feature files in `src/lib/features/goals/`:
 
 ## API added
 
+- `GET /goals/{id}` returns up to 50 updates (was 20), as the Go detail page read.
 - `GoalSummary.motivation`: the list card shows the "why".
 - `GoalList.overdueMilestones`: feeds the overdue KPI.
 
@@ -32,7 +33,6 @@ Feature files in `src/lib/features/goals/`:
 
 - Alpine `confirm()` became a shadcn Dialog (`ConfirmForm`). It is used for milestone remove,
   "Let this one go" and delete. Without JS it submits directly.
-- Goal detail shows at most 20 updates, the API limit. Go web showed 50.
 - The funnel `MomentShown` event is not fired for goal moments: there is no browser analytics hook yet.
 - The category donut stays on ECharts (`EChart.svelte` + the shared `donutOption`).
 

@@ -22,6 +22,8 @@ export class ApiError extends Error {
 	readonly code?: string;
 	readonly fields: Record<string, string>;
 	readonly requestId?: string;
+	/** The parsed reply, for a refusal that carries more than the envelope. */
+	readonly body?: unknown;
 
 	constructor(init: {
 		status: number;
@@ -29,6 +31,7 @@ export class ApiError extends Error {
 		code?: string;
 		fields?: Record<string, string>;
 		requestId?: string;
+		body?: unknown;
 	}) {
 		super(init.message);
 		this.name = 'ApiError';
@@ -37,6 +40,7 @@ export class ApiError extends Error {
 		this.code = init.code;
 		this.fields = init.fields ?? {};
 		this.requestId = init.requestId;
+		this.body = init.body;
 	}
 
 	/** Reads are retried on transient failures; writes never are. */
@@ -76,7 +80,8 @@ export async function apiErrorFrom(response: Response, body?: unknown): Promise<
 		message: detail?.message || response.statusText || 'Something went wrong.',
 		code: detail?.code,
 		fields: detail?.fields,
-		requestId: response.headers.get('x-request-id') ?? undefined
+		requestId: response.headers.get('x-request-id') ?? undefined,
+		body: parsed
 	});
 }
 

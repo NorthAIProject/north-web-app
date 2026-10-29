@@ -41,6 +41,7 @@ with, then `goto`s its URL (Go: `HX-Push-Url`), so reload shows what is on scree
 
 ## API added (north-client-api)
 
+- `GET /training/plans` lists up to 50 plans (was 20), as the Go week editor read.
 - `GET /training/overview` → `{ recap?: LiftRecap, readiness?: TrainingReadiness }`: this week's
   latest workout and the body's readiness, which Go's `planView` added from the lifts service.
   `internal/workouts/overview_api.go`; wired with `workouts.NewAPI(…).WithRecaps(liftSvc).WithLoads(liftSvc)`.
@@ -58,7 +59,6 @@ with, then `goto`s its URL (Go: `HX-Push-Url`), so reload shows what is on scree
   button, intake, import and the exercise page's add-to-day form work without it.
 - A refused edit (422, e.g. "an exercise needs at least one set") shows the plan's message above the
   days; Go answered a bare "That request could not be read." and htmx swapped it in.
-- The week editor lists plans from `GET /training/plans` (20); Go read 50.
 - "From another plan" in the week compares the session's plan version with the followed plan's
   current version; Go compared intake ids. Same answer unless a version is stale.
 - The recap's volume chart is drawn with ECharts (`EChart`) from the same grouped-bar config Go fed

@@ -5615,7 +5615,7 @@ export interface paths {
         put?: never;
         /**
          * Import workout history from a Hevy export
-         * @description Each workout in the CSV becomes a finished strength session with its sets, warm-ups, drop sets and effort. Importing the same file again adds nothing; a workout Apple Health already recorded keeps that session and gains the sets. Exercise names are matched to the catalog; names with no match are kept as typed and listed in unmatched. A file that is not a Hevy export is a 422 with the reason in fields.file.
+         * @description Each workout in the CSV becomes a finished strength session with its sets, warm-ups, drop sets and effort. Importing the same file again adds nothing; a workout Apple Health already recorded keeps that session and gains the sets. Exercise names are matched to the catalog; names with no match are kept as typed and listed in unmatched. A file that is not a Hevy export is a 422 with the reason in fields.file. An import that fails part way is a 500 with code import_partial and, in imported, what was saved before it stopped.
          */
         post: operations["importHevyWorkouts"];
         delete?: never;
@@ -7184,6 +7184,10 @@ export interface components {
             skipped: number;
             /** @description Exercise names with no catalog entry, kept as typed. */
             unmatched: string[];
+        };
+        LiftImportPartial: {
+            error: components["schemas"]["ErrorDetail"];
+            imported: components["schemas"]["LiftImport"];
         };
         LiftLastExercise: {
             key: string;
@@ -19462,6 +19466,15 @@ export interface operations {
             };
             401: components["responses"]["Unauthorized"];
             422: components["responses"]["ValidationError"];
+            /** @description The import stopped part way; what was saved is in imported */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LiftImportPartial"];
+                };
+            };
         };
     };
     getWorkoutRecap: {

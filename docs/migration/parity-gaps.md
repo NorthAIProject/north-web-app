@@ -34,9 +34,7 @@ Pure refactors (named actions instead of per-id URLs, components instead of frag
 - **My Day:** write failures appear as a toast instead of an inline 422 fragment. (day.md)
 - **Fitness:** Strava connect, sync and disconnect results arrive as `/app/fitness?notice=…` redirects. The row "Show" buttons now tint that day's rows; in Go they did nothing. (fitness.md)
 - **Form check:** uploading needs JavaScript; Go's form posted without it. A quota refusal shows inline above the form instead of a bare 429 page. (formcheck.md)
-- **Goals:** goal detail shows at most 20 progress updates. Go showed 50. (goals.md)
 - **Knowledge:** a quota refusal on rebuild or read-again shows inline. A document that cannot be read falls back to its list record plus the API's message. (knowledge.md)
-- **Lifts:** a Hevy import that half-saved shows a generic error without the saved/failed counts. (lifts.md)
 - **Lifts:** `/app/lifts/today` is now a real page; in Go it was a bare fragment. (lifts.md)
 - **Memories:** after an add, the category select keeps the last choice instead of resetting to `general`. (memories.md)
 - **Nutrition:** the food log's quick-capture panel is a link card to `/app/capture`, not an embedded panel. (nutrition.md)
@@ -48,7 +46,7 @@ Pure refactors (named actions instead of per-id URLs, components instead of frag
 - **PWA:** the service worker moves from `/sw.js` to `/service-worker.js`, and the cache name now changes on every deploy. (pwa.md)
 - **Recaps:** the share link uses the request's origin, not `BASE_URL`. (recaps.md)
 - **Reports:** a pending report polls every 5 s and updates in place; Go said "refresh in a moment". Rating is Yes / No / Undo. (reports.md)
-- **Training:** the week editor lists 20 plans (Go: 50). A refused edit shows the plan's message instead of "That request could not be read." (training.md)
+- **Training:** a refused edit shows the plan's message instead of "That request could not be read." (training.md)
 
 Doc claims that the code has since fixed (the docs are stale, nothing to do):
 

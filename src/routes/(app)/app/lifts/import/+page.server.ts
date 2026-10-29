@@ -1,6 +1,7 @@
 import { fail } from '@sveltejs/kit';
 import { isApiError } from '#lib/api/errors.js';
 import { serverApi } from '#lib/server/api.js';
+import type { components } from '#lib/api/generated/schema.js';
 import type { Actions } from './$types';
 
 // Go: internal/lifts/handler.go importPage / importUpload (GET/POST /app/lifts/import).
@@ -31,6 +32,11 @@ export const actions: Actions = {
 		} catch (err) {
 			if (isApiError(err) && err.status === 422) {
 				return fail(422, { error: Object.values(err.fields)[0] || err.message });
+			}
+			// Go showed what was saved above lifts.err.partial.
+			if (isApiError(err) && err.code === 'import_partial') {
+				const { imported } = err.body as components['schemas']['LiftImportPartial'];
+				return fail(500, { errorKey: 'lifts.err.partial', result: imported });
 			}
 			if (isApiError(err)) return fail(err.status >= 500 ? 500 : err.status, { errorKey: 'lifts.err.generic' });
 			throw err;
