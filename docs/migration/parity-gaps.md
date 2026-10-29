@@ -132,3 +132,16 @@ A blanket `/oauth/*`, `/.well-known/*` or `/api/*` rule breaks consent, AASA or 
   token, path and flags), so signed-in users stay signed in across the cut-over.
 - **SvelteKit health probe.** SvelteKit has no `/healthz` (that path stays Go's). On Workers there
   is no pod; probe `/login` for 200 (hosting-cloudflare.md).
+
+## Library pass (2026-10-29)
+
+Rule: install only what the app uses. In use and installed: bits-ui (shadcn-svelte),
+Lucide, TanStack Query, LayerChart (shadcn Chart), ECharts, three, svelte-sonner,
+markdown-it. Removed: `@tailwindcss/forms` and `@tailwindcss/typography`, which
+`app.css` never loaded (chat markdown uses its own classes in
+`features/coach/classes.ts`).
+
+Not installed: every "Library candidates" entry in the feature docs is polish Go
+never had (Motion/GSAP transitions, svelte-dnd-action reordering, TanStack
+Table sorting, Paneforge, MapLibre, Threlte). Each one goes in with the feature
+that needs it.
