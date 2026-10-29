@@ -14,9 +14,10 @@
 		"enabled": true
 	},
 	// The workers.dev URL is for trying a build before kheprios.com moves over.
-	// Production routes are added once the kheprios.com zone is on Cloudflare:
-	//   "routes": [{ "pattern": "kheprios.com/*", "zone_name": "kheprios.com" },
-	//              { "pattern": "www.kheprios.com/*", "zone_name": "kheprios.com" }]
+	// The production route is added once the kheprios.com zone is on Cloudflare:
+	//   "routes": [{ "pattern": "kheprios.com/*", "zone_name": "kheprios.com" }]
+	// www is not routed here: a zone redirect rule sends it to the apex, where the
+	// session cookie and the passkey relying party live.
 	"workers_dev": true,
 	"vars": {
 		// north-client's JSON API as the Worker reaches it.

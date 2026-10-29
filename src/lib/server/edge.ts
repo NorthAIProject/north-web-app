@@ -1,6 +1,7 @@
 // The paths north-client keeps serving after the web moves to SvelteKit: its
-// JSON API, the MCP endpoint and its OAuth server, the health ingest and the
-// webhooks. On Cloudflare the Worker runs for the whole host, so it hands these
+// JSON API, the MCP endpoint and its OAuth server, the health ingest, the
+// webhooks, and the ACME challenges cert-manager answers to renew the origin's
+// certificate (HTTP-01). On Cloudflare the Worker runs for the whole host, so it hands these
 // straight to the Go origin before doing any SvelteKit work.
 //
 // Prefixes are matched exactly, because neighbours belong to SvelteKit:
@@ -13,6 +14,7 @@ const goPrefixes = [
 	'/api/v1/',
 	'/mcp/',
 	'/.well-known/oauth-',
+	'/.well-known/acme-challenge/',
 	'/ingest/',
 	'/webhooks/',
 	'/internal/metrics'

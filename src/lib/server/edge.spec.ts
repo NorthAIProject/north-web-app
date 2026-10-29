@@ -12,6 +12,7 @@ describe('isGoPath', () => {
 			'/oauth/revoke',
 			'/.well-known/oauth-authorization-server',
 			'/.well-known/oauth-protected-resource/mcp',
+			'/.well-known/acme-challenge/Xb3k9',
 			'/ingest/health/batch',
 			'/webhooks/telegram',
 			'/healthz',

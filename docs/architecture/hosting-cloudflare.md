@@ -36,6 +36,10 @@ in `docs/migration/parity-gaps.md` §3. Go keeps:
 - `/mcp`, `/mcp/*`
 - `/oauth/token`, `/oauth/register`, `/oauth/revoke`
 - `/.well-known/oauth-*`
+- `/.well-known/acme-challenge/*`: cert-manager renews the origin's Let's Encrypt
+  certificate over HTTP-01 (`cluster/cert-manager/issuers.yaml` in infra). If the
+  Worker answered these, renewal would fail silently and Full (strict) would break
+  about 60 days later.
 - `/ingest/*`, `/webhooks/*`
 - `/healthz`, `/internal/metrics`
 
@@ -49,7 +53,8 @@ Two layers enforce this:
    CPU, no invocation count, no Worker in the upload path):
    `kheprios.com/api/v1*`, `kheprios.com/mcp*`, `kheprios.com/oauth/token*`,
    `kheprios.com/oauth/register*`, `kheprios.com/oauth/revoke*`,
-   `kheprios.com/.well-known/oauth-*`, `kheprios.com/ingest/*`,
+   `kheprios.com/.well-known/oauth-*`, `kheprios.com/.well-known/acme-challenge/*`,
+   `kheprios.com/ingest/*`,
    `kheprios.com/webhooks/*`, `kheprios.com/healthz*`,
    `kheprios.com/internal/metrics*`. Route patterns only take a trailing `*`,
    so `/mcp*` also catches `/mcpx`. Nothing lives there, and an unknown path
@@ -125,7 +130,8 @@ WEB_URL=http://localhost:8787 bunx playwright test --project desktop
    imported DNS records against Namecheap's: the apex A `178.105.244.185`,
    `www`, `media`, mail records. Set apex/www to **proxied** and `media` to
    **DNS-only**. SSL mode: **Full (strict)**, since the ingress has a real
-   certificate.
+   certificate. Add a redirect rule from `www` to the apex (301, keep the path and
+   query): the session cookie and the passkey relying party are the apex's.
 4. **Nameservers (owner, at Namecheap):** switch to the two Cloudflare
    nameservers. Wait for the zone to show Active.
 5. **Routes (account):** the Worker-less Go routes first, then uncomment
