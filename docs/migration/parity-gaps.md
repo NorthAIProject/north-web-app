@@ -127,10 +127,10 @@ A blanket `/oauth/*`, `/.well-known/*` or `/api/*` rule breaks consent, AASA or 
 - **Upload body limit.** No `BODY_SIZE_LIMIT` is set anywhere in this repo. adapter-node's default
   of 512 KB would refuse uploads before they reach the API: form-check videos (need at least 201M),
   Hevy imports (at least 11 MB), progress photos and knowledge uploads. (formcheck.md, lifts.md, progress.md)
-  On Cloudflare the platform caps a request body too (100 MB on Free/Pro plans), so 201 MB videos
-  cannot pass through the proxied zone at all, from the web or from iOS. Plan: presigned PUT
-  straight to `media.kheprios.com` (DNS-only), before the DNS move. See
-  `docs/architecture/hosting-cloudflare.md`.
+  Resolved by hosting: adapter-cloudflare has no such limit, and the form-check upload streams
+  through the `/api` proxy, so it is never buffered in the Worker. The zone caps request bodies at
+  100 MB (Free/Pro), so videos are now capped at 90 MB in the API, and iOS shrinks bigger clips
+  (decided 2026-10-28; `docs/architecture/hosting-cloudflare.md`).
 - ~~**Session cookie renamed.**~~ Fixed: SvelteKit now uses Go's `north_session` cookie (same
   token, path and flags), so signed-in users stay signed in across the cut-over.
 - **SvelteKit health probe.** SvelteKit has no `/healthz` (that path stays Go's). On Workers there

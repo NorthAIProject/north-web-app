@@ -69,34 +69,28 @@ From the Workers limits page (checked 2026-10-28):
 | Requests | 100k/day | unlimited | Fine either way today. |
 | Subrequests | 50/request | 10,000 | The heaviest loads call the API ~10 times. Fine. |
 | Worker bundle (gzip) | 3 MB | 10 MB | Current build: 1.27 MB gzip. |
-| Request body | 100 MB (Free/Pro **zone**) | same | **Blocks 200 MB form-check videos.** See below. |
+| Request body | 100 MB (Free/Pro **zone**) | same | Videos capped at 90 MB to fit. See below. |
 
 The body cap is a zone limit, not a Workers one. It applies to every proxied
 request, including the Worker-less Go routes, so it hits iOS as well as the web.
 
 ## Before the DNS move: uploads over 100 MB
 
-Today iOS and the web both POST raw videos (up to `media.MaxVideoBytes`,
-200 MB) through `/api/v1`. Once kheprios.com is proxied, anything over 100 MB
-gets a Cloudflare 413. Fix, in order:
+Decision (2026-10-28): cap videos below the zone limit rather than add direct-to-storage uploads.
 
-1. **API (north-client, additive):** `POST /api/v1/form-checks/uploads` returns a
-   presigned PUT URL plus an upload id. `internal/media/storage.go` already holds
-   an `s3.PresignClient` (GET only today), so this adds a `PresignPutObject` call.
-   A second call registers the uploaded object and starts the job. The old
-   multipart route stays, because shipped iOS builds use it.
-2. **Storage host stays DNS-only.** Presigned URLs point at
-   `https://media.kheprios.com` (`STORAGE_ENDPOINT`). That record must be
-   **grey-cloud** in Cloudflare DNS, or the PUT hits the same 100 MB cap. The
-   signature binds the host, so the name cannot change.
-3. **iOS:** upload to the presigned URL; ship it to the App Store.
-4. **Web:** `formcheck` uploads from the browser straight to the presigned URL.
-   The bytes never touch the Worker.
+- **API:** `media.MaxVideoBytes` is 90 MB (north-client 9b9bee51). With the multipart overhead,
+  a request stays under 100 MB, and refusal messages and help text say 90 MB.
+- **iOS:** a picked clip over 90 MB is re-encoded at 720p, then 540p. If it is still too big, the
+  person is asked to trim it (north-ios `fix/form-check-video-cap`, 0bc7a5e). **Ship this build
+  before the DNS move.** An older build sends raw clips, and one over 100 MB gets Cloudflare's
+  413 instead of the API's message.
+- **Web:** the browser posts the file as picked. Over 90 MB, the API's message says so.
 
-Until (3) is on most devices, an iOS user with a clip over 100 MB gets a 413 after
-the move. To shrink that window, add the cap to the iOS picker. Other uploads
-(Hevy CSV, progress photos, plan files, knowledge docs, chat photos) are well
-under 100 MB.
+`media.kheprios.com` (`STORAGE_ENDPOINT`) can stay DNS-only either way. Nothing uploads to it from a
+browser, and presigned GETs are signed for that host.
+
+If 200 MB clips are ever needed again, the alternative is a presigned PUT straight to storage
+(`internal/media/storage.go` already holds an `s3.PresignClient`).
 
 ## Vars and secrets
 
@@ -122,8 +116,8 @@ WEB_URL=http://localhost:8787 bunx playwright test --project desktop
 
 ## Cut-over runbook
 
-1. **Uploads:** the presigned upload is live on the API, and an iOS build with
-   it is approved.
+1. **Uploads:** the 90 MB API cap is live, and the iOS build that shrinks clips
+   is approved.
 2. **First deploy (account):** `bun x wrangler login`, then `bun x wrangler
    deploy`. Open the `*.workers.dev` URL; it talks to the production API.
    Sign in, open My Day, and check that the coach streams.
