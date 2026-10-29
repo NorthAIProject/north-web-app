@@ -6,12 +6,12 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import MonoLabel from '#lib/components/khepri/MonoLabel.svelte';
+	import SearchSelect from '#lib/components/khepri/SearchSelect.svelte';
 	import * as Alert from '#lib/components/ui/alert/index.js';
 	import { Badge } from '#lib/components/ui/badge/index.js';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Card from '#lib/components/ui/card/index.js';
 	import { Input } from '#lib/components/ui/input/index.js';
-	import * as Select from '#lib/components/ui/select/index.js';
 	import * as Table from '#lib/components/ui/table/index.js';
 	import { useI18n } from '#lib/i18n/index.js';
 	import type { WorkoutDraft } from './types.js';
@@ -103,16 +103,14 @@
 				<Card.Header class="flex flex-row flex-wrap items-center justify-between gap-3">
 					<Card.Title>{dayLabel(day.label, i)}</Card.Title>
 					<div class="flex items-center gap-2">
-						<Select.Root type="single" bind:value={day.weekday} items={weekdayItems}>
-							<Select.Trigger class="w-40" aria-invalid={day.weekday === '' ? true : undefined}>
-								<Select.Value placeholder={i18n.t('planimport.weekday_ph')} />
-							</Select.Trigger>
-							<Select.Content>
-								{#each weekdayItems as o (o.value)}
-									<Select.Item value={o.value} label={o.label}>{o.label}</Select.Item>
-								{/each}
-							</Select.Content>
-						</Select.Root>
+						<SearchSelect
+							bind:value={day.weekday}
+							items={weekdayItems}
+							placeholder={i18n.t('planimport.weekday_ph')}
+							invalid={day.weekday === ''}
+							search={false}
+							class="w-40"
+						/>
 						<Button variant="ghost" size="sm" onclick={() => removeDay(i)}>{i18n.t('planimport.remove_day')}</Button>
 					</div>
 				</Card.Header>

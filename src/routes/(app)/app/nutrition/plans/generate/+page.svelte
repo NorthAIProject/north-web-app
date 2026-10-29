@@ -2,12 +2,12 @@
 	import { enhance } from '$app/forms';
 	import { pageTitle } from '#lib/brand.js';
 	import MonoLabel from '#lib/components/khepri/MonoLabel.svelte';
+	import SearchSelect from '#lib/components/khepri/SearchSelect.svelte';
 	import * as Alert from '#lib/components/ui/alert/index.js';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Card from '#lib/components/ui/card/index.js';
 	import { Input } from '#lib/components/ui/input/index.js';
 	import { Label } from '#lib/components/ui/label/index.js';
-	import * as Select from '#lib/components/ui/select/index.js';
 	import { Textarea } from '#lib/components/ui/textarea/index.js';
 	import MealReview from '#lib/features/planimport/MealReview.svelte';
 	import { bandChoice, CARB_BANDS, say } from '#lib/features/planimport/view.js';
@@ -39,16 +39,15 @@
 {/snippet}
 
 {#snippet picker(id: string, items: { value: string; label: string }[], selected: string)}
-	<Select.Root type="single" name={id} value={selected} {items}>
-		<Select.Trigger {id} aria-invalid={errors[id] ? true : undefined}>
-			<Select.Value placeholder={i18n.t('planimport.meal.choose_one')} />
-		</Select.Trigger>
-		<Select.Content>
-			{#each items as item (item.value)}
-				<Select.Item value={item.value} label={item.label}>{item.label}</Select.Item>
-			{/each}
-		</Select.Content>
-	</Select.Root>
+	<SearchSelect
+		{id}
+		name={id}
+		value={selected}
+		{items}
+		placeholder={i18n.t('planimport.meal.choose_one')}
+		invalid={Boolean(errors[id])}
+		search={false}
+	/>
 {/snippet}
 
 {#if form?.review}

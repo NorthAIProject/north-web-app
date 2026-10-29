@@ -8,10 +8,10 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import MuscleViewer from '#lib/components/khepri/MuscleViewer.svelte';
+	import SearchSelect from '#lib/components/khepri/SearchSelect.svelte';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Dialog from '#lib/components/ui/dialog/index.js';
 	import { Input } from '#lib/components/ui/input/index.js';
-	import * as Select from '#lib/components/ui/select/index.js';
 	import { useI18n } from '#lib/i18n/index.js';
 	import { cn } from '#lib/utils.js';
 	import { quickSubmit } from './forms.js';
@@ -91,16 +91,14 @@
 		</Dialog.Header>
 		<form method="post" action="?/soreness" class="space-y-2" use:enhance={quickSubmit(i18n)}>
 			<p class="text-sm font-medium">{i18n.t('day.soreness.add')}</p>
-			<Select.Root type="single" name="region" bind:value={region}>
-				<Select.Trigger id="region">
-					{region ? i18n.t(`day.region.${region}`) : i18n.t('day.soreness.region')}
-				</Select.Trigger>
-				<Select.Content>
-					{#each data.regions as r (r)}
-						<Select.Item value={r} label={i18n.t(`day.region.${r}`)}>{i18n.t(`day.region.${r}`)}</Select.Item>
-					{/each}
-				</Select.Content>
-			</Select.Root>
+			<SearchSelect
+				id="region"
+				name="region"
+				bind:value={region}
+				items={data.regions.map((r) => ({ value: r, label: i18n.t(`day.region.${r}`) }))}
+				placeholder={i18n.t('day.soreness.region')}
+				search={false}
+			/>
 			<div class="grid grid-cols-4 gap-2">
 				{#each ['1', '2', '3', '0'] as sev (sev)}
 					<Button type="submit" variant="outline" size="sm" name="severity" value={sev}>{i18n.t(`day.severity.${sev}`)}</Button>

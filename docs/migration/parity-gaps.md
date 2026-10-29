@@ -21,7 +21,6 @@ Pure refactors (named actions instead of per-id URLs, components instead of frag
 - **Auth:** the passkey button on the MCP consent page now works. Go's did nothing. (auth.md)
 - **Activity:** a refusal shows the API's message without Go's `: validation failed` suffix. (activity.md)
 - **Calculator:** generating a plan without measurements says "The goal could not be worked out." instead of naming the missing biometrics. (calculator.md)
-- **Selects (app-wide):** shadcn Select has no search box and no clear (⊗) button; templUI had both. This matters most on long ingredient and country lists. (calculator, nutrition, planimport, social, settings, landing .md)
 - **Care:** saving one card resets only that form. Text typed in other cards survives, where Go's panel swap cleared it. (care.md)
 - **Charts (app-wide):** Go's Chart.js charts are drawn by shadcn Chart (LayerChart) via `SpecChart`; tick counts and legend swatches differ slightly. ECharts charts are unchanged. (insights.md, care.md)
 - **Dates (app-wide):** times show in the user's timezone. Go showed server time or UTC. Affects care, decisions, knowledge, fitness (Strava "last synced"), settings and the moderation queue. (care, decisions, knowledge, fitness, settings, moderation .md)

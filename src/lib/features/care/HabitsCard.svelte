@@ -1,12 +1,12 @@
 <!-- Habits with streaks, today's tick, and the add form (Go: habitsCard, habitRow). -->
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import SearchSelect from '#lib/components/khepri/SearchSelect.svelte';
 	import { Badge } from '#lib/components/ui/badge/index.js';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Card from '#lib/components/ui/card/index.js';
 	import { Input } from '#lib/components/ui/input/index.js';
 	import { Label } from '#lib/components/ui/label/index.js';
-	import * as Select from '#lib/components/ui/select/index.js';
 	import { useI18n } from '#lib/i18n/index.js';
 	import ActionButton from './ActionButton.svelte';
 	import DayChecks from './DayChecks.svelte';
@@ -90,16 +90,14 @@
 					</div>
 					<div class="space-y-2">
 						<Label for="domain">{i18n.t('care.habits.area')}</Label>
-						<Select.Root type="single" name="domain" value={typed(failure, 'domain') || undefined}>
-							<Select.Trigger id="domain">
-								<Select.Value placeholder={i18n.t('lifedomain.personal')} />
-							</Select.Trigger>
-							<Select.Content>
-								{#each domains as d (d)}
-									<Select.Item value={d} label={i18n.t('lifedomain.' + d)}>{i18n.t('lifedomain.' + d)}</Select.Item>
-								{/each}
-							</Select.Content>
-						</Select.Root>
+						<SearchSelect
+							id="domain"
+							name="domain"
+							value={typed(failure, 'domain') || ''}
+							items={domains.map((d) => ({ value: d, label: i18n.t('lifedomain.' + d) }))}
+							placeholder={i18n.t('lifedomain.personal')}
+							search={false}
+						/>
 					</div>
 				</div>
 				{#if errors.name}

@@ -46,11 +46,10 @@ test('meal plan import: upload, review, remove a food, save', async ({ page, req
 	await expect(page.getByRole('heading', { name: 'Check your meal plan' })).toBeVisible();
 
 	await page.locator('input[name=name]').fill('Imported e2e plan');
-	await page.locator('button[data-slot=select-trigger]').nth(1).click();
+	await page.locator('[data-slot=popover-trigger][role=combobox]').nth(1).click();
 	await page.getByRole('option', { name: /^Mid carb/ }).click();
-	// Nothing in the local catalog may match: keep the file's own macros. The
-	// ingredient picker is the searchable one (templUI selectbox with search).
-	await page.locator('[data-slot=popover-trigger][role=combobox]').first().click();
+	// Nothing in the local catalog may match: keep the file's own macros.
+	await page.locator('[data-slot=popover-trigger][role=combobox]').nth(2).click();
 	await page.getByRole('option', { name: "Save as my own food (file's macros)" }).click();
 	await page.getByRole('button', { name: 'Save plan' }).click();
 	await page.waitForURL(/\/app\/nutrition\/plans\/[0-9a-f-]{36}/);

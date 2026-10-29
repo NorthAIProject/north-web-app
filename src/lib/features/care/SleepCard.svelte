@@ -1,11 +1,11 @@
 <!-- Last night's sleep, logged or corrected (Go: sleepCard). -->
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import SearchSelect from '#lib/components/khepri/SearchSelect.svelte';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Card from '#lib/components/ui/card/index.js';
 	import { Input } from '#lib/components/ui/input/index.js';
 	import { Label } from '#lib/components/ui/label/index.js';
-	import * as Select from '#lib/components/ui/select/index.js';
 	import { useI18n } from '#lib/i18n/index.js';
 	import { sleepDuration, type Care } from './format.js';
 	import { careSubmit, typed, type CareFailure } from './forms.js';
@@ -65,16 +65,14 @@
 					</div>
 					<div class="space-y-2">
 						<Label for="quality">{i18n.t('care.sleep.quality')}</Label>
-						<Select.Root type="single" name="quality" value={typed(failure, 'quality') || undefined}>
-							<Select.Trigger id="quality">
-								<Select.Value placeholder={i18n.t('care.sleep.quality.ph')} />
-							</Select.Trigger>
-							<Select.Content>
-								{#each qualities as q (q)}
-									<Select.Item value={q} label="{q} / 5">{q} / 5</Select.Item>
-								{/each}
-							</Select.Content>
-						</Select.Root>
+						<SearchSelect
+							id="quality"
+							name="quality"
+							value={typed(failure, 'quality') || ''}
+							items={qualities.map((q) => ({ value: String(q), label: `${q} / 5` }))}
+							placeholder={i18n.t('care.sleep.quality.ph')}
+							search={false}
+						/>
 					</div>
 				</div>
 				{#if errors.duration_minutes}

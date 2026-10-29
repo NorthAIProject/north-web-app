@@ -51,7 +51,6 @@ Code: `src/lib/features/nutrition/` — `view.ts` (plan_view.go helpers, `tf` wi
 - `/app/nutrition` has no Go page (only `/app/insights/nutrition`, whose empty state links to it) — not ported, still 404.
 - The log page's embedded quick-capture panel is a card linking to `/app/capture?return_to=/app/nutrition/log` until a
   capture panel component exists.
-- Selects are shadcn Select: no search box (templUI had one). With only 25 ingredients listed this is the same reach.
 - Go's portion "count it" compared `confirm_overage` to `"true"` while its re-post sent `"1"`; any non-empty value confirms here.
 - Named actions on one route replace Go's per-URL POST endpoints; the URLs the browser lands on are the same.
 - Spoken-meal "Find" needs JS (Go posted an htmx partial).

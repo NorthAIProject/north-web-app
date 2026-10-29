@@ -30,7 +30,6 @@ the first field message.
 - A 422 refusal shows the first field message in key order (the API's map); Go used the service's insertion order.
 - Upload errors other than validation/size/quota show `planimport.err.failed`, as Go; the API's own sentence otherwise.
 - Without JS the file input does not auto-submit (Go used an inline `onchange`); with JS, choose/drop submits as in Go.
-- Selects are shadcn Select (no search box), so the ingredient picker on long candidate lists has no filter.
 
 ## Library candidates
 

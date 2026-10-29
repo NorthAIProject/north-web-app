@@ -48,7 +48,6 @@ Svelte: `src/routes/(app)/app/settings/**`, components in `src/lib/features/sett
 - Push row ("Nudges on this device") is not ported: it needs the push subscribe API (`internal/push`, web-only today)
   and the PWA service worker. Gap.
 - Coaching style has no dictation mic (Go `dictate.Field`): no shared dictation component exists yet. Gap.
-- Selects have no search box (templUI had one); bits-ui typeahead covers it.
 - Go nested the News ticker button inside the Activity button (invalid `<a>` in `<a>`); here they are siblings.
   `/app/settings/news-ticker` itself belongs to the news port (API in `internal/news/api_settings.go`).
 - The calendar card renders only when Telegram is enabled, as in Go (it sits inside that `if`).

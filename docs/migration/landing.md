@@ -14,10 +14,10 @@ Behaviour ported: bearing rail / mobile progress hairline, hero wall geometry (`
 - The muscle figure is painted from the exercise data, not read back from the active panel's DOM (same single source).
 - Analytics: env `POSTHOG_API_KEY` / `POSTHOG_HOST` (public, same names as the Go deployment; empty key = off). Vendored `posthog.min.js` copied to `static/assets/js/vendor/`, preloaded in `<head>` and run after hydration (Go ran it synchronously in `<head>`). Because navigation is client-side: pageviews captured on every navigation, autocapture limited with `url_allowlist` to Go's page set, query stripping decided per event, replay started/stopped per page (stopped in `beforeNavigate`), `identify` re-run when the user signs in without a reload.
 - `og:title`/`twitter:title` are emitted only by pages that use `PageTitle.svelte` (public pages); AuthShell/app pages set `<title>` only. Suggest AuthShell adopt `PageTitle`.
-- The setter's select uses the shared bits-ui Select: Go's templUI selectbox shows a clear (⊗) icon once a value is chosen, ours a chevron.
+- The setter's ⊗ empties the select, and the plan keeps to the default goal. Go set the goal to '' and showed a blank objective.
 
 ## Visual check
-Go (:8090) vs SvelteKit (:5173), full-page, desktop 1440 + mobile 390, light + dark: identical page heights; pixel diff limited to the select trigger icon above. Remaining diffs on reruns came from `font-display: optional` (fallback font on a cold load) and dev-server reloads by other agents.
+Go (:8090) vs SvelteKit (:5173), full-page, desktop 1440 + mobile 390, light + dark: identical page heights; pixel diff limited to the select trigger icon (since matched: SearchSelect shows the ⊗). Remaining diffs on reruns came from `font-display: optional` (fallback font on a cold load) and dev-server reloads by other agents.
 
 ## Library candidates
 - **Motion**: thread-entry stagger (now CSS keyframes + inline delay), hero wall sway (CSS), surface tab panel switch (now instant), goal "typing" reveal.

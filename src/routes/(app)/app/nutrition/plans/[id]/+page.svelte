@@ -2,9 +2,9 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { pageTitle } from '#lib/brand.js';
+	import SearchSelect from '#lib/components/khepri/SearchSelect.svelte';
 	import { Badge } from '#lib/components/ui/badge/index.js';
 	import { Button } from '#lib/components/ui/button/index.js';
-	import * as Select from '#lib/components/ui/select/index.js';
 	import DayCard from '#lib/features/nutrition/DayCard.svelte';
 	import FieldMessage from '#lib/features/nutrition/FieldMessage.svelte';
 	import OverageAlert from '#lib/features/nutrition/OverageAlert.svelte';
@@ -71,16 +71,14 @@
 		<form method="post" action="?/addDay" class="flex items-end gap-2" use:enhance>
 			{#if advanced(page)}
 				<div class="w-48">
-					<Select.Root type="single" name="weekday" bind:value={weekday} items={weekdayItems}>
-						<Select.Trigger aria-label={i18n.t('nutrition.day.choose')}>
-							<Select.Value placeholder={i18n.t('nutrition.day.choose')} />
-						</Select.Trigger>
-						<Select.Content>
-							{#each weekdayItems as item (item.value)}
-								<Select.Item value={item.value} label={item.label}>{item.label}</Select.Item>
-							{/each}
-						</Select.Content>
-					</Select.Root>
+					<SearchSelect
+						name="weekday"
+						bind:value={weekday}
+						items={weekdayItems}
+						aria-label={i18n.t('nutrition.day.choose')}
+						placeholder={i18n.t('nutrition.day.choose')}
+						search={false}
+					/>
 				</div>
 				<Button type="submit" variant="outline">{i18n.t('nutrition.day.add')}</Button>
 			{:else}

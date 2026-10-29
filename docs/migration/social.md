@@ -64,8 +64,6 @@ HttpOnly, Lax), `north_facebook_oauth` (path `/app/friends/facebook`, 10 minutes
 ## Deliberate differences
 
 - Form posts target `/app/friends?/<action>` rather than Go's per-route POST paths (see table).
-- The country select is shadcn's Select (bits-ui, typeahead by keyboard) rather than templUI's
-  selectbox with a search box and a clear button; the options and preselection are the same.
 - After a refused phone code the OTP boxes come back empty (keyed on the form result), matching
   Go's full re-render.
 - The rate-limit and unknown-handle messages are Go's hard-coded English strings, as in Go.

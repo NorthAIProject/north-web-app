@@ -9,12 +9,12 @@
 	import ScaleIcon from '@lucide/svelte/icons/scale';
 	import TargetIcon from '@lucide/svelte/icons/target';
 	import MonoLabel from '#lib/components/khepri/MonoLabel.svelte';
+	import SearchSelect from '#lib/components/khepri/SearchSelect.svelte';
 	import { Badge } from '#lib/components/ui/badge/index.js';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Card from '#lib/components/ui/card/index.js';
 	import { Checkbox } from '#lib/components/ui/checkbox/index.js';
 	import { Label } from '#lib/components/ui/label/index.js';
-	import * as Select from '#lib/components/ui/select/index.js';
 	import { Separator } from '#lib/components/ui/separator/index.js';
 	import { Slider } from '#lib/components/ui/slider/index.js';
 	import { useI18n } from '#lib/i18n/index.js';
@@ -47,7 +47,10 @@
 
 	// Goal setter
 	const goals: SetterGoal[] = ['strength', 'leaner', 'endurance', 'pain'];
-	let goal: SetterGoal = $state('strength');
+	// The ⊗ empties the select; the plan keeps to the default goal rather than
+	// show Go's blank objective.
+	let picked = $state<string>('strength');
+	const goal = $derived((picked || 'strength') as SetterGoal);
 	let days = $state(3);
 	let kit: Kit = $state({ barbell: true, dumbbells: true, pullup: false, none: false });
 	const summary = $derived(setterSummary(goal, days, kit, t));
@@ -108,17 +111,13 @@
 					<div class="mt-5 space-y-5">
 						<div>
 							<Label class="text-sm">{t('land.setter.after')}</Label>
-							<Select.Root type="single" bind:value={goal}>
-								<Select.Trigger class="mt-2 border-hairline bg-background/50">
-									<!-- The chosen goal's label; Select.Value would show its key. -->
-									<span data-slot="select-value" class="block truncate">{goal ? t(`land.setter.goal.${goal}`) : t('land.setter.pick')}</span>
-								</Select.Trigger>
-								<Select.Content>
-									{#each goals as g (g)}
-										<Select.Item value={g} label={t(`land.setter.goal.${g}`)} />
-									{/each}
-								</Select.Content>
-							</Select.Root>
+							<SearchSelect
+								bind:value={picked}
+								items={goals.map((g) => ({ value: g, label: t(`land.setter.goal.${g}`) }))}
+								placeholder={t('land.setter.pick')}
+								search={false}
+								class="mt-2 border-hairline bg-background/50"
+							/>
 						</div>
 						<div>
 							<div class="flex items-baseline justify-between">

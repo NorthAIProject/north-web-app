@@ -22,7 +22,6 @@ Go-style `%.0f` rounding), `ChoiceSelect.svelte`.
   this shows the API's message, "The goal could not be worked out."
 - An unparseable date of birth: the API answers under `dateOfBirth` ("Use a date like 1990-05-01."), mapped to the
   `date_of_birth` field; Go said "Enter a date of birth." (`type=date` makes this nearly unreachable).
-- The selects are shadcn Select (no search box, no clear button), like every ported selectbox.
 
 ## Library candidates
 

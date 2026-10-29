@@ -8,12 +8,12 @@
 <script lang="ts">
 	import { browserApi } from '#lib/api/client.js';
 	import { isApiError } from '#lib/api/errors.js';
+	import SearchSelect from '#lib/components/khepri/SearchSelect.svelte';
 	import { Badge } from '#lib/components/ui/badge/index.js';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Card from '#lib/components/ui/card/index.js';
 	import { Checkbox } from '#lib/components/ui/checkbox/index.js';
 	import { Label } from '#lib/components/ui/label/index.js';
-	import * as Select from '#lib/components/ui/select/index.js';
 	import { useI18n } from '#lib/i18n/index.js';
 	import type { PlanSummary, TrainingWeek, WeekRequest } from './types.js';
 	import {
@@ -262,24 +262,16 @@
 						<div>
 							<Label for="week-plan">{i18n.t('workouts.week.source')}</Label>
 							<div class="mt-2">
-								<Select.Root
-									type="single"
+								<SearchSelect
+									id="week-plan"
 									value={source}
 									items={plans.map((p) => ({ value: p.id, label: `${p.name} · ${i18n.tf('workouts.week.ndays', p.days.length)}` }))}
+									search={false}
 									onValueChange={(v) => {
 										source = v;
 										void preview(formRequest());
 									}}
-								>
-									<Select.Trigger id="week-plan"><Select.Value /></Select.Trigger>
-									<Select.Content>
-										{#each plans as p (p.id)}
-											<Select.Item value={p.id} label="{p.name} · {i18n.tf('workouts.week.ndays', p.days.length)}">
-												{p.name} · {i18n.tf('workouts.week.ndays', p.days.length)}
-											</Select.Item>
-										{/each}
-									</Select.Content>
-								</Select.Root>
+								/>
 							</div>
 						</div>
 					{/if}
@@ -317,23 +309,17 @@
 										{:else}
 											{@const nextLabel = `${i18n.t('workouts.week.nextinplan')} · ${d.focus}`}
 											<div class="min-w-0 flex-1">
-												<Select.Root
-													type="single"
+												<SearchSelect
+													id="week-session-{wd}"
+													aria-label={weekDate(i18n, d.date)}
 													value={pins[wd] || NEXT}
 													items={[{ value: NEXT, label: nextLabel }, ...sessions]}
+													search={false}
 													onValueChange={(v) => {
 														pins = { ...pins, [wd]: v === NEXT ? '' : v };
 														void preview(formRequest());
 													}}
-												>
-													<Select.Trigger id="week-session-{wd}" aria-label={weekDate(i18n, d.date)}><Select.Value /></Select.Trigger>
-													<Select.Content>
-														<Select.Item value={NEXT} label={nextLabel}>{nextLabel}</Select.Item>
-														{#each sessions as o (o.value)}
-															<Select.Item value={o.value} label={o.label}>{o.label}</Select.Item>
-														{/each}
-													</Select.Content>
-												</Select.Root>
+												/>
 											</div>
 										{/if}
 									</div>

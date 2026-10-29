@@ -16,10 +16,10 @@
 	import SmileIcon from '@lucide/svelte/icons/smile';
 	import UtensilsIcon from '@lucide/svelte/icons/utensils';
 	import ZapIcon from '@lucide/svelte/icons/zap';
+	import SearchSelect from '#lib/components/khepri/SearchSelect.svelte';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Dialog from '#lib/components/ui/dialog/index.js';
 	import { Input } from '#lib/components/ui/input/index.js';
-	import * as Select from '#lib/components/ui/select/index.js';
 	import CapturePanel from '#lib/features/capture/CapturePanel.svelte';
 	import { useI18n } from '#lib/i18n/index.js';
 	import { cn } from '#lib/utils.js';
@@ -81,16 +81,14 @@
 {/snippet}
 {#snippet supplements()}
 	<form method="post" action="?/supplement" class="space-y-2" data-testid="quick-supplement" use:enhance={done}>
-		<Select.Root type="single" name="preset" bind:value={supplement}>
-			<Select.Trigger id="supplement-preset">
-				{data.supplementPresets.find((p) => p.key === supplement)?.label ?? i18n.t('day.supplement.pick')}
-			</Select.Trigger>
-			<Select.Content>
-				{#each data.supplementPresets as p (p.key)}
-					<Select.Item value={p.key} label={p.label}>{p.label}</Select.Item>
-				{/each}
-			</Select.Content>
-		</Select.Root>
+		<SearchSelect
+			id="supplement-preset"
+			name="preset"
+			bind:value={supplement}
+			items={data.supplementPresets.map((p) => ({ value: p.key, label: p.label }))}
+			placeholder={i18n.t('day.supplement.pick')}
+			search={false}
+		/>
 		<div class="flex items-center gap-2">
 			<label for="supplement-count" class="text-muted-foreground text-sm whitespace-nowrap">{i18n.t('day.supplement.count')}</label>
 			<Input id="supplement-count" name="count" type="number" value="1" class="w-20" min="1" max="20" />
