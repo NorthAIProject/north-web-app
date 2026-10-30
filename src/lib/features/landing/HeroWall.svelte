@@ -14,6 +14,7 @@
 	import SendIcon from '@lucide/svelte/icons/send';
 	import TargetIcon from '@lucide/svelte/icons/target';
 	import TrophyIcon from '@lucide/svelte/icons/trophy';
+	import BrandMark from '#lib/components/brand/BrandMark.svelte';
 	import { useI18n } from '#lib/i18n/index.js';
 	import { backSlots, frontSlots, wallDeck, wallHabitGrid, type WallCard, type WallSlot } from './herowall.js';
 
@@ -55,7 +56,7 @@
 	{:else if c.kind === 'quote'}
 		<div class="flex h-full flex-col">
 			<div class="flex items-center gap-[0.45em]">
-				<img src="/assets/brand/khepri-logo-mark.png" alt="" class="size-[1.4em]" />
+				<BrandMark size="size-[1.4em]" />
 				<span class="font-mono text-[0.62em] uppercase tracking-[0.14em] text-agent">Khepri</span>
 			</div>
 			<p class="mt-[0.9em] text-[1.12em] font-medium leading-snug tracking-[-0.01em] text-balance">{c.body}</p>

@@ -25,10 +25,10 @@
 </script>
 
 <script lang="ts">
-	import LoaderCircleIcon from '@lucide/svelte/icons/loader-circle';
 	import MicIcon from '@lucide/svelte/icons/mic';
 	import SquareIcon from '@lucide/svelte/icons/square';
 	import { Button, type ButtonVariant } from '#lib/components/ui/button/index.js';
+	import { Spinner } from '#lib/components/ui/spinner/index.js';
 	import { useI18n } from '#lib/i18n/index.js';
 	import { cn } from '#lib/utils.js';
 	import { insert, pickType, supported, toWav, transcribe, voiceCapabilities } from './recorder.js';
@@ -163,7 +163,7 @@
 				<SquareIcon class="size-4 fill-current" />
 			</span>
 			<span class="hidden group-data-[state=reading]:inline-flex">
-				<LoaderCircleIcon class="size-4 animate-spin" />
+				<Spinner class="size-4" />
 			</span>
 			{#if showLabel}
 				<span data-dictate-label

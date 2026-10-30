@@ -18,10 +18,8 @@
 <div class="flex min-h-full flex-col items-center justify-center px-4 py-12">
 	<div class={['w-full', wide ? 'max-w-lg' : 'max-w-sm']}>
 		<div class="mb-8 flex flex-col items-center text-center">
-			<div class="flex items-center gap-3">
-				<span aria-hidden="true" class="h-8 w-px bg-signal/70"></span>
-				<BrandLockup href="/" markSize="size-7" textClass="text-xl font-medium tracking-tight" />
-			</div>
+			<!-- No gold rule beside the lockup: the emblem already carries the gold. -->
+			<BrandLockup href="/" markSize="size-7" textClass="text-xl font-medium tracking-tight" />
 			<div class="mt-3">
 				<MonoLabel text={i18n.t('layout.auth.tagline')} />
 			</div>

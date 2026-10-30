@@ -5,14 +5,24 @@
 -->
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import Mascot from './Mascot.svelte';
 	import MonoLabel from './MonoLabel.svelte';
 	import type { EmptyStateProps } from './types.js';
 
-	let { eyebrow = '', title, body = '', class: className = '', children }: EmptyStateProps & { children?: Snippet } =
-		$props();
+	let {
+		eyebrow = '',
+		title,
+		body = '',
+		mascot = false,
+		class: className = '',
+		children
+	}: EmptyStateProps & { children?: Snippet } = $props();
 </script>
 
 <div class={['flex flex-col items-center py-12 text-center', className]}>
+	{#if mascot}
+		<Mascot size="md" class="mb-4" />
+	{/if}
 	{#if eyebrow}
 		<MonoLabel text={eyebrow} />
 	{/if}

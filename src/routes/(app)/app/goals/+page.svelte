@@ -107,7 +107,7 @@
 		</Card.Root>
 	{/if}
 	{#if data.goals.length === 0}
-		<EmptyState eyebrow={i18n.t('goals.mono')} title={i18n.t('goals.empty.title')} body={i18n.t('goals.empty.body')}>
+		<EmptyState mascot eyebrow={i18n.t('goals.mono')} title={i18n.t('goals.empty.title')} body={i18n.t('goals.empty.body')}>
 			<Button class="bg-signal text-background hover:bg-signal/90" onclick={() => (open = true)}>
 				{i18n.t('goals.add')}
 			</Button>
