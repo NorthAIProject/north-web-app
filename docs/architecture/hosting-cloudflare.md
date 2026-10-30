@@ -131,7 +131,16 @@ cookie carried over; My Day, the coach (thread history) and 26 other `/app` page
 render from SvelteKit with no console errors; `/service-worker.js` replaced the Go
 `/sw.js` registration. Go pages left open before the move poll htmx partials;
 the Worker answers any `HX-Request` with `HX-Refresh: true` so they reload
-(`staleHtmxPage`, edge.ts). Open: the Google/Strava/Facebook real-account halves.
+(`staleHtmxPage`, edge.ts).
+
+Provider checks (2026-10-30):
+- Strava: real account, Sync now through the Worker → `POST /api/v1/fitness/strava/sync`
+  202 → worker `strava sync finished` (token valid, nothing new).
+- Google: `/auth/google` through the edge 302s to accounts.google.com with
+  `redirect_uri=https://kheprios.com/auth/google/callback`; Google shows its sign-in
+  page, no `redirect_uri_mismatch`. Open: one real sign-in by the owner (the callback half).
+- Facebook: prod has no `FACEBOOK_APP_ID` in `khepri-env`, so connect is off in Go and
+  here alike; nothing to check until a Meta app exists.
 
 1. **Uploads:** the 90 MB API cap is live, and the iOS build that shrinks clips
    is approved.
