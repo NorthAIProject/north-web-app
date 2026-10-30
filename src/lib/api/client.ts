@@ -24,6 +24,8 @@ export type ApiOptions = {
 	baseUrl: string;
 	token?: string;
 	locale?: string;
+	/** The browser's address, for the API's per-address limits (server code only). */
+	clientAddress?: string;
 };
 
 /** Throws ApiError for every non-2xx response, so callers only see data. */
@@ -34,10 +36,11 @@ const throwOnError: Middleware = {
 	}
 };
 
-export function createApi({ fetch, baseUrl, token, locale }: ApiOptions): Api {
+export function createApi({ fetch, baseUrl, token, locale, clientAddress }: ApiOptions): Api {
 	const headers: Record<string, string> = { Accept: 'application/json' };
 	if (token) headers.Authorization = `Bearer ${token}`;
 	if (locale) headers['Accept-Language'] = locale;
+	if (clientAddress) headers['X-Real-IP'] = clientAddress;
 	const client = createClient<paths>({ baseUrl, fetch, headers });
 	client.use(throwOnError);
 	return client;
