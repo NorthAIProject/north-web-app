@@ -30,3 +30,14 @@ export function toGo(request: Request, origin: string): Promise<Response> {
 	const target = new URL(url.pathname + url.search, origin);
 	return fetch(new Request(target, request), { redirect: 'manual' });
 }
+
+/**
+ * A Go page loaded before the move keeps polling its htmx partials (the bell,
+ * the streak), which no longer exist. This app never sends HX-Request, so any
+ * request carrying it comes from such a page: answer with htmx's refresh
+ * header and the tab reloads into SvelteKit instead of polling into 404s.
+ */
+export function staleHtmxPage(request: Request): Response | undefined {
+	if (request.headers.get('hx-request') !== 'true') return undefined;
+	return new Response(null, { status: 200, headers: { 'HX-Refresh': 'true', 'Cache-Control': 'no-store' } });
+}

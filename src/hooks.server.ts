@@ -4,7 +4,7 @@ import { isApiError } from '#lib/api/errors.js';
 import { isLocale, negotiate } from '#lib/i18n/locales.js';
 import { defaultAppearance, isAppearance } from '#lib/theme.js';
 import { apiBaseUrl, goOrigin } from '#lib/server/config.js';
-import { isGoPath, toGo } from '#lib/server/edge.js';
+import { isGoPath, staleHtmxPage, toGo } from '#lib/server/edge.js';
 import { clearSession, readSession } from '#lib/server/session.js';
 import { readAppearanceCookie, readLocaleCookie } from '#lib/server/preferences.js';
 
@@ -16,6 +16,8 @@ export const handle: Handle = async ({ event, resolve }) => {
 	// Paths north-client still owns go straight to it, untouched (edge.ts).
 	const origin = goOrigin();
 	if (origin && isGoPath(event.url.pathname)) return toGo(event.request, origin);
+	const reload = staleHtmxPage(event.request);
+	if (reload) return reload;
 
 	const token = readSession(event.cookies);
 	const proxied = event.url.pathname.startsWith('/api/');
