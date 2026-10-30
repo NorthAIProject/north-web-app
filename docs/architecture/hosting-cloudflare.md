@@ -126,8 +126,12 @@ WEB_URL=http://localhost:8787 bunx playwright test --project desktop
 routes Worker-less. Checked through the edge: pages from SvelteKit
 (`/service-worker.js` 200, `/sw.js` 404), `/healthz`, `/api/v1`, `/mcp`,
 `/oauth/token`, `/.well-known/*` and `/webhooks/telegram` from Go, www → apex 301.
-Open: a signed-in session through the edge, and the Google/Strava/Facebook
-real-account halves.
+Signed-in check (2026-10-30, owner's Chrome through the edge): the `north_session`
+cookie carried over; My Day, the coach (thread history) and 26 other `/app` pages
+render from SvelteKit with no console errors; `/service-worker.js` replaced the Go
+`/sw.js` registration. Go pages left open before the move poll htmx partials;
+the Worker answers any `HX-Request` with `HX-Refresh: true` so they reload
+(`staleHtmxPage`, edge.ts). Open: the Google/Strava/Facebook real-account halves.
 
 1. **Uploads:** the 90 MB API cap is live, and the iOS build that shrinks clips
    is approved.
