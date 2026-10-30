@@ -181,7 +181,8 @@ export type MomentData = { kind: string; title: string; body: string };
 export type KpiCellProps = { label: string; value: string; href?: string; cta?: string };
 
 /** ui.EmptyProps (the CTA is the children snippet). */
-export type EmptyStateProps = { eyebrow?: string; title: string; body?: string; class?: string };
+/** mascot: the companion above the title, for the empty states that are a first meeting. */
+export type EmptyStateProps = { eyebrow?: string; title: string; body?: string; mascot?: boolean; class?: string };
 
 // ---------------------------------------------------------------------------
 // workoutsummary

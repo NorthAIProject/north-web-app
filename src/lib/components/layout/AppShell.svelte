@@ -117,7 +117,13 @@
 
 {#snippet navItem(item: NavItem)}
 	<Sidebar.MenuItem>
-		<Sidebar.MenuButton isActive={item.active} tooltipContent={item.label}>
+		<!-- Where you are is one of gold's few jobs: a short rule at the edge
+		     and the icon, over the raised navy the primitive already paints. -->
+		<Sidebar.MenuButton
+			isActive={item.active}
+			tooltipContent={item.label}
+			class="relative data-[active=true]:before:absolute data-[active=true]:before:inset-y-1.5 data-[active=true]:before:left-0 data-[active=true]:before:w-0.5 data-[active=true]:before:rounded-full data-[active=true]:before:bg-sidebar-primary data-[active=true]:[&>svg]:text-sidebar-primary"
+		>
 			{#snippet child({ props })}
 				<a href={item.href} {...props}>
 					{#if item.icon}

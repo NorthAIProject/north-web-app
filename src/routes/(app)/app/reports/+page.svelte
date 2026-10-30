@@ -53,6 +53,7 @@
 	</div>
 	{#if data.reports.length === 0}
 		<EmptyState
+			mascot
 			eyebrow={i18n.t('reports.mono')}
 			title={i18n.t('reports.empty.title')}
 			body={i18n.t('reports.empty.body')}

@@ -5,7 +5,6 @@
 -->
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import LoaderCircleIcon from '@lucide/svelte/icons/loader-circle';
 	import RotateCcwIcon from '@lucide/svelte/icons/rotate-ccw';
 	import TargetIcon from '@lucide/svelte/icons/target';
 	import WandSparklesIcon from '@lucide/svelte/icons/wand-sparkles';
@@ -14,6 +13,7 @@
 	import * as Card from '#lib/components/ui/card/index.js';
 	import { Label } from '#lib/components/ui/label/index.js';
 	import { Separator } from '#lib/components/ui/separator/index.js';
+	import { Spinner } from '#lib/components/ui/spinner/index.js';
 	import { Textarea } from '#lib/components/ui/textarea/index.js';
 	import { useI18n } from '#lib/i18n/index.js';
 	import SectionHeading from './SectionHeading.svelte';
@@ -124,7 +124,7 @@
 					<MonoLabel text={t('land.goal.structured')} />
 					{#if running}
 						<span class="text-signal">
-							<LoaderCircleIcon class="size-3.5 motion-safe:animate-spin" />
+							<Spinner class="size-3.5" />
 						</span>
 					{/if}
 				</div>

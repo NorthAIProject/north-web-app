@@ -110,7 +110,7 @@
 </div>
 <div class="mt-4">
 	{#if documents.length === 0}
-		<EmptyState title={i18n.t('knowledge.empty.title')} body={i18n.t('knowledge.empty.body')}>
+		<EmptyState mascot title={i18n.t('knowledge.empty.title')} body={i18n.t('knowledge.empty.body')}>
 			<Button href="#add-note" class="bg-signal text-background hover:bg-signal/90">{i18n.t('knowledge.empty.cta')}</Button>
 		</EmptyState>
 	{:else}

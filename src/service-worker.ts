@@ -47,7 +47,10 @@ const SHELL = [
 	OFFLINE_URL,
 	'/assets/fonts/geist/geist-variable.woff2',
 	'/assets/fonts/geist/geist-mono-variable.woff2',
+	'/assets/fonts/marcellus/marcellus-regular.woff2',
 	'/assets/brand/favicon.svg',
+	'/assets/brand/solar/khepri-emblem-small.svg',
+	'/assets/brand/solar/khepri-emblem-small-light.svg',
 	'/assets/brand/pwa-192.png',
 	'/assets/brand/pwa-512.png'
 ];

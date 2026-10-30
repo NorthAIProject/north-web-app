@@ -169,7 +169,7 @@
 		<span class="mx-auto flex size-10 items-center justify-center rounded-full bg-signal/12 text-signal">
 			<CompassIcon class="size-5" />
 		</span>
-		<h2 class="mt-7 text-3xl font-medium tracking-[-0.03em] text-balance md:text-4xl">
+		<h2 class="mt-7 font-display text-3xl tracking-[-0.01em] text-balance md:text-4xl">
 			{t('land.cta.title')}
 		</h2>
 		<p class="mx-auto mt-5 max-w-[48ch] text-base leading-relaxed text-muted-foreground">

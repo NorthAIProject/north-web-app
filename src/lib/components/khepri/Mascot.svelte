@@ -1,6 +1,7 @@
 <!--
-	The Khepri companion (north-client mascot.Mascot): the brand scarab PNG,
-	posed by data-state and moved by CSS (.north-mascot in app.css).
+	The Khepri companion (north-client mascot.Mascot): the robotic scarab of
+	the 2026-10-30 brand (docs/brand/README.md), posed by data-state and moved
+	by CSS (.north-mascot in app.css).
 
 	<Mascot id="onboarding" size="lg" state="listening" />
 	<Mascot size="md" gesture="celebrate" />
@@ -25,6 +26,19 @@
 				return 'size-8';
 			default:
 				return 'size-24';
+		}
+	}
+
+	// CSS width of each box, so the browser picks the smallest image that is
+	// still sharp: sm is the chat avatar, lg the onboarding hero.
+	function sizesFor(s: MascotSize): string {
+		switch (s) {
+			case 'lg':
+				return '(min-width: 40rem) 12rem, 10rem';
+			case 'sm':
+				return '2rem';
+			default:
+				return '6rem';
 		}
 	}
 
@@ -61,10 +75,15 @@
 >
 	<img
 		bind:this={img}
-		src="/assets/brand/khepri-mascot.png"
+		src="/assets/brand/solar/mascot/khepri-idle-320.webp"
+		srcset="/assets/brand/solar/mascot/khepri-idle-160.webp 160w, /assets/brand/solar/mascot/khepri-idle-320.webp 320w, /assets/brand/solar/mascot/khepri-idle-590.webp 590w"
+		sizes={sizesFor(size as MascotSize)}
+		width="320"
+		height="320"
 		alt=""
 		aria-hidden="true"
 		class="size-full object-contain"
+		decoding="async"
 		onanimationend={onAnimationEnd}
 	/>
 </div>

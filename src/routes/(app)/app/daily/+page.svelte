@@ -84,7 +84,7 @@
 			</Card.Footer>
 		</Card.Root>
 	{:else}
-		<EmptyState title={i18n.t('daily.empty')} body={i18n.t('daily.empty.body')} />
+		<EmptyState mascot title={i18n.t('daily.empty')} body={i18n.t('daily.empty.body')} />
 	{/if}
 
 	{#if earlier.length > 0}
