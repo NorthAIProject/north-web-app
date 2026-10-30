@@ -138,7 +138,13 @@ Provider checks (2026-10-30):
   202 → worker `strava sync finished` (token valid, nothing new).
 - Google: `/auth/google` through the edge 302s to accounts.google.com with
   `redirect_uri=https://kheprios.com/auth/google/callback`; Google shows its sign-in
-  page, no `redirect_uri_mismatch`. Open: one real sign-in by the owner (the callback half).
+  page, no `redirect_uri_mismatch`. Real round trip by the owner's account on 2026-10-30
+  09:01: `google/start` 200 → Google account chooser → `/auth/google/callback` →
+  `google/code` 200 → `/app` signed in, from SvelteKit.
+- Plain http: Cloudflare hands `http://` requests to the Worker untouched (the Go
+  ingress used to redirect). Over http the Google start sent an `http://` redirectUri
+  and the API refused it (422 in prod logs). The Worker now 308s every non-loopback
+  http request to https (`toHttps`, edge.ts).
 - Facebook: prod has no `FACEBOOK_APP_ID` in `khepri-env`, so connect is off in Go and
   here alike; nothing to check until a Meta app exists.
 
