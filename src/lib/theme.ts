@@ -10,5 +10,6 @@ export function isAppearance(value: unknown): value is Appearance {
 	return typeof value === 'string' && (appearances as readonly string[]).includes(value);
 }
 
-export const themeColorLight = '#FCFDFF';
-export const themeColorDark = '#1C1C1F';
+// Warm Ivory and Obsidian Navy, the --background of each mode.
+export const themeColorLight = '#F6F2EA';
+export const themeColorDark = '#0B111C';

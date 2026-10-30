@@ -14,6 +14,15 @@
   font-display: optional;
 }
 
+/* Brand serif: wordmark, hero and section titles only (docs/brand/README.md).
+   One weight, Latin subset, so it costs one small request. */
+@font-face {
+  font-family: "Marcellus";
+  src: url("/assets/fonts/marcellus/marcellus-regular.woff2") format("woff2");
+  font-weight: 400;
+  font-display: optional;
+}
+
 @import "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
@@ -24,6 +33,8 @@
   --font-sans:
     "Geist", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
     "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-display:
+    "Marcellus", ui-serif, Georgia, "Times New Roman", serif;
   --font-mono:
     "Geist Mono", ui-monospace, SFMono-Regular, "SF Mono", Consolas,
     "Liberation Mono", Menlo, monospace;
@@ -90,7 +101,7 @@
   /* My Day trackers — the rings, gauges and timeline dots. One colour per
      tracker so a dot on the day rail and the card it opens always agree.
      Where a tracker already has a meaning in the palette it reuses it:
-     move is effort (ember), sleep is the agent violet. */
+     move is effort (ember); sleep keeps the violet it had. */
   --color-day-water: var(--north-day-water);
   --color-day-food: var(--north-day-food);
   --color-day-protein: var(--north-day-protein);
@@ -107,6 +118,7 @@
 
   --animate-thread-in: north-thread-in 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
   --animate-caret: north-caret 1s steps(2, start) infinite;
+  --animate-solar-core: solar-core 1.6s ease-in-out infinite;
 
   @keyframes north-thread-in {
     from {
@@ -116,6 +128,13 @@
     to {
       opacity: 1;
       transform: none;
+    }
+  }
+
+  /* The spinner's core: dims and returns, never goes out. */
+  @keyframes solar-core {
+    50% {
+      opacity: 0.45;
     }
   }
 
@@ -130,58 +149,60 @@
   /* Native controls (date/time pickers, scrollbars) follow the theme. */
   color-scheme: light;
   --radius: 0.65rem;
-  /* Cool-biased neutrals: night navigation, not pure gray or terminal black. */
-  --background: oklch(0.995 0.002 250);
-  --foreground: oklch(0.16 0.01 250);
-  --card: oklch(1 0.002 250);
-  --card-foreground: oklch(0.16 0.01 250);
-  --popover: oklch(1 0.002 250);
-  --popover-foreground: oklch(0.16 0.01 250);
-  --primary: oklch(0.22 0.02 250);
-  --primary-foreground: oklch(0.985 0.002 250);
-  --secondary: oklch(0.96 0.006 250);
-  --secondary-foreground: oklch(0.22 0.02 250);
-  --muted: oklch(0.96 0.006 250);
-  --muted-foreground: oklch(0.5 0.02 250);
-  --accent: oklch(0.96 0.006 250);
-  --accent-foreground: oklch(0.22 0.02 250);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.91 0.008 250);
-  /* Darker than --border: at 0.91 an input's edge was 1.3:1 on a card and
-     fields read as bare text. 0.66 gives 3:1, the WCAG minimum for a
-     field's boundary. */
-  --input: oklch(0.66 0.01 250);
-  --ring: oklch(0.55 0.08 218);
-  --sidebar: oklch(0.985 0.004 250);
-  --sidebar-foreground: oklch(0.16 0.01 250);
-  --sidebar-primary: oklch(0.45 0.12 218);
-  --sidebar-primary-foreground: oklch(0.985 0.002 250);
-  --sidebar-accent: oklch(0.96 0.006 250);
-  --sidebar-accent-foreground: oklch(0.22 0.02 250);
-  --sidebar-border: oklch(0.91 0.008 250);
-  --sidebar-ring: oklch(0.55 0.08 218);
+  /* Warm ivory and pale stone with navy ink: the light side of the navy and
+     gold identity (docs/brand/README.md). Hex names are the brand palette. */
+  --background: oklch(0.962 0.011 84.6); /* Warm Ivory #F6F2EA */
+  --foreground: oklch(0.216 0.036 257.7); /* navy ink #0F1A2A */
+  --card: oklch(0.98 0.009 84.6);
+  --card-foreground: oklch(0.216 0.036 257.7);
+  --popover: oklch(0.98 0.009 84.6);
+  --popover-foreground: oklch(0.216 0.036 257.7);
+  --primary: oklch(0.283 0.046 257.8); /* Armor Navy #1B2A40 */
+  --primary-foreground: oklch(0.962 0.011 84.6);
+  --secondary: oklch(0.93 0.016 82.8); /* pale stone #EDE7DC */
+  --secondary-foreground: oklch(0.216 0.036 257.7);
+  --muted: oklch(0.93 0.016 82.8);
+  --muted-foreground: oklch(0.501 0.03 261.1); /* 4.9:1 on stone */
+  --accent: oklch(0.93 0.016 82.8);
+  --accent-foreground: oklch(0.216 0.036 257.7);
+  --destructive: oklch(0.532 0.15 24.2);
+  --border: oklch(0.863 0.021 81.8);
+  /* Darker than --border so a field's edge reaches 3:1 on a card, the WCAG
+     minimum for a control's boundary. */
+  --input: oklch(0.618 0.024 86);
+  --ring: oklch(0.523 0.1 76.7);
+  --sidebar: oklch(0.945 0.013 84);
+  --sidebar-foreground: oklch(0.216 0.036 257.7);
+  --sidebar-primary: oklch(0.523 0.1 76.7);
+  --sidebar-primary-foreground: oklch(0.98 0.009 84.6);
+  --sidebar-accent: oklch(0.93 0.016 82.8);
+  --sidebar-accent-foreground: oklch(0.216 0.036 257.7);
+  --sidebar-border: oklch(0.863 0.021 81.8);
+  --sidebar-ring: oklch(0.523 0.1 76.7);
 
-  /* signal: bearing / continuity / primary CTA.
+  /* signal: bearing / continuity / primary CTA. Gold — the one precious
+     colour; keep it to the action, the active place and the key number.
      agent: coach speaking only (thread attribution, never nav chrome).
      ember: physical effort / heat only (form, load) — never marketing fills. */
-  /* 0.53, not 0.55: at 0.55 neither white nor ink text reached 4.5:1 on the
-     signal fill, and signal is the primary-action colour. */
-  --north-signal: oklch(0.53 0.14 218);
-  --north-signal-foreground: oklch(0.99 0.002 250);
-  --north-agent: oklch(0.52 0.19 288);
-  --north-ember: oklch(0.62 0.15 62);
-  --north-surface: oklch(0.985 0.004 250);
-  --north-hairline: oklch(0.3 0.02 250 / 10%);
+  /* Light signal is an antique gold, not Solar Gold: signal is also link and
+     number text, and Solar Gold on ivory is 1.7:1. This one is 4.9:1 as text
+     and 5.2:1 under ivory label text. */
+  --north-signal: oklch(0.523 0.1 76.7); /* #8A6118 */
+  --north-signal-foreground: oklch(0.98 0.009 84.6);
+  --north-agent: oklch(0.514 0.075 243.4); /* #3F6C8F */
+  --north-ember: oklch(0.546 0.121 47.3); /* copper #A8572A */
+  --north-surface: oklch(0.98 0.009 84.6);
+  --north-hairline: oklch(0.3 0.03 258 / 12%);
 
-  /* Run reuses ember and strength reuses agent rather than inventing near
-     neighbours: ember already means physical effort and agent is already the
-     violet in the palette, and two colours a shade apart read as a mistake.
+  /* Run reuses ember: ember already means physical effort, and two colours
+     a shade apart read as a mistake. Strength keeps the violet it had when
+     agent was violet, so the activity terrain reads as it did.
      Rest is the hairline — a rest day is structure, not an activity. */
   --north-sport-run: var(--north-ember);
   --north-sport-ride: oklch(0.58 0.13 250);
   --north-sport-swim: oklch(0.62 0.11 195);
   --north-sport-walk: oklch(0.62 0.12 145);
-  --north-sport-strength: var(--north-agent);
+  --north-sport-strength: oklch(0.52 0.19 288);
   --north-sport-other: oklch(0.58 0.02 250);
   --north-sport-rest: var(--north-hairline);
 
@@ -193,7 +214,7 @@
   --north-day-move: oklch(0.62 0.22 15);
   --north-day-exercise: oklch(0.8 0.2 130);
   --north-day-stand: oklch(0.74 0.13 185);
-  --north-day-sleep: var(--north-agent);
+  --north-day-sleep: oklch(0.52 0.19 288);
   --north-day-caffeine: oklch(0.55 0.06 50);
   --north-day-sun: oklch(0.8 0.16 80);
   --north-day-screen: oklch(0.55 0.16 280);
@@ -213,54 +234,58 @@
      against the dark values rather than inheriting the light ones. */
   --muse-canvas: var(--background);
   --muse-agent-bubble: var(--card);
-  --muse-user-bubble: var(--north-signal);
-  --muse-user-text: oklch(0.99 0.002 250);
+  /* The user's bubble is navy, not signal: a gold thread would spend the
+     accent on every message. */
+  --muse-user-bubble: var(--primary);
+  --muse-user-text: var(--primary-foreground);
   --muse-pill: var(--secondary);
 }
 
 .dark {
   color-scheme: dark;
-  /* Void: cool night navigation (~#1C1C1F with blue bias), not pure black. */
-  --background: oklch(0.145 0.006 250);
-  --foreground: oklch(0.97 0.004 250);
-  --card: oklch(0.19 0.008 250);
-  --card-foreground: oklch(0.97 0.004 250);
-  --popover: oklch(0.19 0.008 250);
-  --popover-foreground: oklch(0.97 0.004 250);
-  --primary: oklch(0.92 0.004 250);
-  --primary-foreground: oklch(0.18 0.01 250);
-  --secondary: oklch(0.24 0.01 250);
-  --secondary-foreground: oklch(0.97 0.004 250);
-  --muted: oklch(0.24 0.01 250);
-  --muted-foreground: oklch(0.7 0.015 250);
-  --accent: oklch(0.24 0.01 250);
-  --accent-foreground: oklch(0.97 0.004 250);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0.01 250 / 10%);
-  --input: oklch(1 0.01 250 / 14%);
-  --ring: oklch(0.65 0.1 218);
-  --sidebar: oklch(0.17 0.008 250);
-  --sidebar-foreground: oklch(0.97 0.004 250);
-  --sidebar-primary: oklch(0.74 0.15 218);
-  --sidebar-primary-foreground: oklch(0.16 0.02 250);
-  --sidebar-accent: oklch(0.24 0.01 250);
-  --sidebar-accent-foreground: oklch(0.97 0.004 250);
-  --sidebar-border: oklch(1 0.01 250 / 10%);
-  --sidebar-ring: oklch(0.65 0.1 218);
+  /* Obsidian navy, the flagship: navy armour with gold trim, as on the
+     mascot. Hex names are the brand palette (docs/brand/README.md). */
+  --background: oklch(0.177 0.025 262.1); /* Obsidian Navy #0B111C */
+  --foreground: oklch(0.962 0.011 84.6); /* Warm Ivory #F6F2EA */
+  --card: oklch(0.225 0.033 258.3); /* Midnight Steel #121C2B */
+  --card-foreground: oklch(0.962 0.011 84.6);
+  --popover: oklch(0.25 0.038 258);
+  --popover-foreground: oklch(0.962 0.011 84.6);
+  --primary: oklch(0.962 0.011 84.6);
+  --primary-foreground: oklch(0.177 0.025 262.1);
+  --secondary: oklch(0.283 0.046 257.8); /* Armor Navy #1B2A40 */
+  --secondary-foreground: oklch(0.962 0.011 84.6);
+  --muted: oklch(0.283 0.046 257.8);
+  --muted-foreground: oklch(0.751 0.023 259.2); /* Muted Silver #A6AFBD */
+  --accent: oklch(0.283 0.046 257.8);
+  --accent-foreground: oklch(0.962 0.011 84.6);
+  --destructive: oklch(0.691 0.128 20.9); /* #E07979 */
+  --border: oklch(0.376 0.042 259.3 / 70%); /* Titanium Slate #344258 */
+  /* 3.1:1 on a card: the field boundary minimum. */
+  --input: oklch(0.52 0.04 259);
+  --ring: oklch(0.804 0.122 80.2);
+  --sidebar: oklch(0.2 0.03 260);
+  --sidebar-foreground: oklch(0.962 0.011 84.6);
+  --sidebar-primary: oklch(0.804 0.122 80.2);
+  --sidebar-primary-foreground: oklch(0.177 0.025 262.1);
+  --sidebar-accent: oklch(0.283 0.046 257.8);
+  --sidebar-accent-foreground: oklch(0.962 0.011 84.6);
+  --sidebar-border: oklch(0.376 0.042 259.3 / 70%);
+  --sidebar-ring: oklch(0.804 0.122 80.2);
 
-  --north-signal: oklch(0.74 0.15 218);
-  /* Dark signal is a light cyan: white on it is about 2:1, ink is 9:1. */
-  --north-signal-foreground: oklch(0.16 0.02 250);
-  --north-agent: oklch(0.63 0.19 288);
-  --north-ember: oklch(0.76 0.16 62);
-  --north-surface: oklch(0.19 0.01 250);
-  --north-hairline: oklch(1 0.01 250 / 8%);
+  --north-signal: oklch(0.804 0.122 80.2); /* Solar Gold #E8B65C */
+  /* Obsidian on Solar Gold is 10:1; ivory on it fails. */
+  --north-signal-foreground: oklch(0.177 0.025 262.1);
+  --north-agent: oklch(0.719 0.067 241.9); /* #7FAACB */
+  --north-ember: oklch(0.712 0.129 53.5); /* copper #E08A4F */
+  --north-surface: oklch(0.225 0.033 258.3);
+  --north-hairline: oklch(0.85 0.03 259 / 10%);
 
   --north-sport-run: var(--north-ember);
   --north-sport-ride: oklch(0.72 0.13 250);
   --north-sport-swim: oklch(0.76 0.11 195);
   --north-sport-walk: oklch(0.78 0.12 145);
-  --north-sport-strength: var(--north-agent);
+  --north-sport-strength: oklch(0.63 0.19 288);
   --north-sport-other: oklch(0.68 0.02 250);
   --north-sport-rest: var(--north-hairline);
 
@@ -272,7 +297,7 @@
   --north-day-move: oklch(0.7 0.21 15);
   --north-day-exercise: oklch(0.87 0.19 130);
   --north-day-stand: oklch(0.82 0.12 185);
-  --north-day-sleep: var(--north-agent);
+  --north-day-sleep: oklch(0.63 0.19 288);
   --north-day-caffeine: oklch(0.72 0.06 50);
   --north-day-sun: oklch(0.86 0.15 80);
   --north-day-screen: oklch(0.7 0.15 280);
@@ -285,9 +310,8 @@
 
   --muse-canvas: var(--background);
   --muse-agent-bubble: var(--card);
-  --muse-user-bubble: var(--north-signal);
-  /* Dark signal is a light blue; white on it fails contrast, void passes. */
-  --muse-user-text: var(--background);
+  --muse-user-bubble: oklch(0.283 0.046 257.8);
+  --muse-user-text: var(--foreground);
   --muse-pill: var(--secondary);
 }
 
@@ -345,9 +369,10 @@ html:has([data-landing]) {
 }
 
 /* working wears the idle pose; the host's ring says "busy" (.muse-ring). */
+/* A slow hover: the companion is present, not performing. */
 .north-mascot[data-state="idle"] img,
 .north-mascot[data-state="working"] img {
-  animation: khepri-idle 3.6s ease-in-out infinite;
+  animation: khepri-idle 6s ease-in-out infinite;
 }
 
 .north-mascot[data-state="thinking"] img {
@@ -372,7 +397,7 @@ html:has([data-landing]) {
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-6%);
+    transform: translateY(-3%);
   }
 }
 
@@ -380,11 +405,11 @@ html:has([data-landing]) {
   0%,
   100% {
     transform: translateY(0) rotate(-7deg);
-    filter: drop-shadow(0 0 0.4rem rgb(201 162 39 / 0.35));
+    filter: drop-shadow(0 0 0.4rem rgb(232 182 92 / 0.35));
   }
   50% {
     transform: translateY(-5%) rotate(-10deg);
-    filter: drop-shadow(0 0 0.7rem rgb(201 162 39 / 0.55));
+    filter: drop-shadow(0 0 0.7rem rgb(255 201 120 / 0.5));
   }
 }
 
