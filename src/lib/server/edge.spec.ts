@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isGoPath, staleHtmxPage } from './edge';
+import { isGoPath, staleHtmxPage, toHttps } from './edge';
 
 describe('isGoPath', () => {
 	it('sends Go-owned paths to Go', () => {
@@ -51,5 +51,19 @@ describe('staleHtmxPage', () => {
 
 	it('leaves every other request alone', () => {
 		expect(staleHtmxPage(new Request('https://kheprios.com/app'))).toBeUndefined();
+	});
+});
+
+describe('toHttps', () => {
+	it('moves plain http to https, keeping path and query', () => {
+		const res = toHttps(new URL('http://kheprios.com/auth/google?next=%2Fapp'));
+		expect(res?.status).toBe(308);
+		expect(res?.headers.get('Location')).toBe('https://kheprios.com/auth/google?next=%2Fapp');
+	});
+
+	it('leaves https and local development alone', () => {
+		expect(toHttps(new URL('https://kheprios.com/login'))).toBeUndefined();
+		expect(toHttps(new URL('http://localhost:5173/login'))).toBeUndefined();
+		expect(toHttps(new URL('http://127.0.0.1:8787/login'))).toBeUndefined();
 	});
 });

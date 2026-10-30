@@ -41,3 +41,18 @@ export function staleHtmxPage(request: Request): Response | undefined {
 	if (request.headers.get('hx-request') !== 'true') return undefined;
 	return new Response(null, { status: 200, headers: { 'HX-Refresh': 'true', 'Cache-Control': 'no-store' } });
 }
+
+/**
+ * Plain http reaches the Worker as-is (Cloudflare does not upgrade it), where
+ * the Go ingress used to redirect it. Over http the Secure session cookie is
+ * never stored, passkeys refuse to run and Google rejects the callback, so
+ * every non-loopback http request moves to https first, method and body kept.
+ */
+export function toHttps(url: URL): Response | undefined {
+	if (url.protocol !== 'http:') return undefined;
+	const host = url.hostname;
+	if (host === 'localhost' || host === '127.0.0.1' || host === '[::1]') return undefined;
+	const target = new URL(url);
+	target.protocol = 'https:';
+	return new Response(null, { status: 308, headers: { Location: target.href } });
+}
