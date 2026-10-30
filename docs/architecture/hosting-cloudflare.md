@@ -182,8 +182,10 @@ Provider checks (2026-10-30):
 
 **Rollback:**
 
-- Quick rollback: delete the `kheprios.com/*` Worker route. Requests fall
-  through to Go, which still serves the old web app until north-60 deletes
-  `web/`. **Keep `web/` until the new app has run a few days.**
-- Full rollback: switch the nameservers back at Namecheap.
-- Worker code: `wrangler rollback` to an earlier version.
+- Worker code: `wrangler rollback` to an earlier version. This is the
+  rollback for anything the web app breaks.
+- Go `web/` is gone (north-client #154, live as 06b48559 via infra#522 on
+  2026-10-30), so deleting the Worker route or switching nameservers no longer
+  brings back a web app: Go answers only the API paths. Going back to the Go
+  pages means re-pinning khepri web and worker to `b20c7ee9` in infra and then
+  deleting the `kheprios.com/*` route.
