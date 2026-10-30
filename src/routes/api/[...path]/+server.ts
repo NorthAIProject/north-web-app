@@ -1,4 +1,5 @@
 import type { RequestHandler } from './$types';
+import { clientAddress } from '#lib/server/api.js';
 import { apiBaseUrl } from '#lib/server/config.js';
 import { clearSession } from '#lib/server/session.js';
 
@@ -26,7 +27,8 @@ const forwardedResponseHeaders = [
 	'x-request-id'
 ];
 
-export const fallback: RequestHandler = async ({ request, params, url, locals, cookies, fetch }) => {
+export const fallback: RequestHandler = async (event) => {
+	const { request, params, url, locals, cookies, fetch } = event;
 	const target = `${apiBaseUrl()}/${params.path}${url.search}`;
 
 	const headers = new Headers();
@@ -36,6 +38,8 @@ export const fallback: RequestHandler = async ({ request, params, url, locals, c
 	}
 	headers.set('accept-language', locals.locale);
 	if (locals.session?.token) headers.set('authorization', `Bearer ${locals.session.token}`);
+	const address = clientAddress(event);
+	if (address) headers.set('x-real-ip', address);
 
 	const hasBody = request.method !== 'GET' && request.method !== 'HEAD';
 	const upstream = await fetch(target, {
