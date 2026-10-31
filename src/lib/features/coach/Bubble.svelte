@@ -4,6 +4,7 @@
 -->
 <script lang="ts">
 	import Markdown from '#lib/components/khepri/Markdown.svelte';
+	import { Button } from '#lib/components/ui/button/index.js';
 	import ExerciseMuscles from '#lib/features/exercises/ExerciseMuscles.svelte';
 	import Sources from '#lib/features/knowledge/Sources.svelte';
 	import { useI18n } from '#lib/i18n/index.js';
@@ -49,14 +50,17 @@
 				<Sources refs={m.evidenceRefs} label={sourceLabel(i18n, m.sourceCount ?? 0)} />
 			</div>
 		{/if}
-		<div class="ml-1 flex flex-wrap items-center gap-3">
-			<button
+		<!-- Revealed on hover only where there is hover; touch always sees them. -->
+		<div class="-ml-1 flex flex-wrap items-center gap-1">
+			<Button
 				type="button"
+				variant="ghost"
+				size="sm"
 				onclick={copy}
-				class="text-muted-foreground hover:text-foreground text-xs opacity-100 transition-opacity focus:opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
+				class="text-muted-foreground hover:text-foreground h-8 px-2 text-xs transition-opacity focus-visible:opacity-100 pointer-coarse:min-h-11 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-focus-within:opacity-100 [@media(hover:hover)]:group-hover:opacity-100"
 			>
 				{copied ? i18n.t('chat.copied') : i18n.t('chat.copy')}
-			</button>
+			</Button>
 			<MessageFeedback messageId={m.id} helpful={m.helpful} />
 		</div>
 	</div>

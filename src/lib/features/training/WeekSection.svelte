@@ -198,7 +198,7 @@
 							{#if d.completed}
 								<Badge variant="outline" class="border-signal/40 text-signal">{i18n.t('workouts.status.completed')}</Badge>
 							{:else if d.isNext}
-								<Badge class="bg-signal text-background">{i18n.t('workouts.status.next')}</Badge>
+								<Badge class="bg-signal text-signal-foreground">{i18n.t('workouts.status.next')}</Badge>
 							{/if}
 						</li>
 					{/each}
@@ -233,6 +233,7 @@
 								<Button
 									variant={shown.length === n ? 'default' : 'outline'}
 									size="sm"
+									aria-pressed={shown.length === n}
 									disabled={busy}
 									aria-label={i18n.tf('workouts.week.ndays', n)}
 									onclick={() => preview({ days: n, planId: source || undefined })}

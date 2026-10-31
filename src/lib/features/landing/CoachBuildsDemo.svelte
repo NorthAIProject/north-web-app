@@ -23,7 +23,7 @@
 {/snippet}
 
 <section id="coach-builds" class="border-hairline relative scroll-mt-20 border-t py-24">
-	<SectionHeading eyebrow={t('land.builds.eyebrow')} title={t('land.builds.title')} body={t('land.builds.body')} />
+	<SectionHeading title={t('land.builds.title')} body={t('land.builds.body')} />
 	<div class="mt-10 grid gap-4 lg:grid-cols-2">
 		{#each exchanges as n (n)}
 			<Card.Root class="border-hairline bg-surface">
@@ -36,7 +36,7 @@
 						</div>
 						<p class="text-muted-foreground mt-1 text-xs">{t(`land.builds.${n}.card.body`)}</p>
 						<div class="mt-2 flex gap-2">
-							<span class="bg-signal text-background rounded-md px-2.5 py-1 text-[11px] font-medium">{t('land.builds.approve')}</span>
+							<span class="bg-signal text-signal-foreground rounded-md px-2.5 py-1 text-[11px] font-medium">{t('land.builds.approve')}</span>
 							<span class="border-hairline rounded-md border px-2.5 py-1 text-[11px]">{t('land.builds.change')}</span>
 						</div>
 					</div>

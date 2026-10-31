@@ -8,7 +8,7 @@
 	import { bar, singleLine } from '#lib/features/viz/chartjs.js';
 	import { gaugeOption } from '#lib/features/viz/echarts.js';
 	import PanelEmpty from '../PanelEmpty.svelte';
-	import StatTile from '../StatTile.svelte';
+	import StatRow from '../StatRow.svelte';
 	import { formatHours, formatLitres, formatScore } from '../format.js';
 	import { formatCount, type BodyView } from '../domains.js';
 
@@ -27,20 +27,22 @@
 </script>
 
 <div class="space-y-6">
-	<div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-		<StatTile
-			label={i18n.t('insights.body.water')}
-			value={formatLitres(i18n, view.totalWaterML)}
-			note={i18n.t('insights.body.water.note')}
-		/>
-		<StatTile label={i18n.t('insights.body.nights')} value={formatCount(view.nights)} />
-		<StatTile
-			label={i18n.t('insights.body.avgSleep')}
-			value={formatHours(view.avgSleepMinutes)}
-			note={i18n.t('insights.body.avgSleep.note')}
-		/>
-		<StatTile label={i18n.t('insights.body.quality')} value={formatScore(i18n, view.avgQuality)} note={qualityNote} />
-	</div>
+	<StatRow
+		items={[
+			{
+				label: i18n.t('insights.body.water'),
+				value: formatLitres(i18n, view.totalWaterML),
+				note: i18n.t('insights.body.water.note')
+			},
+			{ label: i18n.t('insights.body.nights'), value: formatCount(view.nights) },
+			{
+				label: i18n.t('insights.body.avgSleep'),
+				value: formatHours(view.avgSleepMinutes),
+				note: i18n.t('insights.body.avgSleep.note')
+			},
+			{ label: i18n.t('insights.body.quality'), value: formatScore(i18n, view.avgQuality), note: qualityNote }
+		]}
+	/>
 	<div class="grid gap-4 lg:grid-cols-2">
 		<Card class="border-hairline bg-surface">
 			<CardHeader>
@@ -111,7 +113,7 @@
 							<li>
 								<div class="mb-1 flex items-baseline justify-between gap-3">
 									<span class="truncate text-sm font-medium">{h.name}</span>
-									<span class="text-muted-foreground shrink-0 font-mono text-[10px] tabular-nums">
+									<span class="text-muted-foreground shrink-0 text-xs tabular-nums">
 										{formatCount(h.kept)}/{formatCount(h.scheduled)}
 										{#if h.streak > 0}
 											<span>· {i18n.tf('insights.body.habits.streak', h.streak)}</span>

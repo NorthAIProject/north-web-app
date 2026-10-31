@@ -11,7 +11,7 @@ test('calculator records measurements and generates a plan', async ({ page, requ
 
 	// Without measurements the plan is refused with a sentence under the form.
 	await page.getByRole('button', { name: 'Generate plan' }).click();
-	await expect(page.locator('form[action="?/generate"] p.text-red-500')).toBeVisible();
+	await expect(page.locator('form[action="?/generate"] p.text-destructive')).toBeVisible();
 
 	await page.getByLabel('Weight (kg)').fill('72');
 	await page.getByLabel('Height (cm)').fill('175');

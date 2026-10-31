@@ -6,7 +6,7 @@
 	import { groupedBar } from '#lib/features/viz/chartjs.js';
 	import Highlights from '../Highlights.svelte';
 	import PanelEmpty from '../PanelEmpty.svelte';
-	import StatTile from '../StatTile.svelte';
+	import StatRow from '../StatRow.svelte';
 	import type { CoachView } from './types.js';
 
 	let { view }: { view: CoachView } = $props();
@@ -17,20 +17,20 @@
 	<PanelEmpty message={i18n.t('insights.coach.empty')} cta={i18n.t('insights.coach.cta')} href="/app/chat" />
 {:else}
 	<div class="space-y-6" data-testid="insights-coach">
-		<div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-			<StatTile label={i18n.t('insights.coach.turns')} value={String(view.turns)} note={i18n.t('insights.coach.turns.note')} />
-			<StatTile label={i18n.t('insights.coach.yours')} value={String(view.yourMessages)} />
-			<StatTile label={i18n.t('insights.coach.replies')} value={String(view.coachReplies)} />
-			{#if view.hasRatings}
-				<StatTile
-					label={i18n.t('insights.coach.useful')}
-					value="{view.helpfulRate}%"
-					note={i18n.tf('insights.coach.useful.rated', view.rated)}
-				/>
-			{:else}
-				<StatTile label={i18n.t('insights.coach.useful')} value="—" note={i18n.t('insights.coach.useful.none')} />
-			{/if}
-		</div>
+		<StatRow
+			items={[
+				{ label: i18n.t('insights.coach.turns'), value: String(view.turns), note: i18n.t('insights.coach.turns.note') },
+				{ label: i18n.t('insights.coach.yours'), value: String(view.yourMessages) },
+				{ label: i18n.t('insights.coach.replies'), value: String(view.coachReplies) },
+				view.hasRatings
+					? {
+							label: i18n.t('insights.coach.useful'),
+							value: `${view.helpfulRate}%`,
+							note: i18n.tf('insights.coach.useful.rated', view.rated)
+						}
+					: { label: i18n.t('insights.coach.useful'), value: '—', note: i18n.t('insights.coach.useful.none') }
+			]}
+		/>
 		<div class="border-hairline bg-surface/60 space-y-3 rounded-lg border p-4">
 			<MonoLabel text={i18n.t('insights.coach.conversation')} />
 			<SpecChart

@@ -68,7 +68,7 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-  /* Muse chat (see _reviews/muse-chat-contract.md): bg-muse-canvas, etc. */
+  /* Muse chat (the coach chat header and bubbles): bg-muse-canvas, etc. */
   --color-muse-canvas: var(--muse-canvas);
   --color-muse-agent: var(--muse-agent-bubble);
   --color-muse-user: var(--muse-user-bubble);
@@ -82,10 +82,24 @@
      surface / hairline = instrument panels and rules */
   --color-signal: var(--north-signal);
   --color-signal-foreground: var(--north-signal-foreground);
+  /* bg-signal-hover: the primary button's hover, a step darker than signal
+     (not signal/90, which lightens it on ivory and drops the label below
+     4.5:1). text-signal-text: signal as text on a tint (bg-signal/12 badges,
+     the active tab on muted), where plain signal is too light in light mode. */
+  --color-signal-hover: var(--north-signal-hover);
+  --color-signal-text: var(--north-signal-text);
   --color-agent: var(--north-agent);
   --color-ember: var(--north-ember);
   --color-surface: var(--north-surface);
   --color-hairline: var(--north-hairline);
+
+  /* Status: success (done, improved, met) and warning (due, needs a look).
+     Both are 4.5:1 as text on background, card and muted in both themes;
+     *-foreground is the text on a solid fill. Errors stay destructive. */
+  --color-success: var(--north-success);
+  --color-success-foreground: var(--north-success-foreground);
+  --color-warning: var(--north-warning);
+  --color-warning-foreground: var(--north-warning-foreground);
 
   /* Sport families — the activity terrain and its legend. One definition, so
      the scene and the swatch beside it cannot drift apart; the families
@@ -100,8 +114,7 @@
 
   /* My Day trackers — the rings, gauges and timeline dots. One colour per
      tracker so a dot on the day rail and the card it opens always agree.
-     Where a tracker already has a meaning in the palette it reuses it:
-     move is effort (ember); sleep keeps the violet it had. */
+     Move and now sit on the red of effort; sleep is violet. */
   --color-day-water: var(--north-day-water);
   --color-day-food: var(--north-day-food);
   --color-day-protein: var(--north-day-protein);
@@ -115,6 +128,25 @@
   --color-day-sun: var(--north-day-sun);
   --color-day-screen: var(--north-day-screen);
   --color-day-now: var(--north-day-now);
+  /* Tracker colours as text (text-day-food-text, ...). The fills above are
+     tuned for rings and dots (3:1); words in a tracker colour use these
+     steps, which reach 4.5:1 on card, surface and their own tints. */
+  --color-day-water-text: var(--north-day-water-text);
+  --color-day-food-text: var(--north-day-food-text);
+  --color-day-fat-text: var(--north-day-fat-text);
+  --color-day-move-text: var(--north-day-move-text);
+  --color-day-sleep-text: var(--north-day-sleep-text);
+  --color-day-now-text: var(--north-day-now-text);
+
+  /* Stacking scale (z-sticky, z-modal, ...). Menus, selects and tooltips sit
+     above dialogs because they open from inside them; toasts sit above all
+     but tooltips. Values live in :root as --z-*. */
+  --z-index-sticky: var(--z-sticky);
+  --z-index-overlay: var(--z-overlay);
+  --z-index-modal: var(--z-modal);
+  --z-index-dropdown: var(--z-dropdown);
+  --z-index-toast: var(--z-toast);
+  --z-index-tooltip: var(--z-tooltip);
 
   --animate-thread-in: north-thread-in 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
   --animate-caret: north-caret 1s steps(2, start) infinite;
@@ -165,20 +197,22 @@
   --muted-foreground: oklch(0.501 0.03 261.1); /* 4.9:1 on stone */
   --accent: oklch(0.93 0.016 82.8);
   --accent-foreground: oklch(0.216 0.036 257.7);
-  --destructive: oklch(0.532 0.15 24.2);
+  /* 4.7:1 at 90% (the destructive Alert's description) on background. */
+  --destructive: oklch(0.51 0.15 24.2);
   --border: oklch(0.863 0.021 81.8);
   /* Darker than --border so a field's edge reaches 3:1 on a card, the WCAG
-     minimum for a control's boundary. */
+     minimum for a control's boundary; also the switch's off track. */
   --input: oklch(0.618 0.024 86);
-  --ring: oklch(0.523 0.1 76.7);
+  /* The gold roles alias --north-signal (sync-theme.py resolves var()). */
+  --ring: var(--north-signal);
   --sidebar: oklch(0.945 0.013 84);
   --sidebar-foreground: oklch(0.216 0.036 257.7);
-  --sidebar-primary: oklch(0.523 0.1 76.7);
+  --sidebar-primary: var(--north-signal);
   --sidebar-primary-foreground: oklch(0.98 0.009 84.6);
   --sidebar-accent: oklch(0.93 0.016 82.8);
   --sidebar-accent-foreground: oklch(0.216 0.036 257.7);
   --sidebar-border: oklch(0.863 0.021 81.8);
-  --sidebar-ring: oklch(0.523 0.1 76.7);
+  --sidebar-ring: var(--north-signal);
 
   /* signal: bearing / continuity / primary CTA. Gold — the one precious
      colour; keep it to the action, the active place and the key number.
@@ -189,14 +223,23 @@
      and 5.2:1 under ivory label text. */
   --north-signal: oklch(0.523 0.1 76.7); /* #8A6118 */
   --north-signal-foreground: oklch(0.98 0.009 84.6);
+  /* A step darker: ivory on it is 6.8:1, and the hover reads as a press. */
+  --north-signal-hover: oklch(0.46 0.095 76.7);
+  /* Signal on its own 12% tint is 4.2:1; this is 5.1:1 there, 5.4:1 on muted. */
+  --north-signal-text: oklch(0.48 0.098 76.7);
   --north-agent: oklch(0.514 0.075 243.4); /* #3F6C8F */
   --north-ember: oklch(0.546 0.121 47.3); /* copper #A8572A */
   --north-surface: oklch(0.98 0.009 84.6);
   --north-hairline: oklch(0.3 0.03 258 / 12%);
 
+  --north-success: oklch(0.48 0.12 150);
+  --north-success-foreground: var(--primary-foreground);
+  --north-warning: oklch(0.5 0.11 60);
+  --north-warning-foreground: var(--primary-foreground);
+
   /* Run reuses ember: ember already means physical effort, and two colours
-     a shade apart read as a mistake. Strength keeps the violet it had when
-     agent was violet, so the activity terrain reads as it did.
+     a shade apart read as a mistake. Strength is the violet sleep also uses,
+     apart from every other family's hue.
      Rest is the hairline — a rest day is structure, not an activity. */
   --north-sport-run: var(--north-ember);
   --north-sport-ride: oklch(0.58 0.13 250);
@@ -206,19 +249,30 @@
   --north-sport-other: oklch(0.58 0.02 250);
   --north-sport-rest: var(--north-hairline);
 
+  /* Fills: every one is 3:1 on surface and background, so a ring or dot is
+     visible on ivory. Carb, fat, exercise, stand and sun were darkened for
+     that on 2026-10-30. */
   --north-day-water: oklch(0.62 0.14 235);
   --north-day-food: oklch(0.62 0.14 150);
   --north-day-protein: oklch(0.58 0.2 305);
-  --north-day-carb: oklch(0.78 0.16 90);
-  --north-day-fat: oklch(0.7 0.16 55);
+  --north-day-carb: oklch(0.63 0.13 90);
+  --north-day-fat: oklch(0.65 0.16 55);
   --north-day-move: oklch(0.62 0.22 15);
-  --north-day-exercise: oklch(0.8 0.2 130);
-  --north-day-stand: oklch(0.74 0.13 185);
+  --north-day-exercise: oklch(0.62 0.17 130);
+  --north-day-stand: oklch(0.62 0.11 185);
   --north-day-sleep: oklch(0.52 0.19 288);
   --north-day-caffeine: oklch(0.55 0.06 50);
-  --north-day-sun: oklch(0.8 0.16 80);
+  --north-day-sun: oklch(0.63 0.13 80);
   --north-day-screen: oklch(0.55 0.16 280);
   --north-day-now: oklch(0.6 0.21 25);
+  /* Text steps: the same hues at L≈0.5, 4.5:1 on card, surface and the
+     tracker's own tint (the rail's 9% bands, the soreness chip's 20%). */
+  --north-day-water-text: oklch(0.5 0.11 235);
+  --north-day-food-text: oklch(0.5 0.13 150);
+  --north-day-fat-text: oklch(0.52 0.13 55);
+  --north-day-move-text: oklch(0.5 0.2 15);
+  --north-day-sleep-text: var(--north-day-sleep);
+  --north-day-now-text: oklch(0.52 0.2 25);
 
   /* The body figure: untrained muscle is a cool grey-blue, the skin's
      outline a blue of the same family, and training heat ramps from heat-low
@@ -239,6 +293,14 @@
   --muse-user-bubble: var(--primary);
   --muse-user-text: var(--primary-foreground);
   --muse-pill: var(--secondary);
+
+  /* Stacking scale, theme-independent (Tailwind: z-sticky, z-modal, ...). */
+  --z-sticky: 10;
+  --z-overlay: 40;
+  --z-modal: 50;
+  --z-dropdown: 60;
+  --z-toast: 70;
+  --z-tooltip: 80;
 }
 
 .dark {
@@ -263,23 +325,34 @@
   --border: oklch(0.376 0.042 259.3 / 70%); /* Titanium Slate #344258 */
   /* 3.1:1 on a card: the field boundary minimum. */
   --input: oklch(0.52 0.04 259);
-  --ring: oklch(0.804 0.122 80.2);
+  /* Declared here as well as in :root: sync-theme.py reads each block on
+     its own, so an alias must name a token of the same block. */
+  --ring: var(--north-signal);
   --sidebar: oklch(0.2 0.03 260);
   --sidebar-foreground: oklch(0.962 0.011 84.6);
-  --sidebar-primary: oklch(0.804 0.122 80.2);
+  --sidebar-primary: var(--north-signal);
   --sidebar-primary-foreground: oklch(0.177 0.025 262.1);
   --sidebar-accent: oklch(0.283 0.046 257.8);
   --sidebar-accent-foreground: oklch(0.962 0.011 84.6);
   --sidebar-border: oklch(0.376 0.042 259.3 / 70%);
-  --sidebar-ring: oklch(0.804 0.122 80.2);
+  --sidebar-ring: var(--north-signal);
 
   --north-signal: oklch(0.804 0.122 80.2); /* Solar Gold #E8B65C */
   /* Obsidian on Solar Gold is 10:1; ivory on it fails. */
   --north-signal-foreground: oklch(0.177 0.025 262.1);
+  /* Darker on hover here too; obsidian on it is still 8:1. */
+  --north-signal-hover: oklch(0.74 0.12 80.2);
+  /* Solar Gold already reads on its tint (7:1). */
+  --north-signal-text: var(--north-signal);
   --north-agent: oklch(0.719 0.067 241.9); /* #7FAACB */
   --north-ember: oklch(0.712 0.129 53.5); /* copper #E08A4F */
   --north-surface: oklch(0.225 0.033 258.3);
   --north-hairline: oklch(0.85 0.03 259 / 10%);
+
+  --north-success: oklch(0.76 0.14 150);
+  --north-success-foreground: var(--primary-foreground);
+  --north-warning: oklch(0.78 0.14 60);
+  --north-warning-foreground: var(--primary-foreground);
 
   --north-sport-run: var(--north-ember);
   --north-sport-ride: oklch(0.72 0.13 250);
@@ -302,6 +375,14 @@
   --north-day-sun: oklch(0.86 0.15 80);
   --north-day-screen: oklch(0.7 0.15 280);
   --north-day-now: oklch(0.7 0.2 25);
+  /* Dark fills already read as text, except sleep on its band and move on
+     the soreness chip, which need the lighter step. */
+  --north-day-water-text: var(--north-day-water);
+  --north-day-food-text: var(--north-day-food);
+  --north-day-fat-text: var(--north-day-fat);
+  --north-day-move-text: oklch(0.74 0.17 15);
+  --north-day-sleep-text: oklch(0.7 0.16 288);
+  --north-day-now-text: var(--north-day-now);
 
   --north-body-idle: oklch(0.43 0.05 250);
   --north-body-shell: oklch(0.8 0.06 245);
@@ -310,7 +391,7 @@
 
   --muse-canvas: var(--background);
   --muse-agent-bubble: var(--card);
-  --muse-user-bubble: oklch(0.283 0.046 257.8);
+  --muse-user-bubble: var(--secondary);
   --muse-user-text: var(--foreground);
   --muse-pill: var(--secondary);
 }
@@ -326,15 +407,6 @@
       "rlig" 1,
       "calt" 1;
   }
-
-  /* Alpine hides x-show elements only once it has booted, and it is loaded
-     deferred. Without this rule every collapsed pane renders expanded first —
-     the whole check-in wizard arrives as one stacked column and then snaps.
-     Alpine's cloak contract is an attribute selector, so no utility replaces it. */
-  [x-cloak] {
-    display: none !important;
-  }
-
 }
 
 /* Landing anchor links (#muscle, #pricing, ...) glide and stop below the fixed
@@ -349,17 +421,8 @@ html:has([data-landing]) {
   }
 }
 
-/* NOR-39: the vendored sidebar trigger is size-7. Thumbs miss it.
-   Unlayered so it outranks the size-7 utility. Scoped to the app header
-   so other sheets stay as the component drew them. */
-[data-tui-sidebar-layout] header [data-tui-dialog-trigger] button,
-[data-tui-sidebar-layout] header [data-tui-sidebar-trigger] {
-  width: 2.75rem;
-  height: 2.75rem;
-}
-
 /* Khepri companion poses. Attribute selectors sit outside @layer so they are
-   not fighting utilities; alpine.js only writes data-state. */
+   not fighting utilities; the Mascot component only writes data-state. */
 .north-mascot {
   perspective: 28rem;
 }
@@ -461,7 +524,7 @@ html:has([data-landing]) {
   }
 }
 
-/* Muse chat header (web/chat/chat.templ chatHeader). Plain CSS rather than
+/* Muse chat header (coach/ChatHeader.svelte). Plain CSS rather than
    utilities because the geometry is one unit — bar, scrim, avatar and pill
    are sized against each other — and the mascot's own size-40 box has to be
    overridden from outside, which only an unlayered rule can do. */
@@ -497,7 +560,7 @@ html:has([data-landing]) {
 
 /* The working ring: 3px, 4px clear of the 110px avatar, a bright arc
    sweeping round a faint track. A sibling of .muse-avatar, which clips.
-   Hidden until #chat-root's phase is "working" (alpine.js). */
+   Hidden until .muse-identity's data-phase is "working" (ChatHeader.svelte). */
 .muse-ring {
   position: absolute;
   top: -7px;
@@ -585,11 +648,49 @@ html:has([data-landing]) {
   color: var(--muted-foreground);
 }
 
-/* Landing hero card wall (web/landing/herowall.templ). Plain CSS rather than
+/* Short viewports (landscape phone, 200% zoom): the hanging avatar would
+   leave the transcript a sliver, so avatar and pill sit side by side inside
+   the 56px bar and the scrim keeps only a short fade below it. The
+   transcript's top padding drops to match (ChatPage.svelte). */
+@media (max-height: 32rem) {
+  .muse-scrim {
+    height: calc(3.5rem + 24px);
+    background: linear-gradient(to bottom, var(--muse-canvas) 3.5rem, transparent 100%);
+  }
+  .muse-identity {
+    top: 7px;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+  }
+  .muse-avatar {
+    width: 40px;
+    height: 40px;
+    box-shadow: 0 1px 2px oklch(0 0 0 / 8%);
+  }
+  .muse-avatar .north-mascot {
+    width: 30px;
+    height: 30px;
+  }
+  .muse-ring {
+    top: -7px;
+    left: 20px;
+    width: calc(40px + 14px);
+    height: calc(40px + 14px);
+    margin-left: calc((40px + 14px) / -2);
+  }
+  .muse-pill {
+    margin-top: 0;
+    align-items: flex-start;
+    padding: 2px 12px 3px;
+  }
+}
+
+/* Landing hero card wall (landing/HeroWall.svelte). Plain CSS rather than
    utilities because the geometry is one unit: the hero's bottom padding, the
    wall's height, every slot's offset and the fade are all sized against the
    one card height, and the per-slot values arrive as custom properties from
-   Go (herowall.go). */
+   landing/herowall.ts. */
 .hero {
   --wall-card-h: clamp(11rem, 26vh, 18rem);
   /* Room for the front row's middle card (it sits 20% below the line). */
@@ -692,7 +793,7 @@ html:has([data-landing]) {
   }
 }
 
-/* Badge unlock (web/awards/unlock.templ). The coin springs in and then turns
+/* Badge unlock (awards/UnlockDialog.svelte). The coin springs in and then turns
    once, slowly, about its vertical axis. Reduced motion gets a fade only. */
 @keyframes awards-coin-in {
   0% {

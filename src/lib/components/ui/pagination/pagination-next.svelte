@@ -2,6 +2,7 @@
 	import ChevronRightIcon from "@lucide/svelte/icons/chevron-right";
 	import { Button, type ButtonProps } from "#lib/components/ui/button/index.js";
 	import { cn } from "#lib/utils.js";
+	import { useI18n } from "#lib/i18n/index.js";
 
 	type Props = Omit<ButtonProps, "variant" | "size"> & { label?: string };
 
@@ -13,12 +14,14 @@
 		label,
 		...restProps
 	}: Props = $props();
+
+	const i18n = useI18n();
 </script>
 
 <Button
 	bind:ref
 	data-slot="pagination-next"
-	aria-label={label ? undefined : "Go to next page"}
+	aria-label={label ? undefined : i18n.t("layout.pagination.next")}
 	href={disabled ? undefined : href}
 	{disabled}
 	variant="ghost"

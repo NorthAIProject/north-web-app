@@ -5,6 +5,7 @@
 -->
 <script lang="ts">
 	import CheckIcon from '@lucide/svelte/icons/check';
+	import { invalidate } from '$app/navigation';
 	import Moment from '#lib/components/khepri/Moment.svelte';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import { Card, CardContent } from '#lib/components/ui/card/index.js';
@@ -37,6 +38,9 @@
 		} finally {
 			busy = false;
 		}
+		// The app layout loads once per visit and decides the smaller rail from
+		// the week; a week that just ended gives the full rail back.
+		if (latest === null || (latest && (latest.status !== 'active' || latest.day > latest.totalDays))) void invalidate('north:first-week');
 	}
 </script>
 

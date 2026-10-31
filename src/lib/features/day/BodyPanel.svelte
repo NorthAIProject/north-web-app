@@ -85,7 +85,7 @@
 			{/snippet}
 		</Dialog.Trigger>
 	</section>
-	<Dialog.Content class="max-h-[90vh] overflow-y-auto sm:max-w-md">
+	<Dialog.Content class="sm:max-w-md">
 		<Dialog.Header>
 			<Dialog.Title>{i18n.t('day.body')}</Dialog.Title>
 		</Dialog.Header>
@@ -97,11 +97,20 @@
 				bind:value={region}
 				items={data.regions.map((r) => ({ value: r, label: i18n.t(`day.region.${r}`) }))}
 				placeholder={i18n.t('day.soreness.region')}
+				aria-label={i18n.t('day.soreness.region')}
 				search={false}
 			/>
-			<div class="grid grid-cols-4 gap-2">
+			<!-- Two per row on a phone: "Muito doloroso" does not fit a quarter of the dialog. -->
+			<div class="grid grid-cols-2 gap-2 sm:grid-cols-4">
 				{#each ['1', '2', '3', '0'] as sev (sev)}
-					<Button type="submit" variant="outline" size="sm" name="severity" value={sev}>{i18n.t(`day.severity.${sev}`)}</Button>
+					<Button
+						type="submit"
+						variant="outline"
+						size="sm"
+						name="severity"
+						value={sev}
+						class="h-auto min-h-8 py-1.5 leading-tight whitespace-normal">{i18n.t(`day.severity.${sev}`)}</Button
+					>
 				{/each}
 			</div>
 		</form>

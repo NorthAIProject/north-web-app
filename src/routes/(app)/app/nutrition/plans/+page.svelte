@@ -9,7 +9,7 @@
 	import { Checkbox } from '#lib/components/ui/checkbox/index.js';
 	import { Input } from '#lib/components/ui/input/index.js';
 	import { Label } from '#lib/components/ui/label/index.js';
-	import FieldMessage from '#lib/features/nutrition/FieldMessage.svelte';
+	import { FieldMessage, describedBy, withInvalidFocus } from '#lib/components/ui/field-message/index.js';
 	import PlanTypeFields from '#lib/features/nutrition/PlanTypeFields.svelte';
 	import TargetNotice from '#lib/features/nutrition/TargetNotice.svelte';
 	import { radioClass } from '#lib/features/nutrition/radio.js';
@@ -49,19 +49,26 @@
 			<Card.Title>{i18n.t('nutrition.plans.new')}</Card.Title>
 		</Card.Header>
 		<Card.Content>
-			<form method="post" action="/app/nutrition/plans" class="space-y-5" use:enhance={() => async ({ update }) => update({ reset: false })}>
+			<form method="post" action="/app/nutrition/plans" class="space-y-5" use:enhance={withInvalidFocus(() => async ({ update }) => update({ reset: false }))}>
 				<fieldset class="space-y-5" disabled={!target}>
 					<div class="space-y-2">
 						<Label for="name">{i18n.t('nutrition.field.name')}</Label>
-						<Input id="name" name="name" value={values?.name ?? ''} required aria-invalid={errors.name ? 'true' : undefined} />
-						<FieldMessage message={errors.name} />
+						<Input
+							id="name"
+							name="name"
+							value={values?.name ?? ''}
+							required
+							aria-invalid={errors.name ? 'true' : undefined}
+							aria-describedby={describedBy('name', errors.name)}
+						/>
+						<FieldMessage id="name" error={errors.name} />
 					</div>
 					<div class="space-y-2">
 						<Label for="description">{i18n.t('nutrition.field.description')}</Label>
 						<Input id="description" name="description" value={values?.description ?? ''} />
 					</div>
-					<div class="space-y-2">
-						<MonoLabel text={i18n.t('nutrition.field.mode')} />
+					<fieldset class="space-y-2">
+						<legend class="mb-2"><MonoLabel text={i18n.t('nutrition.field.mode')} /></legend>
 						<div class="flex items-center gap-2">
 							<input type="radio" id="new-mode-easy" name="mode" value="easy" bind:group={mode} class={radioClass} />
 							<Label for="new-mode-easy">{i18n.t('nutrition.mode.easy.desc')}</Label>
@@ -70,7 +77,7 @@
 							<input type="radio" id="new-mode-advanced" name="mode" value="advanced" bind:group={mode} class={radioClass} />
 							<Label for="new-mode-advanced">{i18n.t('nutrition.mode.advanced.desc')}</Label>
 						</div>
-					</div>
+					</fieldset>
 					<PlanTypeFields
 						prefix="new"
 						{target}
@@ -91,13 +98,14 @@
 								min="1"
 								max={String(data.options.maxDays)}
 								aria-invalid={errors.day_count ? 'true' : undefined}
+								aria-describedby={describedBy('day_count', errors.day_count)}
 							/>
-							<FieldMessage message={errors.day_count} />
+							<FieldMessage id="day_count" error={errors.day_count} />
 						</div>
 					</div>
 					<div class:hidden={mode !== 'advanced'}>
-						<div class="space-y-2">
-							<MonoLabel text={i18n.t('nutrition.field.weekdays')} />
+						<fieldset class="space-y-2" aria-describedby={describedBy('weekdays', errors.weekdays)}>
+							<legend class="mb-2"><MonoLabel text={i18n.t('nutrition.field.weekdays')} /></legend>
 							<div class="flex flex-wrap gap-4">
 								{#each WEEK_ORDER as wd (wd)}
 									<div class="flex items-center gap-2">
@@ -106,11 +114,11 @@
 									</div>
 								{/each}
 							</div>
-							<FieldMessage message={errors.weekdays} />
-						</div>
+							<FieldMessage id="weekdays" error={errors.weekdays} />
+						</fieldset>
 					</div>
-					<FieldMessage message={errors.macro_target} />
-					<Button type="submit" class="bg-signal text-background hover:bg-signal/90">{i18n.t('nutrition.plans.create')}</Button>
+					<FieldMessage id="macro_target" error={errors.macro_target} />
+					<Button type="submit">{i18n.t('nutrition.plans.create')}</Button>
 				</fieldset>
 			</form>
 		</Card.Content>

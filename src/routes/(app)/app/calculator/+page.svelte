@@ -6,6 +6,7 @@
 	import * as Card from '#lib/components/ui/card/index.js';
 	import { Input } from '#lib/components/ui/input/index.js';
 	import { Label } from '#lib/components/ui/label/index.js';
+	import { describedBy, FieldMessage } from '#lib/components/ui/field-message/index.js';
 	import ChoiceSelect from '#lib/features/calculator/ChoiceSelect.svelte';
 	import {
 		ACTIVITY_MODERATE,
@@ -28,9 +29,13 @@
 	const plan = $derived(calc.goal);
 	const units = $derived(data.units);
 
-	const bioValues = $derived(form?.biometrics?.values ?? { weight: '', height: '', date_of_birth: '', sex: '' });
+	const bioValues = $derived(
+		form?.biometrics?.values ?? { weight: '', height: '', date_of_birth: '', sex: '' }
+	);
 	const bioErrors = $derived<Record<string, string>>(form?.biometrics?.errors ?? {});
-	const planValues = $derived(form?.plan?.values ?? { activity_level: '', goal: '', macro_split: '' });
+	const planValues = $derived(
+		form?.plan?.values ?? { activity_level: '', goal: '', macro_split: '' }
+	);
 	const planErrors = $derived<Record<string, string>>(form?.plan?.errors ?? {});
 
 	/** An option's name alone ("Moderate"). */
@@ -38,7 +43,8 @@
 	/** "Label — what it means": the choice means nothing without it. */
 	const choiceLabel = (kind: string, value: string) =>
 		`${optionLabel(kind, value)} — ${i18n.t(`calculator.${kind}.${value}.desc`)}`;
-	const choices = (kind: string, values: string[]) => values.map((v) => ({ value: v, label: choiceLabel(kind, v) }));
+	const choices = (kind: string, values: string[]) =>
+		values.map((v) => ({ value: v, label: choiceLabel(kind, v) }));
 
 	const currentMeasurements = $derived.by(() => {
 		if (!bio) return '';
@@ -67,8 +73,6 @@
 			whole(plan.carbG)
 		);
 	});
-
-	const errorClass = 'text-[0.8rem] font-medium text-red-500';
 </script>
 
 <svelte:head><title>{pageTitle(i18n.t('calculator.page'))}</title></svelte:head>
@@ -77,13 +81,15 @@
 	<header>
 		<MonoLabel text={i18n.t('nav.fitness')} />
 		<h1 class="mt-2 text-2xl font-medium tracking-tight">{i18n.t('calculator.heading')}</h1>
-		<p class="text-muted-foreground mt-1 text-sm leading-relaxed">{i18n.t('calculator.intro')}</p>
+		<p class="mt-1 text-sm leading-relaxed text-muted-foreground">{i18n.t('calculator.intro')}</p>
 	</header>
 
 	<Card.Root class="border-hairline bg-surface">
 		<Card.Header>
 			<Card.Title>{i18n.t('calculator.bio.title')}</Card.Title>
-			<Card.Description>{bio ? currentMeasurements : i18n.t('calculator.bio.empty')}</Card.Description>
+			<Card.Description
+				>{bio ? currentMeasurements : i18n.t('calculator.bio.empty')}</Card.Description
+			>
 		</Card.Header>
 		<Card.Content>
 			<form method="post" action="?/biometrics" class="space-y-4" use:enhance>
@@ -98,8 +104,9 @@
 							value={bioValues.weight}
 							required
 							aria-invalid={bioErrors.weight_kg ? 'true' : undefined}
+							aria-describedby={describedBy('weight', bioErrors.weight_kg)}
 						/>
-						{#if bioErrors.weight_kg}<p class={errorClass}>{bioErrors.weight_kg}</p>{/if}
+						<FieldMessage id="weight" error={bioErrors.weight_kg} />
 					</div>
 					<div class="space-y-2">
 						<Label for="height">{i18n.tf('calculator.bio.height', heightUnit(units))}</Label>
@@ -111,8 +118,9 @@
 							value={bioValues.height}
 							required
 							aria-invalid={bioErrors.height_cm ? 'true' : undefined}
+							aria-describedby={describedBy('height', bioErrors.height_cm)}
 						/>
-						{#if bioErrors.height_cm}<p class={errorClass}>{bioErrors.height_cm}</p>{/if}
+						<FieldMessage id="height" error={bioErrors.height_cm} />
 					</div>
 				</div>
 				<div class="space-y-2">
@@ -124,13 +132,17 @@
 						value={bioValues.date_of_birth}
 						required
 						aria-invalid={bioErrors.date_of_birth ? 'true' : undefined}
+						aria-describedby={describedBy('date_of_birth', bioErrors.date_of_birth)}
 					/>
-					{#if bioErrors.date_of_birth}<p class={errorClass}>{bioErrors.date_of_birth}</p>{/if}
+					<FieldMessage id="date_of_birth" error={bioErrors.date_of_birth} />
 				</div>
 				<div class="space-y-2">
-					<Label>{i18n.t('calculator.bio.sex')}</Label>
+					<Label id="sex-label" for="sex">{i18n.t('calculator.bio.sex')}</Label>
 					<ChoiceSelect
 						id="sex"
+						aria-labelledby="sex-label"
+						invalid={Boolean(bioErrors.sex)}
+						aria-describedby={describedBy('sex', bioErrors.sex)}
 						name="sex"
 						placeholder={i18n.t('calculator.bio.choose')}
 						selected={bioValues.sex}
@@ -139,7 +151,7 @@
 							{ value: 'female', label: i18n.t('calculator.bio.female') }
 						]}
 					/>
-					{#if bioErrors.sex}<p class={errorClass}>{bioErrors.sex}</p>{/if}
+					<FieldMessage id="sex" error={bioErrors.sex} />
 				</div>
 				<Button type="submit" variant="outline">{i18n.t('calculator.bio.save')}</Button>
 			</form>
@@ -154,9 +166,12 @@
 		<Card.Content>
 			<form method="post" action="?/generate" class="space-y-4" use:enhance>
 				<div class="space-y-2">
-					<Label>{i18n.t('calculator.plan.activity')}</Label>
+					<Label id="activity_level-label" for="activity_level"
+						>{i18n.t('calculator.plan.activity')}</Label
+					>
 					<ChoiceSelect
 						id="activity_level"
+						aria-labelledby="activity_level-label"
 						name="activity_level"
 						placeholder={optionLabel('activity', ACTIVITY_MODERATE)}
 						selected={planValues.activity_level}
@@ -164,9 +179,10 @@
 					/>
 				</div>
 				<div class="space-y-2">
-					<Label>{i18n.t('calculator.plan.goal')}</Label>
+					<Label id="goal-label" for="goal">{i18n.t('calculator.plan.goal')}</Label>
 					<ChoiceSelect
 						id="goal"
+						aria-labelledby="goal-label"
 						name="goal"
 						placeholder={optionLabel('goal', GOAL_MAINTENANCE)}
 						selected={planValues.goal}
@@ -174,17 +190,20 @@
 					/>
 				</div>
 				<div class="space-y-2">
-					<Label>{i18n.t('calculator.plan.split')}</Label>
+					<Label id="macro_split-label" for="macro_split">{i18n.t('calculator.plan.split')}</Label>
 					<ChoiceSelect
 						id="macro_split"
+						aria-labelledby="macro_split-label"
 						name="macro_split"
 						placeholder={optionLabel('split', SPLIT_MODERATE_CARB)}
 						selected={planValues.macro_split}
 						items={choices('split', calc.options.macroSplits)}
 					/>
 				</div>
-				{#if planErrors._}<p class={errorClass}>{planErrors._}</p>{/if}
-				<Button type="submit" class="bg-signal text-background hover:bg-signal/90">{i18n.t('calculator.plan.submit')}</Button>
+				<FieldMessage id="plan" error={planErrors._} />
+				<Button type="submit"
+					>{i18n.t('calculator.plan.submit')}</Button
+				>
 			</form>
 		</Card.Content>
 	</Card.Root>
@@ -203,7 +222,7 @@
 							<dt class="text-sm">
 								{optionLabel('goal', c.goal)}
 								{#if c.goal === plan.goal}
-									<span class="text-signal ml-2 font-mono text-[10px] tracking-[0.14em] uppercase">
+									<span class="ml-2 font-mono text-[10px] tracking-[0.14em] text-signal uppercase">
 										{i18n.t('calculator.compare.yours')}
 									</span>
 								{/if}

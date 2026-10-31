@@ -11,6 +11,8 @@
 	import type { Snippet } from 'svelte';
 	import { useI18n } from '#lib/i18n/index.js';
 	import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '#lib/components/ui/card/index.js';
+	import KpiCell from './KpiCell.svelte';
+	import KpiStrip from './KpiStrip.svelte';
 	import { changeLabel, recapTitle, recapWhen } from './workout-summary.js';
 	import type { ChartJsProps, RecapView } from './types.js';
 
@@ -29,19 +31,12 @@
 	const when = $derived(recapWhen(i18n, recap, timeZone));
 </script>
 
-{#snippet tile(label: string, value: string)}
-	<div class="border-hairline rounded-lg border p-3">
-		<dt class="text-muted-foreground font-mono text-[10px] uppercase tracking-[0.14em]">{label}</dt>
-		<dd class="mt-1 text-lg font-medium tabular-nums">{value}</dd>
-	</div>
-{/snippet}
-
 <Card class="border-hairline bg-surface" data-testid="workout-recap">
 	<CardHeader>
 		<div class="flex items-baseline justify-between gap-3">
 			<CardTitle class="text-base">{recapTitle(i18n, recap)}</CardTitle>
 			{#if when}
-				<span class="text-muted-foreground shrink-0 font-mono text-[10px] tabular-nums">{when}</span>
+				<span class="text-muted-foreground shrink-0 text-xs tabular-nums">{when}</span>
 			{/if}
 		</div>
 		{#if recap.sentence}
@@ -49,12 +44,12 @@
 		{/if}
 	</CardHeader>
 	<CardContent>
-		<dl class="grid grid-cols-2 gap-3 sm:grid-cols-4">
-			{@render tile(i18n.t('layout.recap.time'), recap.duration)}
-			{@render tile(i18n.t('layout.recap.sets'), recap.sets)}
-			{@render tile(i18n.t('layout.recap.volume'), recap.volume)}
-			{@render tile(i18n.t('layout.recap.burned'), recap.calories)}
-		</dl>
+		<KpiStrip>
+			<KpiCell label={i18n.t('layout.recap.time')} value={recap.duration} />
+			<KpiCell label={i18n.t('layout.recap.sets')} value={recap.sets} />
+			<KpiCell label={i18n.t('layout.recap.volume')} value={recap.volume} />
+			<KpiCell label={i18n.t('layout.recap.burned')} value={recap.calories} />
+		</KpiStrip>
 		{#if recap.chart && chart}
 			<div class="mt-4">
 				{@render chart(recap.chart)}

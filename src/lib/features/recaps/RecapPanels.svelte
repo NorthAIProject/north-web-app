@@ -1,22 +1,25 @@
 <!--
 	north-client web/recaps/recaps.templ Panels: everything below the header,
 	the toggle included. Go swapped it whole from /app/recap/panels; here the
-	toggle links re-run the page load client-side, so the selection, tiles and
-	chart never disagree.
+	toggle (RangeTabs) re-runs the page load client-side, so the selection,
+	totals and chart never disagree.
 -->
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import LockIcon from '@lucide/svelte/icons/lock';
 	import ShareIcon from '@lucide/svelte/icons/share';
-	import TrendingDownIcon from '@lucide/svelte/icons/trending-down';
-	import TrendingUpIcon from '@lucide/svelte/icons/trending-up';
 	import UsersIcon from '@lucide/svelte/icons/users';
 	import { formatTime } from '#lib/components/khepri/dates.js';
+	import KpiCell from '#lib/components/khepri/KpiCell.svelte';
+	import KpiStrip from '#lib/components/khepri/KpiStrip.svelte';
+	import RangeTabs from '#lib/components/khepri/RangeTabs.svelte';
 	import { Alert, AlertDescription, AlertTitle } from '#lib/components/ui/alert/index.js';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '#lib/components/ui/card/index.js';
 	import { SpecChart } from '#lib/components/ui/chart/index.js';
 	import { useI18n } from '#lib/i18n/index.js';
+	import DeltaChip from '#lib/features/insights/DeltaChip.svelte';
+	import { formatCountChange } from '#lib/features/insights/format.js';
 	import type { Notice, RecapPageView } from './view.js';
 
 	let { view, notice, timeZone }: { view: RecapPageView; notice: Notice; timeZone?: string } = $props();
@@ -55,28 +58,12 @@
 			<LockIcon class="size-3.5" />
 			{view.period} · {i18n.t('recap.private')}
 		</p>
-		<nav aria-label={i18n.t('dash.range')} class="border-hairline bg-surface/60 flex shrink-0 gap-1 rounded-lg border p-1">
-			{#each view.options as opt (opt.key)}
-				{#if opt.selected}
-					<a
-						href="/app/recap?range={opt.key}"
-						data-sveltekit-reset="false"
-						aria-current="true"
-						class="bg-signal text-background rounded-md px-3 py-1.5 text-xs font-medium whitespace-nowrap"
-					>
-						{opt.label}
-					</a>
-				{:else}
-					<a
-						href="/app/recap?range={opt.key}"
-						data-sveltekit-reset="false"
-						class="text-muted-foreground hover:bg-accent/60 hover:text-foreground rounded-md px-3 py-1.5 text-xs font-medium whitespace-nowrap transition-colors"
-					>
-						{opt.label}
-					</a>
-				{/if}
-			{/each}
-		</nav>
+		<RangeTabs
+			label={i18n.t('dash.range')}
+			value={view.key}
+			options={view.options}
+			hrefFor={(key) => `/app/recap?range=${key}`}
+		/>
 	</div>
 
 	{#if notice === 'posted'}
@@ -100,36 +87,14 @@
 		</Alert>
 	{/if}
 
-	<section
-		class="border-hairline bg-surface/60 grid grid-cols-2 gap-4 rounded-lg border p-4 sm:grid-cols-3"
-		aria-label={i18n.t('recap.totals')}
-	>
-		{#each view.tiles as t (t.label)}
-			<div class="space-y-1">
-				<p class="text-muted-foreground font-mono text-[10px] uppercase tracking-[0.14em]">{t.label}</p>
-				<div class="flex items-baseline gap-2">
-					<p class="text-2xl font-medium tabular-nums">{t.value}</p>
-					{#if t.hasPrior && t.delta !== 0}
-						<span
-							class={[
-								'inline-flex items-center gap-0.5 font-mono text-[10px] tabular-nums',
-								t.delta > 0 && 'text-signal',
-								t.delta < 0 && 'text-muted-foreground'
-							]}
-							title={i18n.t('recap.delta')}
-						>
-							{#if t.delta > 0}
-								<TrendingUpIcon class="size-3" />
-								+{t.delta}
-							{:else}
-								<TrendingDownIcon class="size-3" />
-								{t.delta}
-							{/if}
-						</span>
-					{/if}
-				</div>
-			</div>
-		{/each}
+	<section aria-label={i18n.t('recap.totals')}>
+		<KpiStrip>
+			{#each view.tiles as t (t.label)}
+				<KpiCell label={t.label} value={String(t.value)}>
+					<DeltaChip change={formatCountChange(t.delta, t.hasPrior)} />
+				</KpiCell>
+			{/each}
+		</KpiStrip>
 	</section>
 
 	<Card class="border-hairline bg-surface">

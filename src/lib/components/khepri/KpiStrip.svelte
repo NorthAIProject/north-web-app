@@ -1,10 +1,20 @@
-<!-- The strip KpiCells sit in (north-client ui.KpiStrip). -->
+<!--
+	The strip KpiCells sit in (north-client ui.KpiStrip): one ruled row of
+	label/value pairs, hairlines between them and no tile chrome. On a phone
+	it is a list, one pair per line; from md it is a single row.
+-->
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import { cn } from '#lib/utils.js';
 
-	let { children }: { children?: Snippet } = $props();
+	let { children, class: className = '' }: { children?: Snippet; class?: string } = $props();
 </script>
 
-<div class="border-hairline bg-surface/60 grid gap-3 rounded-lg border p-4 sm:grid-cols-2 lg:grid-cols-5">
+<dl
+	class={cn(
+		'border-hairline divide-hairline flex flex-col divide-y border-y md:flex-row md:divide-x md:divide-y-0',
+		className
+	)}
+>
 	{@render children?.()}
-</div>
+</dl>

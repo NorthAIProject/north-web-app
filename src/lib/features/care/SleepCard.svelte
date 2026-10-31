@@ -4,6 +4,7 @@
 	import SearchSelect from '#lib/components/khepri/SearchSelect.svelte';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Card from '#lib/components/ui/card/index.js';
+	import { FieldMessage, describedBy } from '#lib/components/ui/field-message/index.js';
 	import { Input } from '#lib/components/ui/input/index.js';
 	import { Label } from '#lib/components/ui/label/index.js';
 	import { useI18n } from '#lib/i18n/index.js';
@@ -45,6 +46,7 @@
 							type="number"
 							value={typed(failure, 'hours')}
 							aria-invalid={errors.duration_minutes ? 'true' : undefined}
+							aria-describedby={describedBy('hours', errors.duration_minutes)}
 							min="0"
 							max="24"
 							placeholder="7"
@@ -75,9 +77,7 @@
 						/>
 					</div>
 				</div>
-				{#if errors.duration_minutes}
-					<p class="text-[0.8rem] font-medium text-red-500">{errors.duration_minutes}</p>
-				{/if}
+				<FieldMessage id="hours" error={errors.duration_minutes} />
 				<div class="flex flex-wrap gap-4">
 					<div class="space-y-2">
 						<Label for="bedtime">{i18n.t('care.sleep.bedtime')}</Label>
@@ -87,7 +87,9 @@
 							type="time"
 							value={typed(failure, 'bedtime')}
 							aria-invalid={errors.bedtime ? 'true' : undefined}
+							aria-describedby={describedBy('bedtime', errors.bedtime)}
 						/>
+						<FieldMessage id="bedtime" error={errors.bedtime} />
 					</div>
 					<div class="space-y-2">
 						<Label for="wake_time">{i18n.t('care.sleep.woke')}</Label>
@@ -97,10 +99,12 @@
 							type="time"
 							value={typed(failure, 'wake_time')}
 							aria-invalid={errors.wake_time ? 'true' : undefined}
+							aria-describedby={describedBy('wake_time', errors.wake_time)}
 						/>
+						<FieldMessage id="wake_time" error={errors.wake_time} />
 					</div>
 				</div>
-				<Button type="submit" class="bg-signal text-background hover:bg-signal/90">
+				<Button type="submit">
 					{i18n.t(last ? 'care.sleep.update' : 'care.sleep.log')}
 				</Button>
 			</form>

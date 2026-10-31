@@ -26,7 +26,7 @@
 					</label>
 				{/each}
 			</div>
-			<Button type="submit" class="bg-signal text-background hover:bg-signal/90">{i18n.t('settings.diets.save')}</Button>
+			<Button type="submit">{i18n.t('settings.diets.save')}</Button>
 		</form>
 	</Card.Content>
 </Card.Root>

@@ -5,8 +5,13 @@
 
 	The frames are white-on-transparent SVGs used as a CSS mask over
 	bg-current, so one asset serves both themes. Stacked rather than swapping
-	one mask URL, so every frame is fetched on first paint; a hard cut rather
-	than a crossfade, which would read as a double exposure.
+	one mask URL, so a cut never waits on a fetch; a hard cut rather than a
+	crossfade, which would read as a double exposure.
+
+	Only the first frame is drawn until the artwork is on screen: frames 2 and
+	3 are added (and so fetched) the first time it scrolls into view, and the
+	flipbook runs only while it is in view and the tab is visible. A training
+	week renders dozens of these; the ones nobody is looking at stay still.
 -->
 <script lang="ts">
 	import { useI18n } from '#lib/i18n/index.js';
@@ -17,13 +22,36 @@
 	let { id, slug, name, class: className = '' }: ExerciseArtProps = $props();
 
 	const i18n = useI18n();
-	const frames = Array.from({ length: FRAME_COUNT }, (_, i) => i + 1);
 	let frame = $state(1);
+	let root: HTMLDivElement | undefined = $state();
+	let inView = $state(false);
+	let pageVisible = $state(true);
+	// Set once, the first time the artwork is seen; from then on every frame
+	// stays in the DOM so a cut never waits on a fetch.
+	let primed = $state(false);
+	const frames = $derived(primed ? Array.from({ length: FRAME_COUNT }, (_, i) => i + 1) : [1]);
 
-	// Reduced motion: the first frame is a complete drawing on its own.
+	// Reduced motion: the first frame is a complete drawing on its own, and the
+	// other two are never fetched.
 	$effect(() => {
-		if (!slug) return;
+		if (!slug || !root) return;
 		if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+		const observer = new IntersectionObserver((entries) => {
+			inView = entries.some((e) => e.isIntersecting);
+			if (inView) primed = true;
+		});
+		observer.observe(root);
+		const onVisibility = () => (pageVisible = !document.hidden);
+		onVisibility();
+		document.addEventListener('visibilitychange', onVisibility);
+		return () => {
+			observer.disconnect();
+			document.removeEventListener('visibilitychange', onVisibility);
+		};
+	});
+
+	$effect(() => {
+		if (!inView || !pageVisible) return;
 		const timer = setInterval(() => {
 			frame = (frame % FRAME_COUNT) + 1;
 		}, FRAME_MS);
@@ -33,7 +61,7 @@
 
 {#if slug}
 	<AspectRatio ratio="square" class={className}>
-		<div {id} class="text-foreground relative h-full w-full" role="img" aria-label={i18n.tf('layout.art.aria', name)}>
+		<div {id} bind:this={root} class="text-foreground relative h-full w-full" role="img" aria-label={i18n.tf('layout.art.aria', name)}>
 			{#each frames as n (n)}
 				<span
 					aria-hidden="true"

@@ -5,7 +5,14 @@ import { clipDraft } from '#lib/features/coach/copy.js';
 import type { Actions, PageServerLoad } from './$types';
 
 // GET /app/chat/{id} (Go coach.Handler.show): the conversation, the thread
-// list beside it, the coach strip, and any approval or owed resume.
+// list beside it, the coach strip, and any approval or owed resume. Wide: the
+// chat lays out its own panes in a viewport-high shell (AppShell), so the
+// transcript scrolls on its own and the composer stays on screen.
+//
+// A finished turn re-runs this load (invalidate('north:chat') in
+// chat.svelte.ts). The stream's "done" frame carries only the reply's id; the
+// stored turns' ids, attachments, sources and any approval or new title come
+// from here, and the API has no paging, so the page draws a window instead.
 export const load: PageServerLoad = async (event) => {
 	event.depends('north:chat');
 	const api = serverApi(event);
@@ -17,6 +24,7 @@ export const load: PageServerLoad = async (event) => {
 			api.GET('/conversations/stats')
 		]);
 		return {
+			wide: true as const,
 			detail: detail.data!,
 			list: list.data?.conversations ?? [],
 			stats: stats.data ?? { threadCount: 0, messagesThisWeek: 0 },

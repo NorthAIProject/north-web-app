@@ -35,13 +35,13 @@ test('a logged week shows totals, the daily chart and switches to 30 days', asyn
 
 	const totals = page.getByRole('region', { name: 'Totals' });
 	await expect(totals).toContainText('Workouts');
-	await expect(totals.locator('p.text-2xl').first()).toHaveText('1');
+	await expect(totals.locator('dd span.tabular-nums').first()).toHaveText('1');
 	await expect(page.locator('[data-testid="recap-panels"] [data-slot="chart"] svg').first()).toBeVisible();
 	await expect(page.getByText('Private to you')).toBeVisible();
 	await page.screenshot({ path: 'test-results/recap-week.png', fullPage: true });
 
 	const period = page.getByRole('navigation', { name: 'Time period' });
-	await period.getByRole('link', { name: 'Last 30 days' }).click();
+	await period.getByRole('radio', { name: 'Last 30 days' }).click();
 	await expect(page).toHaveURL(/range=month/);
 	await expect(period.locator('[aria-current="true"]')).toHaveText('Last 30 days');
 });

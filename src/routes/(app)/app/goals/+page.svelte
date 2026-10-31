@@ -10,6 +10,7 @@
 	import { Badge } from '#lib/components/ui/badge/index.js';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Card from '#lib/components/ui/card/index.js';
+	import { withInvalidFocus } from '#lib/components/ui/field-message/index.js';
 	import { Progress } from '#lib/components/ui/progress/index.js';
 	import GoalFields from '#lib/features/goals/GoalFields.svelte';
 	import {
@@ -92,13 +93,13 @@
 					method="post"
 					action="?/create"
 					class="space-y-4 pt-6"
-					use:enhance={() => {
+					use:enhance={withInvalidFocus(() => {
 						submitting = true;
 						return async ({ update }) => {
 							await update({ reset: false });
 							submitting = false;
 						};
-					}}
+					})}
 				>
 					<GoalFields form={form?.values ?? blankGoalForm()} errors={form?.errors ?? {}} />
 					<Button type="submit" class="w-full" disabled={submitting}>{i18n.t('goals.create')}</Button>
@@ -108,7 +109,7 @@
 	{/if}
 	{#if data.goals.length === 0}
 		<EmptyState mascot eyebrow={i18n.t('goals.mono')} title={i18n.t('goals.empty.title')} body={i18n.t('goals.empty.body')}>
-			<Button class="bg-signal text-background hover:bg-signal/90" onclick={() => (open = true)}>
+			<Button onclick={() => (open = true)}>
 				{i18n.t('goals.add')}
 			</Button>
 		</EmptyState>

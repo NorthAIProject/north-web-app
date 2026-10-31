@@ -5,8 +5,8 @@
 	import SearchSelect from '#lib/components/khepri/SearchSelect.svelte';
 	import { Badge } from '#lib/components/ui/badge/index.js';
 	import { Button } from '#lib/components/ui/button/index.js';
+	import { FieldMessage, describe, describedBy } from '#lib/components/ui/field-message/index.js';
 	import DayCard from '#lib/features/nutrition/DayCard.svelte';
-	import FieldMessage from '#lib/features/nutrition/FieldMessage.svelte';
 	import OverageAlert from '#lib/features/nutrition/OverageAlert.svelte';
 	import PlanNotes from '#lib/features/nutrition/PlanNotes.svelte';
 	import SettingsCard from '#lib/features/nutrition/SettingsCard.svelte';
@@ -70,14 +70,16 @@
 	{#if free.length > 0}
 		<form method="post" action="?/addDay" class="flex items-end gap-2" use:enhance>
 			{#if advanced(page)}
-				<div class="w-48">
+				<div class="w-48" {@attach describe('add-day-weekday', describedBy('add-day-weekday', errorFor(page, 'days', 'weekday')))}>
 					<SearchSelect
+						id="add-day-weekday"
 						name="weekday"
 						bind:value={weekday}
 						items={weekdayItems}
 						aria-label={i18n.t('nutrition.day.choose')}
 						placeholder={i18n.t('nutrition.day.choose')}
 						search={false}
+						invalid={Boolean(errorFor(page, 'days', 'weekday'))}
 					/>
 				</div>
 				<Button type="submit" variant="outline">{i18n.t('nutrition.day.add')}</Button>
@@ -85,6 +87,6 @@
 				<Button type="submit" variant="outline">{tf(i18n, 'nutrition.day.add.named', weekdayName(i18n, free[0]))}</Button>
 			{/if}
 		</form>
-		<FieldMessage message={errorFor(page, 'days', 'weekday')} />
+		<FieldMessage id="add-day-weekday" error={errorFor(page, 'days', 'weekday')} />
 	{/if}
 </div>

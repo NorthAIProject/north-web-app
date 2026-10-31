@@ -39,7 +39,7 @@
 		</Card.Header>
 		{#if !care.checkedInToday}
 			<Card.Content>
-				<Button href="/app/check-ins" class="bg-signal text-background hover:bg-signal/90">
+				<Button href="/app/check-ins">
 					{i18n.t('care.kpi.checkcta')}
 				</Button>
 			</Card.Content>

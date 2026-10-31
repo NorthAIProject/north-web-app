@@ -5,7 +5,7 @@
 	import { useI18n } from '#lib/i18n/index.js';
 	import { bar } from '#lib/features/viz/chartjs.js';
 	import PanelEmpty from '../PanelEmpty.svelte';
-	import StatTile from '../StatTile.svelte';
+	import StatRow from '../StatRow.svelte';
 	import { changeLabel, formatCount, type LiftingView } from '../domains.js';
 
 	let { lifting }: { lifting: LiftingView } = $props();
@@ -14,7 +14,7 @@
 </script>
 
 <section class="space-y-4" data-testid="insights-lifting">
-	<h2 class="text-muted-foreground font-mono text-[11px] tracking-[0.14em] uppercase">
+	<h2 class="text-muted-foreground text-sm font-medium">
 		{i18n.t('insights.lifting.title')}
 	</h2>
 	{#if !lifting.hasSets}
@@ -28,34 +28,36 @@
 			</CardContent>
 		</Card>
 	{:else}
-		<div class="grid gap-3 sm:grid-cols-3">
-			<StatTile
-				label={i18n.t('insights.lifting.volume')}
-				value={lifting.volume}
-				note={i18n.t('insights.lifting.volume.note')}
-				delta={lifting.delta}
-			/>
-			<StatTile
-				label={i18n.t('insights.lifting.sets')}
-				value={formatCount(lifting.sets)}
-				note={i18n.t('insights.lifting.sets.note')}
-			/>
-			<StatTile
-				label={i18n.t('insights.lifting.workouts')}
-				value={formatCount(lifting.workouts)}
-				note={i18n.t('insights.lifting.workouts.note')}
-			/>
-		</div>
+		<StatRow
+			items={[
+				{
+					label: i18n.t('insights.lifting.volume'),
+					value: lifting.volume,
+					note: i18n.t('insights.lifting.volume.note'),
+					delta: lifting.delta
+				},
+				{
+					label: i18n.t('insights.lifting.sets'),
+					value: formatCount(lifting.sets),
+					note: i18n.t('insights.lifting.sets.note')
+				},
+				{
+					label: i18n.t('insights.lifting.workouts'),
+					value: formatCount(lifting.workouts),
+					note: i18n.t('insights.lifting.workouts.note')
+				}
+			]}
+		/>
 		<div class="grid gap-4 lg:grid-cols-3">
 			<Card class="border-hairline bg-surface lg:col-span-2">
 				<CardHeader>
-					<CardTitle>{i18n.t('insights.lifting.exercises')}</CardTitle>
+					<CardTitle level={3}>{i18n.t('insights.lifting.exercises')}</CardTitle>
 					<CardDescription>{i18n.t('insights.lifting.exercises.desc')}</CardDescription>
 				</CardHeader>
 				<CardContent>
 					<div class="-mx-2 overflow-x-auto">
 						<table class="w-full text-sm">
-							<thead class="text-muted-foreground font-mono text-[10px] tracking-[0.1em] uppercase">
+							<thead class="text-muted-foreground text-xs">
 								<tr>
 									<th class="px-2 py-1 text-left font-normal">{i18n.t('insights.lifting.col.exercise')}</th>
 									<th class="px-2 py-1 text-right font-normal">{i18n.t('insights.lifting.col.sets')}</th>
@@ -92,7 +94,7 @@
 			</Card>
 			<Card class="border-hairline bg-surface">
 				<CardHeader>
-					<CardTitle>{i18n.t('insights.lifting.records')}</CardTitle>
+					<CardTitle level={3}>{i18n.t('insights.lifting.records')}</CardTitle>
 					<CardDescription>{i18n.t('insights.lifting.records.desc')}</CardDescription>
 				</CardHeader>
 				<CardContent>
@@ -120,7 +122,7 @@
 			{#if lifting.hasWeekly}
 				<Card class="border-hairline bg-surface lg:col-span-2">
 					<CardHeader>
-						<CardTitle>{i18n.t('insights.lifting.weekly')}</CardTitle>
+						<CardTitle level={3}>{i18n.t('insights.lifting.weekly')}</CardTitle>
 					</CardHeader>
 					<CardContent>
 						<SpecChart
@@ -137,7 +139,7 @@
 			{#if lifting.muscles.length > 0}
 				<Card class="border-hairline bg-surface">
 					<CardHeader>
-						<CardTitle>{i18n.t('insights.lifting.muscles')}</CardTitle>
+						<CardTitle level={3}>{i18n.t('insights.lifting.muscles')}</CardTitle>
 						<CardDescription>{i18n.t('insights.lifting.muscles.desc')}</CardDescription>
 					</CardHeader>
 					<CardContent>

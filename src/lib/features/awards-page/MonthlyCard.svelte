@@ -25,7 +25,7 @@
 		<div class="min-w-0 flex-1 space-y-2">
 			<p class="text-sm font-medium">{challenge.title}</p>
 			<p class="text-muted-foreground text-sm">{challenge.goal}</p>
-			<Progress value={challenge.progress} max={challenge.target} />
+			<Progress value={challenge.progress} max={challenge.target} aria-label={challenge.title} />
 			<p class="text-muted-foreground text-xs tabular-nums" data-monthly-progress>
 				{challenge.met ? i18n.t('monthly.met') : challenge.progressText}
 			</p>

@@ -88,7 +88,7 @@
 			<Button
 				href="/app/fitness/strava/connect"
 				data-sveltekit-reload
-				class="bg-signal text-background hover:bg-signal/90"
+			
 			>
 				{i18n.t('fitness.strava.connect')}
 			</Button>

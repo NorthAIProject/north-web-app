@@ -6,6 +6,7 @@
 	import * as Alert from '#lib/components/ui/alert/index.js';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Card from '#lib/components/ui/card/index.js';
+	import { FieldMessage, describe, describedBy, withInvalidFocus } from '#lib/components/ui/field-message/index.js';
 	import { Input } from '#lib/components/ui/input/index.js';
 	import { Label } from '#lib/components/ui/label/index.js';
 	import { Textarea } from '#lib/components/ui/textarea/index.js';
@@ -27,7 +28,6 @@
 	const planTypeItems = $derived(CARB_BANDS.map((b) => ({ value: b.type, label: bandChoice(i18n, b) })));
 	const count = (n: number) => (n === 0 ? '' : String(n));
 	let busy = $state(false);
-	const errorClass = 'text-[0.8rem] font-medium text-red-500';
 </script>
 
 <svelte:head>
@@ -35,19 +35,21 @@
 </svelte:head>
 
 {#snippet message(name: string)}
-	{#if errors[name]}<p class={errorClass}>{errors[name]}</p>{/if}
+	<FieldMessage id={name} error={errors[name]} />
 {/snippet}
 
 {#snippet picker(id: string, items: { value: string; label: string }[], selected: string)}
-	<SearchSelect
-		{id}
-		name={id}
-		value={selected}
-		{items}
-		placeholder={i18n.t('planimport.meal.choose_one')}
-		invalid={Boolean(errors[id])}
-		search={false}
-	/>
+	<div class="contents" {@attach describe(id, describedBy(id, errors[id]))}>
+		<SearchSelect
+			{id}
+			name={id}
+			value={selected}
+			{items}
+			placeholder={i18n.t('planimport.meal.choose_one')}
+			invalid={Boolean(errors[id])}
+			search={false}
+		/>
+	</div>
 {/snippet}
 
 {#if form?.review}
@@ -77,13 +79,13 @@
 					<form
 						method="post"
 						class="space-y-5 pt-6"
-						use:enhance={() => {
+						use:enhance={withInvalidFocus(() => {
 							busy = true;
 							return async ({ update }) => {
 								await update({ reset: false });
 								busy = false;
 							};
-						}}
+						})}
 					>
 						<div class="space-y-2">
 							<Label for="objective" error={errors.objective}>{i18n.t('planimport.generate.objective')}</Label>
@@ -102,6 +104,7 @@
 									min="1"
 									max="7"
 									aria-invalid={errors.days ? 'true' : undefined}
+									aria-describedby={describedBy('days', errors.days)}
 								/>
 								{@render message('days')}
 							</div>
@@ -116,6 +119,7 @@
 									min="1"
 									max="8"
 									aria-invalid={errors.meals_per_day ? 'true' : undefined}
+									aria-describedby={describedBy('meals_per_day', errors.meals_per_day)}
 								/>
 								{@render message('meals_per_day')}
 							</div>
@@ -136,6 +140,7 @@
 									rows={2}
 									placeholder={i18n.t('planimport.generate.exclusions.ph')}
 									aria-invalid={errors.exclusions ? 'true' : undefined}
+									aria-describedby={describedBy('exclusions', errors.exclusions)}
 								/>
 							</DictateField>
 							<p class="text-muted-foreground text-sm">{i18n.t('planimport.generate.exclusions.desc')}</p>
@@ -151,6 +156,7 @@
 									rows={2}
 									placeholder={i18n.t('planimport.generate.notes.ph')}
 									aria-invalid={errors.notes ? 'true' : undefined}
+									aria-describedby={describedBy('notes', errors.notes)}
 								/>
 							</DictateField>
 							{@render message('notes')}

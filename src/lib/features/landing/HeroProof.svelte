@@ -4,10 +4,44 @@
 	five-month thread. It opens the content column.
 -->
 <script lang="ts">
+	import { onMount } from 'svelte';
+	import PauseIcon from '@lucide/svelte/icons/pause';
+	import PlayIcon from '@lucide/svelte/icons/play';
 	import MonoLabel from '#lib/components/khepri/MonoLabel.svelte';
+	import { Button } from '#lib/components/ui/button/index.js';
 	import { useI18n } from '#lib/i18n/index.js';
 
 	const i18n = useI18n();
+
+	// The film starts itself only when the visitor has not asked for less
+	// motion; otherwise the poster stands and the button plays it. Either way
+	// the button stops it (WCAG 2.2.2). No autoplay attribute: it would start
+	// before this check runs.
+	let video: HTMLVideoElement | undefined = $state();
+	let playing = $state(false);
+
+	// It starts when it scrolls into view, as the autoplay attribute did, so the
+	// file is not fetched for visitors who never reach it, and it pauses off
+	// screen. A visitor who paused it keeps it paused.
+	let stopped = false;
+
+	onMount(() => {
+		if (!video || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+		const el = video;
+		const seen = new IntersectionObserver(([entry]) => {
+			if (entry.isIntersecting && !stopped) el.play().catch(() => {});
+			else if (!entry.isIntersecting && !el.paused) el.pause();
+		});
+		seen.observe(el);
+		return () => seen.disconnect();
+	});
+
+	function toggle() {
+		if (!video) return;
+		stopped = !video.paused;
+		if (video.paused) video.play().catch(() => {});
+		else video.pause();
+	}
 
 	const tour = $derived([
 		{ href: '#day', label: i18n.t('land.tour.day') },
@@ -46,23 +80,41 @@
 		{/each}
 	</nav>
 	<div class="mt-10 grid items-start gap-10 lg:grid-cols-[minmax(0,1fr)_22rem]">
-		<!-- Muted + playsinline + loop so it autoplays on mobile; the poster covers the first paint. -->
+		<!-- Muted + playsinline + loop so it can start on mobile; the poster covers the first paint. -->
 		<div id="product-film" class="scroll-mt-20">
 			<div class="mb-4 flex flex-wrap items-end justify-between gap-3">
-				<div>
-					<MonoLabel text={i18n.t('land.film.label')} />
-					<p class="mt-2 max-w-[54ch] text-sm leading-relaxed text-muted-foreground">
+				<div class="min-w-0 flex-1 basis-72">
+					<p class="text-sm font-medium">{i18n.t('land.film.label')}</p>
+					<p class="mt-1 max-w-[54ch] text-sm leading-relaxed text-muted-foreground">
 						{i18n.t('land.film.desc')}
 					</p>
 				</div>
-				<MonoLabel text={i18n.t('land.film.autoplay')} />
+				<Button
+					type="button"
+					variant="outline"
+					size="sm"
+					class="shrink-0 border-hairline pointer-coarse:min-h-11"
+					aria-controls="product-film-video"
+					onclick={toggle}
+				>
+					{#if playing}
+						<PauseIcon class="size-3.5" aria-hidden="true" />
+						{i18n.t('land.film.pause')}
+					{:else}
+						<PlayIcon class="size-3.5" aria-hidden="true" />
+						{i18n.t('land.film.play')}
+					{/if}
+				</Button>
 			</div>
 			<div
 				class="overflow-hidden rounded-xl border border-hairline bg-surface shadow-[0_0_0_1px_color-mix(in_oklab,var(--north-signal)_12%,transparent)]"
 			>
 				<video
+					bind:this={video}
+					id="product-film-video"
 					class="aspect-video w-full bg-background object-cover"
-					autoplay
+					onplay={() => (playing = true)}
+					onpause={() => (playing = false)}
 					muted
 					loop
 					playsinline

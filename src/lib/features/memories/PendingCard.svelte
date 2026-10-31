@@ -19,7 +19,7 @@
 			<Badge variant="outline">{categoryLabel(i18n, m.category)}</Badge>
 			<Badge variant="secondary">{i18n.t('memories.badge.proposed')}</Badge>
 			{#if replaces}
-				<Badge variant="outline" class="border-signal/40 bg-signal/12 text-signal">{i18n.t('memories.badge.replaces')}</Badge>
+				<Badge variant="outline" class="border-signal/40 bg-signal/12 text-signal-text">{i18n.t('memories.badge.replaces')}</Badge>
 			{/if}
 		</div>
 		<p class="text-sm">{m.content}</p>
@@ -29,7 +29,7 @@
 		<div class="flex flex-wrap gap-2">
 			<form method="post" action="?/approve" use:enhance>
 				<input type="hidden" name="id" value={m.id} />
-				<Button type="submit" size="sm" class="bg-signal text-background hover:bg-signal/90">
+				<Button type="submit" size="sm">
 					{i18n.t('memories.approve')}
 				</Button>
 			</form>

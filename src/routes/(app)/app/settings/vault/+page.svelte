@@ -4,6 +4,7 @@
 	import { pageTitle } from '#lib/brand.js';
 	import { formatTime } from '#lib/components/khepri/dates.js';
 	import { Button } from '#lib/components/ui/button/index.js';
+	import { FieldMessage, describedBy, withInvalidFocus } from '#lib/components/ui/field-message/index.js';
 	import { Input } from '#lib/components/ui/input/index.js';
 	import { Label } from '#lib/components/ui/label/index.js';
 	import { useI18n } from '#lib/i18n/index.js';
@@ -50,7 +51,7 @@
 	{/if}
 	<section class="border-hairline bg-surface space-y-4 rounded-lg border p-4">
 		<h2 class="text-sm font-medium">{vault.rootPath ? i18n.t('settings.vault.change') : i18n.t('settings.vault.connect')}</h2>
-		<form method="post" action="?/connect" class="space-y-4" use:enhance={() => async ({ update }) => update({ reset: false })}>
+		<form method="post" action="?/connect" class="space-y-4" use:enhance={withInvalidFocus(() => async ({ update }) => update({ reset: false }))}>
 			<div class="space-y-2">
 				<Label for="root_path">{i18n.t('settings.vault.path')}</Label>
 				<Input
@@ -59,10 +60,9 @@
 					{value}
 					placeholder="/Users/you/Documents/Obsidian/MyVault"
 					aria-invalid={pathError ? 'true' : 'false'}
+					aria-describedby={describedBy('root_path', pathError)}
 				/>
-				{#if pathError}
-					<p class="text-destructive text-xs">{pathError}</p>
-				{/if}
+				<FieldMessage id="root_path" error={pathError} />
 			</div>
 			<Button type="submit">{i18n.t('settings.vault.save')}</Button>
 		</form>

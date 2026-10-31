@@ -6,6 +6,6 @@
 </script>
 
 <section class="space-y-3">
-	<h2 class="text-foreground text-base font-medium tracking-tight">{heading}</h2>
+	<h2 class="text-foreground text-base font-medium tracking-tight text-balance">{heading}</h2>
 	{@render children()}
 </section>

@@ -13,7 +13,7 @@
 	import { bar } from '#lib/features/viz/chartjs.js';
 	import { donutOption } from '#lib/features/viz/echarts.js';
 	import PanelEmpty from '../PanelEmpty.svelte';
-	import StatTile from '../StatTile.svelte';
+	import StatRow from '../StatRow.svelte';
 	import { formatKcal, relativeTime } from '../format.js';
 	import { formatCount, type TrainingView } from '../domains.js';
 	import LiftingSection from './LiftingSection.svelte';
@@ -47,7 +47,7 @@
 							{#if plan.rangePlanned > 0}
 								<div class="border-hairline border-t pt-3">
 									<div class="flex items-baseline justify-between gap-2">
-										<p class="text-muted-foreground font-mono text-[10px] uppercase tracking-[0.14em]">
+										<p class="text-muted-foreground text-[13px]">
 											{i18n.t('insights.training.plan.window')}
 										</p>
 										<p class="text-xl font-medium tabular-nums">{rate}</p>
@@ -70,20 +70,22 @@
 			{/if}
 		</section>
 	{/if}
-	<div class="grid gap-3 sm:grid-cols-3">
-		<StatTile
-			label={i18n.t('insights.training.burned')}
-			value={formatKcal(view.calories)}
-			note={i18n.t('insights.training.burned.note')}
-			delta={view.delta}
-		/>
-		<StatTile
-			label={i18n.t('insights.training.sessions')}
-			value={formatCount(view.sessionCount)}
-			note={i18n.t('insights.training.sessions.note')}
-		/>
-		<StatTile label={i18n.t('insights.training.time')} value={timeLabel} />
-	</div>
+	<StatRow
+		items={[
+			{
+				label: i18n.t('insights.training.burned'),
+				value: formatKcal(view.calories),
+				note: i18n.t('insights.training.burned.note'),
+				delta: view.delta
+			},
+			{
+				label: i18n.t('insights.training.sessions'),
+				value: formatCount(view.sessionCount),
+				note: i18n.t('insights.training.sessions.note')
+			},
+			{ label: i18n.t('insights.training.time'), value: timeLabel }
+		]}
+	/>
 	<div class="grid gap-4 lg:grid-cols-3">
 		<Card class="border-hairline bg-surface lg:col-span-2">
 			<CardHeader>
@@ -139,7 +141,7 @@
 					{#each view.sessions as s, i (i)}
 						<li class="flex items-baseline justify-between gap-3 py-2">
 							<span class="truncate text-sm font-medium">{s.name}</span>
-							<span class="text-muted-foreground shrink-0 font-mono text-[10px] whitespace-nowrap tabular-nums">
+							<span class="text-muted-foreground shrink-0 text-xs whitespace-nowrap tabular-nums">
 								{s.duration}
 								{#if s.calories > 0}
 									<span>· {formatKcal(s.calories)}</span>

@@ -30,9 +30,9 @@
 	const sizeClasses: Record<Size, string> = { sm: "h-1", default: "h-2.5", lg: "h-4" };
 	const variantClasses: Record<Variant, string> = {
 		default: "bg-primary",
-		success: "bg-green-500",
+		success: "bg-success",
 		danger: "bg-destructive",
-		warning: "bg-yellow-500",
+		warning: "bg-warning",
 	};
 
 	const percent = $derived.by(() => {

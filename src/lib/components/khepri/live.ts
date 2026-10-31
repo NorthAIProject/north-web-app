@@ -16,15 +16,29 @@ export function announceCheckInSaved(): void {
 }
 
 /**
- * Calls refresh at once after a save in this tab and every 20 seconds.
- * Returns the unsubscribe function, so it fits an $effect directly.
+ * Calls refresh at once after a save in this tab and every 20 seconds while
+ * the page is visible. A background tab does not poll; when it comes back
+ * after missing a beat it refreshes once, straight away. Returns the
+ * unsubscribe function, so it fits an $effect directly.
  */
 export function onCheckInSaved(refresh: () => void, pollMs: number = CHECKIN_POLL_MS): () => void {
-	const handler = () => refresh();
-	document.addEventListener(CHECKIN_SAVED, handler);
-	const timer = setInterval(handler, pollMs);
+	let last = Date.now();
+	const run = () => {
+		last = Date.now();
+		refresh();
+	};
+	const tick = () => {
+		if (!document.hidden) run();
+	};
+	const onVisibility = () => {
+		if (!document.hidden && Date.now() - last >= pollMs) run();
+	};
+	document.addEventListener(CHECKIN_SAVED, run);
+	document.addEventListener('visibilitychange', onVisibility);
+	const timer = setInterval(tick, pollMs);
 	return () => {
-		document.removeEventListener(CHECKIN_SAVED, handler);
+		document.removeEventListener(CHECKIN_SAVED, run);
+		document.removeEventListener('visibilitychange', onVisibility);
 		clearInterval(timer);
 	};
 }

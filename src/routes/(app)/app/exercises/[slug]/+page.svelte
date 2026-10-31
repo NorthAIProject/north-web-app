@@ -106,13 +106,13 @@
 		{#if !data.planId}
 			<p class="mt-2 text-sm leading-relaxed">{i18n.t('exercises.next.noplan')}</p>
 			<div class="mt-3">
-				<Button href="/app/training" class="bg-signal text-background hover:bg-signal/90">{i18n.t('exercises.next.build')}</Button>
+				<Button href="/app/training">{i18n.t('exercises.next.build')}</Button>
 			</div>
 		{:else}
 			{#if inPlanOn.length > 0}
 				<p class="mt-2 text-sm leading-relaxed">{i18n.tf('exercises.next.inplan', inPlanOn.join(', '))}</p>
 				<div class="mt-3">
-					<Button href="/app/training/{data.planId}" class="bg-signal text-background hover:bg-signal/90"
+					<Button href="/app/training/{data.planId}"
 						>{i18n.t('exercises.next.open')}</Button
 					>
 				</div>

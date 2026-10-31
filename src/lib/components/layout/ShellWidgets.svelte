@@ -39,9 +39,11 @@
 		     truncated call to action is worse than none. -->
 		<a
 			href="/app/settings/connections"
-			class="border-hairline text-muted-foreground hover:text-foreground hover:border-border hidden h-8 items-center gap-2 rounded-full border pr-3 pl-1.5 text-xs transition-colors sm:inline-flex"
+			class="hidden h-8 items-center gap-2 rounded-full border border-hairline pr-3 pl-1.5 text-xs text-muted-foreground transition-colors hover:border-border hover:text-foreground sm:inline-flex"
 		>
-			<span class="bg-signal text-background rounded-full px-2 py-0.5 font-mono text-[10px] tracking-[0.12em] uppercase">
+			<span
+				class="rounded-full bg-signal px-2 py-0.5 font-mono text-[10px] tracking-[0.12em] text-background uppercase"
+			>
 				{i18n.t('nav.agentpill.new')}
 			</span>
 			<span class="whitespace-nowrap">{i18n.t('nav.agentpill')}</span>
@@ -50,7 +52,7 @@
 		<a
 			href="/app/settings/connections"
 			aria-label={i18n.t('nav.agentpill')}
-			class="border-hairline text-muted-foreground hover:text-foreground flex size-8 items-center justify-center rounded-full border sm:hidden"
+			class="flex size-8 items-center justify-center rounded-full border border-hairline text-muted-foreground hover:text-foreground sm:hidden pointer-coarse:size-11"
 		>
 			<PlugIcon class="size-3.5" />
 		</a>

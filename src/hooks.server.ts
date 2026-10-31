@@ -54,11 +54,34 @@ export const handle: Handle = async ({ event, resolve }) => {
 		: (readAppearanceCookie(event.cookies) ?? defaultAppearance);
 
 	const appearance = event.locals.appearance;
+	const lean = isPublicPage(event.route.id);
 	return resolve(event, {
 		transformPageChunk: ({ html }) =>
 			html
 				.replace('%lang%', event.locals.locale)
 				.replace('%htmlclass%', appearance === 'dark' ? 'h-full dark' : 'h-full')
 				.replace('%appearance%', appearance)
+				.replace('%monopreload%', lean ? '' : monoPreload),
+		preload: lean ? leanPreload : undefined
 	});
 };
+
+// The signed-out pages (landing, sign-in, legal) are where a first visit on a
+// slow phone lands. By default SvelteKit puts a modulepreload in the head for
+// every chunk the page will hydrate with — 77 on the landing page — and on a
+// thin connection they share the line with the one render-blocking stylesheet
+// and push the first paint back. There the head carries the stylesheet, fonts
+// and the two entry chunks; the rest of the JavaScript is fetched as the entry
+// imports it, after the page is already on screen.
+function isPublicPage(routeId: string | null): boolean {
+	return routeId?.startsWith('/(public)') ?? false;
+}
+
+function leanPreload({ type, path }: { type: 'js' | 'css' | 'font' | 'asset'; path: string }): boolean {
+	return type === 'css' || type === 'font' || (type === 'js' && path.includes('/immutable/entry/'));
+}
+
+// Geist Mono is the app's figures and labels; the public pages can let it
+// arrive late (font-display: optional falls back for that one visit).
+const monoPreload =
+	'<link rel="preload" href="/assets/fonts/geist/geist-mono-variable.woff2" as="font" type="font/woff2" crossorigin="anonymous" />';

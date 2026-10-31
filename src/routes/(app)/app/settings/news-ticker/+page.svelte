@@ -3,6 +3,11 @@
 	import { pageTitle } from '#lib/brand.js';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Card from '#lib/components/ui/card/index.js';
+	import {
+		FieldMessage,
+		describedBy,
+		withInvalidFocus
+	} from '#lib/components/ui/field-message/index.js';
 	import { Input } from '#lib/components/ui/input/index.js';
 	import { Label } from '#lib/components/ui/label/index.js';
 	import { Switch } from '#lib/components/ui/switch/index.js';
@@ -83,7 +88,7 @@
 				</ul>
 			{/if}
 			{#if s.feeds.length < s.maxFeeds}
-				<form method="post" action="?/add" class="space-y-3" use:enhance>
+				<form method="post" action="?/add" class="space-y-3" use:enhance={withInvalidFocus()}>
 					<div class="space-y-2">
 						<Label for="news-feed-url">{i18n.t('news.settings.url')}</Label>
 						<Input
@@ -93,10 +98,9 @@
 							value={form?.url ?? ''}
 							placeholder="https://"
 							aria-invalid={form?.error ? true : undefined}
+							aria-describedby={describedBy('news-feed-url', form?.error)}
 						/>
-						{#if form?.error}
-							<p class="text-sm font-medium text-destructive">{form.error}</p>
-						{/if}
+						<FieldMessage id="news-feed-url" error={form?.error} />
 					</div>
 					<Button type="submit">{i18n.t('news.settings.add')}</Button>
 				</form>

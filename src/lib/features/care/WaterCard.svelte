@@ -3,6 +3,7 @@
 	import { enhance } from '$app/forms';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Card from '#lib/components/ui/card/index.js';
+	import { FieldMessage } from '#lib/components/ui/field-message/index.js';
 	import { Progress } from '#lib/components/ui/progress/index.js';
 	import { formatTime } from '#lib/components/khepri/dates.js';
 	import { useI18n } from '#lib/i18n/index.js';
@@ -22,10 +23,8 @@
 		</Card.Description>
 	</Card.Header>
 	<Card.Content>
-		<Progress value={waterPercent(water.totalMl, water.targetMl)} class="mb-4" />
-		{#if failure?.errors.amount_ml}
-			<p class="mb-3 text-[0.8rem] font-medium text-red-500">{failure.errors.amount_ml}</p>
-		{/if}
+		<Progress value={waterPercent(water.totalMl, water.targetMl)} class="mb-4" aria-label={i18n.t('care.water.title')} />
+		<FieldMessage id="water-amount" error={failure?.errors.amount_ml} class="mb-3" />
 		<div class="flex flex-wrap gap-2">
 			{#each quickAmounts as amount (amount)}
 				<form method="post" action="?/water" use:enhance={careSubmit()}>

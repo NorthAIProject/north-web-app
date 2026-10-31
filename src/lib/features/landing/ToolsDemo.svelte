@@ -59,29 +59,47 @@
 </script>
 
 <section class="relative border-t border-hairline py-24">
-	<SectionHeading eyebrow={t('land.tools.eyebrow')} title={t('land.tools.title')} body={t('land.tools.body')} />
+	<SectionHeading title={t('land.tools.title')} body={t('land.tools.body')} />
 	<div class="mt-10 grid gap-5 lg:grid-cols-2">
 		<div>
 			<Card.Root class="h-full border-hairline bg-surface">
 				<Card.Content class="flex h-full flex-col">
-					<div class="flex items-center gap-2 text-muted-foreground">
-						<ScaleIcon class="size-3.5" />
-						<MonoLabel text={t('land.bmi.label')} />
-					</div>
+					<h3 class="flex items-center gap-2 text-sm font-medium">
+						<ScaleIcon class="size-3.5 text-muted-foreground" aria-hidden="true" />
+						{t('land.bmi.label')}
+					</h3>
 					<div class="mt-5 space-y-6">
 						<div>
 							<div class="flex items-baseline justify-between">
-								<Label for="bmi-height" class="text-sm">{t('land.bmi.height')}</Label>
+								<Label id="bmi-height-label" for="bmi-height" class="text-sm">{t('land.bmi.height')}</Label>
 								<span class="font-mono text-sm tabular-nums">{height} cm</span>
 							</div>
-							<Slider id="bmi-height" type="single" min={140} max={210} step={1} bind:value={height} class="mt-3" />
+							<Slider
+								id="bmi-height"
+								aria-labelledby="bmi-height-label"
+								type="single"
+								min={140}
+								max={210}
+								step={1}
+								bind:value={height}
+								class="mt-3"
+							/>
 						</div>
 						<div>
 							<div class="flex items-baseline justify-between">
-								<Label for="bmi-weight" class="text-sm">{t('land.bmi.weight')}</Label>
+								<Label id="bmi-weight-label" for="bmi-weight" class="text-sm">{t('land.bmi.weight')}</Label>
 								<span class="font-mono text-sm tabular-nums">{weight} kg</span>
 							</div>
-							<Slider id="bmi-weight" type="single" min={40} max={160} step={1} bind:value={weight} class="mt-3" />
+							<Slider
+								id="bmi-weight"
+								aria-labelledby="bmi-weight-label"
+								type="single"
+								min={40}
+								max={160}
+								step={1}
+								bind:value={weight}
+								class="mt-3"
+							/>
 						</div>
 					</div>
 					<Separator class="mb-6 mt-auto bg-hairline" />
@@ -104,14 +122,15 @@
 		<div>
 			<Card.Root class="h-full border-hairline bg-surface">
 				<Card.Content>
-					<div class="flex items-center gap-2 text-muted-foreground">
-						<TargetIcon class="size-3.5" />
-						<MonoLabel text={t('land.setter.label')} />
-					</div>
+					<h3 class="flex items-center gap-2 text-sm font-medium">
+						<TargetIcon class="size-3.5 text-muted-foreground" aria-hidden="true" />
+						{t('land.setter.label')}
+					</h3>
 					<div class="mt-5 space-y-5">
 						<div>
-							<Label class="text-sm">{t('land.setter.after')}</Label>
+							<Label id="setter-goal-label" for="setter-goal" class="text-sm">{t('land.setter.after')}</Label>
 							<SearchSelect
+								id="setter-goal"
 								bind:value={picked}
 								items={goals.map((g) => ({ value: g, label: t(`land.setter.goal.${g}`) }))}
 								placeholder={t('land.setter.pick')}
@@ -121,13 +140,22 @@
 						</div>
 						<div>
 							<div class="flex items-baseline justify-between">
-								<Label for="setter-days" class="text-sm">{t('land.setter.days')}</Label>
+								<Label id="setter-days-label" for="setter-days" class="text-sm">{t('land.setter.days')}</Label>
 								<span class="font-mono text-sm tabular-nums">{days}</span>
 							</div>
-							<Slider id="setter-days" type="single" min={1} max={6} step={1} bind:value={days} class="mt-3" />
+							<Slider
+								id="setter-days"
+								aria-labelledby="setter-days-label"
+								type="single"
+								min={1}
+								max={6}
+								step={1}
+								bind:value={days}
+								class="mt-3"
+							/>
 						</div>
-						<div>
-							<Label class="text-sm">{t('land.setter.have')}</Label>
+						<fieldset>
+							<legend class="text-sm leading-none font-medium">{t('land.setter.have')}</legend>
 							<div class="mt-3 flex flex-wrap gap-x-5 gap-y-2.5">
 								{#each kitKeys as key (key)}
 									<div class="flex items-center gap-2">
@@ -140,7 +168,7 @@
 									</div>
 								{/each}
 							</div>
-						</div>
+						</fieldset>
 					</div>
 					<Separator class="my-6 bg-hairline" />
 					<div class="rounded-lg border border-hairline bg-background/40 p-4">
@@ -149,13 +177,13 @@
 						<ol class="mt-4 space-y-2">
 							{#each split as s, i (i)}
 								<li class="flex items-baseline gap-3 text-sm">
-									<span class="font-mono text-[10px] uppercase tracking-[0.14em] text-signal">{s.day}</span>
+									<span class="font-mono text-[10px] uppercase tracking-[0.14em] text-signal-text">{s.day}</span>
 									<span class="text-foreground/90">{s.work}</span>
 								</li>
 							{/each}
 						</ol>
 					</div>
-					<Button href={cta.href} class="mt-5 w-full bg-signal text-background hover:bg-signal/90">
+					<Button href={cta.href} class="mt-5 w-full">
 						{t('land.setter.start')}
 						<ArrowRightIcon class="size-4" />
 					</Button>

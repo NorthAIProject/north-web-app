@@ -23,7 +23,7 @@ test('overview renders the command center and its panels', async ({ page, reques
 test('the range selector switches period', async ({ page, request }) => {
 	const user = await createUser(request);
 	await signIn(page, user, '/app/overview');
-	await page.getByRole('navigation', { name: 'Time period' }).getByRole('link', { name: 'Last 7 days' }).click();
+	await page.getByRole('navigation', { name: 'Time period' }).getByRole('radio', { name: 'Last 7 days' }).click();
 	await expect(page).toHaveURL(/\/app\/overview\?range=week/);
 	await expect(
 		page.getByRole('navigation', { name: 'Time period' }).locator('[aria-current="true"]')

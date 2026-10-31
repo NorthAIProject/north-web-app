@@ -71,7 +71,6 @@
 	const timeZone = $derived(data.user.timezone || 'UTC');
 	const notice = $derived(noticeText(data.notice));
 	const hasPlan = $derived(Boolean(hub.planId));
-	const signal = 'bg-signal text-background hover:bg-signal/90';
 
 	// The Body pages the rail does not carry; the 3D view is offered by the
 	// Strava card in the state where it has something to show.
@@ -115,7 +114,7 @@
 		<p class="text-3xl font-semibold tracking-tight tabular-nums">{value}</p>
 		<p class="mt-0.5 text-xs text-muted-foreground">{unit}</p>
 		{#if sub}
-			<p class="text-[11px] text-muted-foreground/80">{sub}</p>
+			<p class="text-[11px] text-muted-foreground">{sub}</p>
 		{/if}
 	</div>
 {/snippet}
@@ -511,7 +510,7 @@
 				{/if}
 				<p class="mt-1 text-xs text-muted-foreground">{exerciseCount(i18n, s.exerciseCount)}</p>
 				<div class="mt-4">
-					<Button href={trainingHref(hub)} size="sm" class={['w-full', signal]}>
+					<Button href={trainingHref(hub)} size="sm" class="w-full">
 						<DumbbellIcon class="size-4" />
 						{i18n.t('fitness.next.open')}
 					</Button>
@@ -625,7 +624,7 @@
 								<Alert.Description>
 									<span class="block">{status.lastSyncError}</span>
 									{#if status.lastSyncAttemptedAt}
-										<span class="block text-xs opacity-80">
+										<span class="block text-xs">
 											{i18n.tf('fitness.strava.tried', syncStamp(status.lastSyncAttemptedAt))}
 										</span>
 									{/if}
@@ -639,7 +638,7 @@
 						</p>
 					{/if}
 					<div class="flex flex-wrap gap-2">
-						<Button href="/app/fitness/activities" class={signal}
+						<Button href="/app/fitness/activities"
 							>{i18n.t('fitness.strava.view3d')}</Button
 						>
 						<form method="post" action="/app/fitness/strava/sync">
@@ -651,7 +650,7 @@
 					</div>
 				{:else}
 					<!-- A full navigation: the route leaves for Strava's consent page. -->
-					<Button href="/app/fitness/strava/connect" data-sveltekit-reload class={signal}>
+					<Button href="/app/fitness/strava/connect" data-sveltekit-reload>
 						{i18n.t('fitness.strava.connect')}
 					</Button>
 				{/if}
@@ -727,7 +726,7 @@
 				<UtensilsIcon class="size-4" />
 				{i18n.t('fitness.hub.logfood')}
 			</Button>
-			<Button href="/app/activity" size="sm" class={signal}>
+			<Button href="/app/activity" size="sm">
 				<TimerIcon class="size-4" />
 				{i18n.t('fitness.hub.track')}
 			</Button>

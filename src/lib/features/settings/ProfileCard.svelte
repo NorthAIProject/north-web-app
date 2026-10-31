@@ -16,7 +16,7 @@
 	import { appearances, isAppearance } from '#lib/theme.js';
 	import DictateField from '#lib/features/voice/DictateField.svelte';
 	import FieldDescription from './FieldDescription.svelte';
-	import FieldMessage from './FieldMessage.svelte';
+	import { FieldMessage, describedBy, withInvalidFocus } from '#lib/components/ui/field-message/index.js';
 	import FormSelect from './FormSelect.svelte';
 	import type { FieldErrors } from './form.js';
 	import { localeOptions, localeOrDefault, toneOrDefault, tones, zoneGroupsIncluding } from './options.js';
@@ -69,7 +69,7 @@
 			method="post"
 			action="?/profile"
 			class="space-y-4"
-			use:enhance={({ formData }) => {
+			use:enhance={withInvalidFocus(({ formData }) => {
 				const appearance = String(formData.get('appearance') ?? '');
 				const locale = String(formData.get('locale') ?? '');
 				return async ({ result, update }) => {
@@ -81,7 +81,7 @@
 					// the language just saved.
 					await update({ reset: false });
 				};
-			}}
+			})}
 		>
 			<div class="space-y-2">
 				<Label for="display_name">{i18n.t('settings.profile.name')}</Label>
@@ -91,8 +91,9 @@
 					value={values.displayName}
 					required
 					aria-invalid={errors.display_name ? true : undefined}
+					aria-describedby={describedBy('display_name', errors.display_name)}
 				/>
-				<FieldMessage message={errors.display_name} />
+				<FieldMessage id="display_name" error={errors.display_name} />
 			</div>
 			<div class="space-y-2">
 				<Label for="timezone">{i18n.t('settings.profile.timezone')}</Label>
@@ -106,8 +107,9 @@
 					placeholder={i18n.t('settings.profile.timezone.choose')}
 					groups={zones}
 					error={Boolean(errors.timezone)}
+					describedby={describedBy('timezone', errors.timezone)}
 				/>
-				<FieldMessage message={errors.timezone} />
+				<FieldMessage id="timezone" error={errors.timezone} />
 			</div>
 			<div class="space-y-2">
 				<Label for="locale">{i18n.t('settings.profile.language')}</Label>
@@ -118,8 +120,10 @@
 					placeholder={i18n.t('settings.profile.language.choose')}
 					groups={languages}
 					error={Boolean(errors.locale)}
+					describedby={describedBy('locale', errors.locale)}
 				/>
 				<FieldDescription>{i18n.t('settings.profile.language.desc')}</FieldDescription>
+				<FieldMessage id="locale" error={errors.locale} />
 			</div>
 			<div class="space-y-2">
 				<Label for="appearance">{i18n.t('settings.profile.appearance')}</Label>
@@ -131,9 +135,10 @@
 					placeholder={i18n.t('appearance.' + shownAppearance)}
 					groups={appearanceGroups}
 					error={Boolean(errors.appearance)}
+					describedby={describedBy('appearance', errors.appearance)}
 				/>
 				<FieldDescription>{i18n.t('settings.profile.appearance.desc')}</FieldDescription>
-				<FieldMessage message={errors.appearance} />
+				<FieldMessage id="appearance" error={errors.appearance} />
 			</div>
 			<div class="space-y-2">
 				<Label for="coaching_tone">{i18n.t('settings.profile.tone')}</Label>
@@ -144,9 +149,11 @@
 					value={toneOrDefault(values.coachingTone)}
 					placeholder={i18n.t('tone.direct')}
 					groups={toneGroups}
+					error={Boolean(errors.coaching_tone)}
+					describedby={describedBy('coaching_tone', errors.coaching_tone)}
 				/>
 				<FieldDescription>{i18n.t('settings.profile.tone.desc')}</FieldDescription>
-				<FieldMessage message={errors.coaching_tone} />
+				<FieldMessage id="coaching_tone" error={errors.coaching_tone} />
 			</div>
 			<div class="space-y-2">
 				<Label for="coaching_style">{i18n.t('settings.profile.style')}</Label>
@@ -157,11 +164,13 @@
 						rows={3}
 						placeholder={i18n.t('settings.profile.style.placeholder')}
 						value={values.coachingStyle}
+						aria-invalid={errors.coaching_style ? true : undefined}
+						aria-describedby={describedBy('coaching_style', errors.coaching_style)}
 					/>
 				</DictateField>
-				<FieldMessage message={errors.coaching_style} />
+				<FieldMessage id="coaching_style" error={errors.coaching_style} />
 			</div>
-			<Button type="submit" class="bg-signal text-background hover:bg-signal/90">{i18n.t('settings.profile.save')}</Button>
+			<Button type="submit">{i18n.t('settings.profile.save')}</Button>
 		</form>
 	</Card.Content>
 </Card.Root>

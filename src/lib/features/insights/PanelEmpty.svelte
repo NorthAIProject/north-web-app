@@ -9,6 +9,6 @@
 <div class="py-6 text-center">
 	<p class="text-muted-foreground text-sm">{message}</p>
 	{#if cta && href}
-		<a {href} class="text-signal mt-2 inline-block text-sm hover:underline">{cta}</a>
+		<a {href} class="text-signal mt-2 text-sm focus-visible:ring-ring inline-flex min-h-6 items-center rounded-sm outline-none hover:underline focus-visible:ring-2 pointer-coarse:min-h-11">{cta}</a>
 	{/if}
 </div>

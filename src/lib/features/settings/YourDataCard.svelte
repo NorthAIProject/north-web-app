@@ -11,7 +11,7 @@
 	import { Input } from '#lib/components/ui/input/index.js';
 	import { Label } from '#lib/components/ui/label/index.js';
 	import { useI18n } from '#lib/i18n/index.js';
-	import FieldMessage from './FieldMessage.svelte';
+	import { FieldMessage } from '#lib/components/ui/field-message/index.js';
 
 	let { email, deleteError = '' }: { email: string; deleteError?: string } = $props();
 
@@ -33,7 +33,7 @@
 			</div>
 			<div class="border-hairline space-y-3 border-t pt-6">
 				<p class="text-muted-foreground text-sm leading-relaxed">{i18n.t('settings.delete.desc')}</p>
-				<FieldMessage message={deleteError} />
+				<FieldMessage id="delete_account" error={deleteError} />
 				<Dialog.Root bind:open>
 					<Dialog.Trigger class={buttonVariants({ variant: 'destructive' })}>
 						{i18n.t('settings.delete.button')}

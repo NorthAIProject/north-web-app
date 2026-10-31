@@ -43,7 +43,7 @@
 			</div>
 		{:else if push.state === 'subscribed'}
 			<div class="flex flex-wrap items-center gap-3">
-				<Badge variant="outline" class="border-signal/40 bg-signal/12 text-signal"
+				<Badge variant="outline" class="border-signal/40 bg-signal/12 text-signal-text"
 					>{i18n.t('settings.push.on')}</Badge
 				>
 				<Button variant="outline" size="sm" onclick={() => push.disable()}

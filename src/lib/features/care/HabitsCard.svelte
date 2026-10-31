@@ -5,6 +5,7 @@
 	import { Badge } from '#lib/components/ui/badge/index.js';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Card from '#lib/components/ui/card/index.js';
+	import { FieldMessage, describedBy } from '#lib/components/ui/field-message/index.js';
 	import { Input } from '#lib/components/ui/input/index.js';
 	import { Label } from '#lib/components/ui/label/index.js';
 	import { useI18n } from '#lib/i18n/index.js';
@@ -58,7 +59,6 @@
 									<ActionButton
 										action="?/habitDone"
 										fields={{ id: s.id, done: 'true' }}
-										class="bg-signal text-background hover:bg-signal/90"
 									>
 										{i18n.t('care.habits.markdone')}
 									</ActionButton>
@@ -86,6 +86,7 @@
 							value={typed(failure, 'name')}
 							placeholder={i18n.t('care.habits.new.ph')}
 							aria-invalid={errors.name ? 'true' : undefined}
+							aria-describedby={describedBy('name', errors.name)}
 						/>
 					</div>
 					<div class="space-y-2">
@@ -100,17 +101,13 @@
 						/>
 					</div>
 				</div>
-				{#if errors.name}
-					<p class="text-[0.8rem] font-medium text-red-500">{errors.name}</p>
-				{/if}
-				<div>
-					<Label>{i18n.t('care.habits.days')}</Label>
+				<FieldMessage id="name" error={errors.name} />
+				<fieldset aria-describedby={describedBy('habit-days', errors.days)}>
+					<legend class="text-sm leading-none font-medium">{i18n.t('care.habits.days')}</legend>
 					<DayChecks idPrefix="habit-day" checked={(d) => dayChecked(failure, d)} />
-					{#if errors.days}
-						<p class="mt-2 text-[0.8rem] font-medium text-red-500">{errors.days}</p>
-					{/if}
-				</div>
-				<Button type="submit" class="bg-signal text-background hover:bg-signal/90">{i18n.t('care.habits.add')}</Button>
+					<FieldMessage id="habit-days" error={errors.days} class="mt-2" />
+				</fieldset>
+				<Button type="submit">{i18n.t('care.habits.add')}</Button>
 			</form>
 		{/key}
 	</Card.Content>

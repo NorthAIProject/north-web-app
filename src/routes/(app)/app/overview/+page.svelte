@@ -3,6 +3,7 @@
 	import { browserApi } from '#lib/api/client.js';
 	import { pageTitle } from '#lib/brand.js';
 	import MonoLabel from '#lib/components/khepri/MonoLabel.svelte';
+	import RangeTabs from '#lib/components/khepri/RangeTabs.svelte';
 	import { onCheckInSaved } from '#lib/components/khepri/live.js';
 	import FirstWeekCard from '#lib/features/firstweek/FirstWeekCard.svelte';
 	import NextStepCard from '#lib/features/overview/NextStepCard.svelte';
@@ -56,27 +57,13 @@
 				{i18n.tf('dash.intro', rangeLabel(i18n, s.range))}
 			</p>
 		</div>
-		<nav
-			aria-label={i18n.t('dash.range')}
-			class="border-hairline bg-surface/60 -mx-1 flex shrink-0 gap-1 overflow-x-auto rounded-lg border p-1"
-		>
-			{#each RANGE_KEYS as key (key)}
-				{#if key === s.range}
-					<a
-						href={rangeHref(key)}
-						aria-current="true"
-						data-sveltekit-reset="false"
-						class="bg-signal text-background rounded-md px-3 py-1.5 text-xs font-medium whitespace-nowrap"
-					>{rangeLabel(i18n, key)}</a>
-				{:else}
-					<a
-						href={rangeHref(key)}
-						data-sveltekit-reset="false"
-						class="text-muted-foreground hover:bg-accent/60 hover:text-foreground rounded-md px-3 py-1.5 text-xs font-medium whitespace-nowrap transition-colors"
-					>{rangeLabel(i18n, key)}</a>
-				{/if}
-			{/each}
-		</nav>
+		<RangeTabs
+			label={i18n.t('dash.range')}
+			value={s.range}
+			options={RANGE_KEYS.map((key) => ({ key, label: rangeLabel(i18n, key) }))}
+			hrefFor={rangeHref}
+			class="-mx-1"
+		/>
 	</header>
 
 	{#if step && step.kind === NEXT_STEP_PUSH}

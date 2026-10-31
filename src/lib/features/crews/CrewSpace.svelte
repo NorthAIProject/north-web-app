@@ -252,7 +252,7 @@
 				type="button"
 				variant="ghost"
 				size="icon"
-				class="size-9 lg:hidden"
+				class="size-9 pointer-coarse:size-11 lg:hidden"
 				aria-label={i18n.t('crews.channels')}
 				onclick={() => (channelsSheet = true)}
 			>
@@ -272,20 +272,27 @@
 				{/if}
 			</div>
 			<!-- The chat and the challenge are separate pages, so these are links styled as tab triggers. -->
-			<nav class="bg-muted text-muted-foreground inline-flex h-9 items-center rounded-lg p-1 text-sm">
+			<nav class="bg-muted text-muted-foreground inline-flex h-9 items-center rounded-lg p-1 text-sm pointer-coarse:h-auto">
 				<a
 					href={channelURL(crewID, open.id)}
-					class={cn('rounded-md px-3 py-1', data.tab === 'chat' && 'bg-background text-foreground shadow-sm')}
+					class={cn('inline-flex items-center rounded-md px-3 py-1 pointer-coarse:min-h-11', data.tab === 'chat' && 'bg-background text-foreground shadow-sm')}
 					aria-current={data.tab === 'chat' ? 'page' : undefined}>{i18n.t('crews.tab.chat')}</a
 				>
 				<a
 					href={challengeURL(crewID)}
-					class={cn('rounded-md px-3 py-1', data.tab === 'challenge' && 'bg-background text-foreground shadow-sm')}
+					class={cn('inline-flex items-center rounded-md px-3 py-1 pointer-coarse:min-h-11', data.tab === 'challenge' && 'bg-background text-foreground shadow-sm')}
 					aria-current={data.tab === 'challenge' ? 'page' : undefined}>{i18n.t('crews.tab.challenge')}</a
 				>
 			</nav>
 			{#if data.tab === 'chat'}
-				<Button type="button" variant="ghost" size="icon" class="size-9" aria-label={i18n.t('crews.pins')} onclick={openPins}>
+				<Button
+					type="button"
+					variant="ghost"
+					size="icon"
+					class="size-9 pointer-coarse:size-11"
+					aria-label={i18n.t('crews.pins')}
+					onclick={openPins}
+				>
 					<PinIcon class="size-4" />
 				</Button>
 				{#if manage}
@@ -293,7 +300,7 @@
 						type="button"
 						variant="ghost"
 						size="icon"
-						class="size-9"
+						class="size-9 pointer-coarse:size-11"
 						aria-label={i18n.t('crews.channel.edit')}
 						onclick={() => {
 							channelError = '';
@@ -532,7 +539,7 @@
 		<DropdownMenu.Root>
 			<DropdownMenu.Trigger>
 				{#snippet child({ props })}
-					<Button {...props} variant="ghost" size="icon" class="size-8" aria-label={i18n.t('crews.menu')}>
+					<Button {...props} variant="ghost" size="icon" class="size-8 pointer-coarse:size-11" aria-label={i18n.t('crews.menu')}>
 						<EllipsisIcon class="size-4" />
 					</Button>
 				{/snippet}
@@ -574,7 +581,7 @@
 					type="button"
 					variant="ghost"
 					size="icon"
-					class="size-6"
+					class="size-8 pointer-coarse:size-11"
 					aria-label={i18n.t('crews.channel.new')}
 					onclick={() => {
 						channelError = '';
@@ -597,7 +604,7 @@
 					<a
 						href={channelURL(crewID, ch.id)}
 						class={cn(
-							'hover:bg-accent/60 flex min-h-9 items-center gap-2 rounded-md px-2 text-sm transition-colors',
+							'hover:bg-accent/60 flex min-h-9 items-center gap-2 rounded-md px-2 text-sm transition-colors pointer-coarse:min-h-11',
 							current && 'bg-accent text-foreground font-medium',
 							!current && !ch.unread && 'text-muted-foreground',
 							!current && !!ch.unread && 'text-foreground font-medium'

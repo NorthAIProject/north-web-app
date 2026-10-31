@@ -71,7 +71,7 @@
 					</div>
 					<Input id="password" name="password" type="password" required autocomplete="current-password" />
 				</div>
-				<Button type="submit" class="w-full bg-signal text-background hover:bg-signal/90" disabled={submitting}>
+				<Button type="submit" class="w-full" disabled={submitting}>
 					{i18n.t('auth.signin.submit')}
 				</Button>
 			</form>

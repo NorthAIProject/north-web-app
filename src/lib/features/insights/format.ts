@@ -3,9 +3,33 @@
 import { formatTime } from '#lib/components/khepri/dates.js';
 import type { Translator } from '#lib/i18n/index.js';
 
-/** "12%" — the magnitude only; the arrow carries the direction. */
+/** "12%" — the magnitude only; formatDelta adds the sign. */
 export function formatPct(pct: number): string {
 	return `${Math.abs(pct).toFixed(0)}%`;
+}
+
+/**
+ * A change against the previous window, ready to print: the direction
+ * (1 up, -1 down) and the signed text. The sign is there so the direction is
+ * not carried by colour alone. Null when there is nothing to show: no
+ * previous window, or no change.
+ */
+export type DeltaText = { direction: 1 | -1; text: string };
+
+const MINUS = '\u2212';
+
+/** "+12%" / "−12%" from an API delta (Go deltaChip). */
+export function formatDelta(delta: { pct: number; direction: number; hasPrior: boolean }): DeltaText | null {
+	if (!delta.hasPrior || delta.direction === 0) return null;
+	const direction = delta.direction > 0 ? 1 : -1;
+	return { direction, text: (direction > 0 ? '+' : MINUS) + formatPct(delta.pct) };
+}
+
+/** "+2" / "−3" for a change in a count (the recap's tiles). */
+export function formatCountChange(change: number, hasPrior = true): DeltaText | null {
+	if (!hasPrior || change === 0 || !Number.isFinite(change)) return null;
+	const direction = change > 0 ? 1 : -1;
+	return { direction, text: (direction > 0 ? '+' : MINUS) + String(Math.abs(Math.trunc(change))) };
 }
 
 export function formatKcal(v: number): string {

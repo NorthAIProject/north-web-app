@@ -3,12 +3,23 @@
 	import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '#lib/components/ui/card/index.js';
 	import type { StatsRow } from './types.js';
 
-	let { title, description = '', rows }: { title: string; description?: string; rows: StatsRow[] } = $props();
+	let {
+		title,
+		description = '',
+		level = 2,
+		rows
+	}: {
+		title: string;
+		description?: string;
+		/** The card title's heading level: 3 inside a section with its own h2. */
+		level?: 2 | 3;
+		rows: StatsRow[];
+	} = $props();
 </script>
 
 <Card class="border-hairline bg-surface">
 	<CardHeader>
-		<CardTitle>{title}</CardTitle>
+		<CardTitle {level}>{title}</CardTitle>
 		{#if description}
 			<CardDescription>{description}</CardDescription>
 		{/if}
@@ -21,7 +32,7 @@
 					<dd class="text-right font-medium tabular-nums">
 						{r.value}
 						{#if r.note}
-							<span class="text-muted-foreground block text-[11px] font-normal">{r.note}</span>
+							<span class="text-muted-foreground block text-xs font-normal">{r.note}</span>
 						{/if}
 					</dd>
 				</div>

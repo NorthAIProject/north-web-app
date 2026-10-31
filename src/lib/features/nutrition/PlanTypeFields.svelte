@@ -8,7 +8,7 @@
 	import { Input } from '#lib/components/ui/input/index.js';
 	import { Label } from '#lib/components/ui/label/index.js';
 	import { useI18n } from '#lib/i18n/index.js';
-	import FieldMessage from './FieldMessage.svelte';
+	import { FieldMessage, describedBy } from '#lib/components/ui/field-message/index.js';
 	import { radioClass } from './radio.js';
 	import { bandLabel, type Macros, type PlanTypeOption } from './view.js';
 
@@ -34,8 +34,8 @@
 	const bands = $derived(planTypes.filter((t) => t.id !== 'custom'));
 </script>
 
-<div class="space-y-2">
-	<MonoLabel text={i18n.t('nutrition.macro.carbs')} />
+<fieldset class="space-y-2" aria-describedby={describedBy(`${prefix}-type`, errors.plan_type)}>
+	<legend class="mb-2"><MonoLabel text={i18n.t('nutrition.macro.carbs')} /></legend>
 	{#each bands as b (b.id)}
 		<div class="flex items-center gap-2">
 			<input type="radio" id="{prefix}-type-{b.id}" name="plan_type" value={b.id} bind:group={type} class={radioClass} />
@@ -47,8 +47,8 @@
 			<input type="radio" id="{prefix}-type-custom" name="plan_type" value="custom" bind:group={type} class={radioClass} />
 			<Label for="{prefix}-type-custom">{i18n.t('nutrition.type.custom.choice')}</Label>
 	</div>
-	<FieldMessage message={errors.plan_type} />
-</div>
+	<FieldMessage id="{prefix}-type" error={errors.plan_type} />
+</fieldset>
 <div class="space-y-2" class:hidden={!(mode === 'advanced' && type === 'custom')}>
 		<Label for="{prefix}-custom-carb-pct">{i18n.t('nutrition.field.custompct')}</Label>
 		<Input
@@ -60,6 +60,7 @@
 			max="100"
 			step="1"
 			aria-invalid={errors.custom_carb_pct ? 'true' : undefined}
+			aria-describedby={describedBy(`${prefix}-custom-carb-pct`, errors.custom_carb_pct)}
 		/>
-		<FieldMessage message={errors.custom_carb_pct} />
+		<FieldMessage id="{prefix}-custom-carb-pct" error={errors.custom_carb_pct} />
 </div>

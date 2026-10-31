@@ -12,6 +12,10 @@
 <TabsPrimitive.Content
 	bind:ref
 	data-slot="tabs-content"
-	class={cn("flex-1 outline-none", className)}
+	class={cn(
+		// The panel is a tab stop (tabindex=0), so it needs a visible ring.
+		"flex-1 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+		className
+	)}
 	{...restProps}
 />

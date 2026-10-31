@@ -3,35 +3,30 @@
 	web/assets/js/shared/analytics.js). Renders nothing, and loads nothing, when
 	POSTHOG_API_KEY is unset.
 
-	The bundle is the vendored posthog-js array.full.js under /assets/js/vendor,
-	never a CDN: a visitor's browser makes no request to a third-party origin
-	we did not put in the repository. It is preloaded from the document head so
-	the download starts with the page, and run once the app has hydrated.
+	The SDK is the vendored posthog-js array.js under /assets/js/vendor, never a
+	CDN: a visitor's browser makes no request to a third-party origin we did not
+	put in the repository. It is fetched once the page has loaded and the
+	browser is idle, so it never competes with the first paint or hydration.
+	Session replay's recorder is a second vendored file, fetched only on the
+	pages that may be recorded (analytics.ts recordPages).
 -->
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { POSTHOG_API_KEY, POSTHOG_HOST } from '$app/env/public';
 	import { afterNavigate, beforeNavigate } from '$app/navigation';
-	import { posthogConfig, shouldRecord, type PostHog } from './analytics.js';
+	import { loadScript, posthogConfig, posthogScript, recorderScript, shouldRecord, whenIdle, type PostHog } from './analytics.js';
 
 	// identity: the signed-in account id, matching the server's DistinctId.
 	let { identity = null }: { identity?: string | null } = $props();
 
-	const src = '/assets/js/vendor/posthog.min.js';
 	const enabled = Boolean(POSTHOG_API_KEY && POSTHOG_HOST);
 
 	let ph: PostHog | null = $state.raw(null);
 	let identified: string | null = null;
 
-	function load(): Promise<PostHog | null> {
-		if (window.posthog) return Promise.resolve(window.posthog);
-		return new Promise((resolve) => {
-			const script = document.createElement('script');
-			script.src = src;
-			script.onload = () => resolve(window.posthog ?? null);
-			script.onerror = () => resolve(null);
-			document.head.appendChild(script);
-		});
+	async function load(): Promise<PostHog | null> {
+		if (window.posthog) return window.posthog;
+		return (await loadScript(posthogScript)) ? (window.posthog ?? null) : null;
 	}
 
 	// Super properties: every event says which appearance was chosen and which
@@ -45,9 +40,16 @@
 		});
 	}
 
+	// The recorder arrives after the page it was fetched for; by then the
+	// reader may have moved on to a page that must not be recorded.
+	async function record() {
+		if (!(await loadScript(recorderScript))) return;
+		if (ph && shouldRecord(location.pathname)) ph.startSessionRecording();
+	}
+
 	function follow(path: string) {
 		if (!ph) return;
-		if (shouldRecord(path)) ph.startSessionRecording();
+		if (shouldRecord(path)) void record();
 		else ph.stopSessionRecording();
 		ph.capture('$pageview');
 	}
@@ -55,16 +57,19 @@
 	onMount(() => {
 		if (!enabled) return;
 		let alive = true;
-		load().then((posthog) => {
-			if (!alive || !posthog) return;
-			posthog.init(POSTHOG_API_KEY, posthogConfig(POSTHOG_HOST, () => location.pathname));
-			ph = posthog;
-			registerAppearance();
-			follow(location.pathname);
+		const cancel = whenIdle(() => {
+			void load().then((posthog) => {
+				if (!alive || !posthog) return;
+				posthog.init(POSTHOG_API_KEY, posthogConfig(POSTHOG_HOST, () => location.pathname));
+				ph = posthog;
+				registerAppearance();
+				follow(location.pathname);
+			});
 		});
 		document.addEventListener('theme-changed', registerAppearance);
 		return () => {
 			alive = false;
+			cancel();
 			document.removeEventListener('theme-changed', registerAppearance);
 		};
 	});
@@ -91,9 +96,3 @@
 		follow(to.url.pathname);
 	});
 </script>
-
-<svelte:head>
-	{#if enabled}
-		<link rel="preload" href={src} as="script" />
-	{/if}
-</svelte:head>

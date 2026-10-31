@@ -14,12 +14,27 @@ export const noAuthOptions: AuthOptions = { google: false, passkey: false, passw
  * that fails to learn about Google should still offer the password form.
  */
 export async function fetchAuthOptions(api: Api): Promise<AuthOptions> {
+	return (await fetchAuthOptionsOrUnknown(api)) ?? noAuthOptions;
+}
+
+/**
+ * The options, or null when the API could not say. A page that hides itself
+ * when a method is off (the password-reset pages) must tell "off" from
+ * "unknown": a blip in GET /auth/options should not turn the reset journey,
+ * or an emailed reset link, into a 404.
+ */
+export async function fetchAuthOptionsOrUnknown(api: Api): Promise<AuthOptions | null> {
 	try {
 		const { data } = await api.GET('/auth/options');
-		return data ?? noAuthOptions;
+		return data ?? null;
 	} catch {
-		return noAuthOptions;
+		return null;
 	}
+}
+
+/** False only when the API said there is no mailer to send the reset link. */
+export function passwordResetOffered(options: AuthOptions | null): boolean {
+	return options === null || options.passwordReset;
 }
 
 /** The Google entry point, carrying next the way Go's googleAuthHref did. */

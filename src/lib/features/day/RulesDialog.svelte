@@ -36,7 +36,13 @@
 				<div class="flex items-center gap-3">
 					<Checkbox id="rule-on-{r.kind}" name="on_{r.kind}" value="true" checked={r.enabled} />
 					<label for="rule-on-{r.kind}" class="flex-1 text-sm">{i18n.t(`day.rule.${r.kind}`)}</label>
-					<Input type="time" name="at_{r.kind}" value={r.at} class="w-28" />
+					<Input
+						type="time"
+						name="at_{r.kind}"
+						value={r.at}
+						class="w-28"
+						aria-label={i18n.tf('day.rule.at', i18n.t(`day.rule.${r.kind}`))}
+					/>
 				</div>
 			{/each}
 			<Dialog.Footer>

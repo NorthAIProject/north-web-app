@@ -153,9 +153,15 @@
 					<circle cx="40" cy="40" r={r.radius} fill="none" stroke={r.color} stroke-width="8" stroke-linecap="round" pathLength="100" stroke-dasharray={ringDash(r.fraction)} transform="rotate(-90 40 40)"></circle>
 				{/each}
 			</svg>
-			<span class="space-y-1 text-right text-sm font-semibold tabular-nums">
+			<!-- The unit names each ring's value (kcal move, min exercise, h
+				stand), so the number does not lean on the swatch's colour alone. -->
+			<span class="space-y-1 text-right text-sm tabular-nums">
 				{#each a.rings as r (r.key)}
-					<span class="flex items-center justify-end gap-1.5"><Swatch color={r.color} />{r.value}</span>
+					<span class="flex items-center justify-end gap-1.5">
+						<Swatch color={r.color} />
+						<span class="font-semibold">{r.value}</span>
+						<span class="text-muted-foreground text-xs">{r.unit}</span>
+					</span>
 				{/each}
 			</span>
 		</span>

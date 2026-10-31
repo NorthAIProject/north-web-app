@@ -1,9 +1,13 @@
 <!--
 	The conversation list (Go: threadList). Off-canvas below lg, pinned open
-	from lg up, so one piece of markup serves both.
+	from lg up, so one piece of markup serves both. Closed off-canvas it is
+	inert (out of the tab order and the accessibility tree); open, it takes
+	focus, Escape closes it, and focus goes back to the toggle that opened it.
 -->
 <script lang="ts">
 	import PlusIcon from '@lucide/svelte/icons/plus';
+	import { tick } from 'svelte';
+	import { MediaQuery } from 'svelte/reactivity';
 	import { Badge } from '#lib/components/ui/badge/index.js';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import { useI18n } from '#lib/i18n/index.js';
@@ -26,11 +30,40 @@
 	} = $props();
 
 	const i18n = useI18n();
+	// lg: the list is pinned beside the transcript and always reachable.
+	const pinned = new MediaQuery('min-width: 64rem');
+	let panel: HTMLElement | undefined = $state();
+
+	// Focus follows the drawer: in when it opens, back to the header's toggle
+	// (ChatHeader, #chat-threads-toggle) when it closes from inside.
+	let wasOpen = false;
+	$effect(() => {
+		const changed = open !== wasOpen;
+		wasOpen = open;
+		if (!changed || pinned.current) return;
+		if (open) {
+			void tick().then(() => panel?.querySelector<HTMLElement>('[aria-current="page"], a, button')?.focus());
+			return;
+		}
+		// Going inert drops focus to the body, so it goes back to the toggle.
+		const active = document.activeElement;
+		if (active === document.body || panel?.contains(active)) document.getElementById('chat-threads-toggle')?.focus();
+	});
+
+	function onkeydown(event: KeyboardEvent) {
+		if (event.key === 'Escape' && open && !pinned.current) open = false;
+	}
 </script>
 
+<svelte:window {onkeydown} />
+
 <aside
+	id="chat-threads"
+	bind:this={panel}
+	inert={!open && !pinned.current}
+	aria-label={i18n.t('chat.threads.label')}
 	class={[
-		'border-border bg-card absolute inset-y-0 left-0 z-30 flex w-64 shrink-0 flex-col border-r transition-transform lg:static lg:z-auto lg:translate-x-0',
+		'border-border bg-card absolute inset-y-0 left-0 z-30 flex w-64 shrink-0 flex-col border-r transition-transform motion-reduce:transition-none lg:static lg:z-auto lg:translate-x-0',
 		open ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
 	]}
 	data-testid="thread-list"

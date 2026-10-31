@@ -111,7 +111,7 @@
 <div class="mt-4">
 	{#if documents.length === 0}
 		<EmptyState mascot title={i18n.t('knowledge.empty.title')} body={i18n.t('knowledge.empty.body')}>
-			<Button href="#add-note" class="bg-signal text-background hover:bg-signal/90">{i18n.t('knowledge.empty.cta')}</Button>
+			<Button href="#add-note">{i18n.t('knowledge.empty.cta')}</Button>
 		</EmptyState>
 	{:else}
 		<div class="overflow-x-auto rounded-md border border-hairline">
@@ -150,14 +150,14 @@
 								{#if d.kind === 'upload' && d.byteSize > 0}
 									{humanSize(i18n, d.byteSize)}
 								{:else}
-									<span class="text-muted-foreground/50">—</span>
+									<span class="text-muted-foreground">—</span>
 								{/if}
 							</Table.Cell>
 							<Table.Cell class="hidden text-muted-foreground tabular-nums md:table-cell">
 								{#if (d.lineCount ?? 0) > 0}
 									{d.lineCount}
 								{:else}
-									<span class="text-muted-foreground/50">—</span>
+									<span class="text-muted-foreground">—</span>
 								{/if}
 							</Table.Cell>
 							<Table.Cell><StatusBadge doc={d} /></Table.Cell>

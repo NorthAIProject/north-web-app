@@ -5,6 +5,7 @@
 -->
 <script lang="ts">
 	import SearchSelect from '#lib/components/khepri/SearchSelect.svelte';
+	import { describe } from '#lib/components/ui/field-message/index.js';
 
 	export type Option = { value: string; label: string };
 	export type OptionGroup = { label?: string; options: Option[] };
@@ -18,6 +19,7 @@
 		error = false,
 		search = true,
 		searchPlaceholder,
+		describedby,
 		onchange
 	}: {
 		id: string;
@@ -29,6 +31,8 @@
 		/** templUI's search box; false is NoSearch. */
 		search?: boolean;
 		searchPlaceholder?: string;
+		/** The FieldMessage id the trigger is described by (describedBy()). */
+		describedby?: string;
 		onchange?: (value: string) => void;
 	} = $props();
 
@@ -36,14 +40,16 @@
 	let selected = $derived(value);
 </script>
 
-<SearchSelect
-	{id}
-	{name}
-	bind:value={selected}
-	groups={groups.map((g) => ({ label: g.label, items: g.options }))}
-	{placeholder}
-	{search}
-	{searchPlaceholder}
-	invalid={error}
-	onValueChange={(v) => onchange?.(v)}
-/>
+<div class="contents" {@attach describe(id, describedby)}>
+	<SearchSelect
+		{id}
+		{name}
+		bind:value={selected}
+		groups={groups.map((g) => ({ label: g.label, items: g.options }))}
+		{placeholder}
+		{search}
+		{searchPlaceholder}
+		invalid={error}
+		onValueChange={(v) => onchange?.(v)}
+	/>
+</div>

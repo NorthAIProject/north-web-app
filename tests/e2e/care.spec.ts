@@ -38,16 +38,16 @@ test('last night is logged, and a missing duration is rejected', async ({ page, 
 	await openCare(page, request);
 	await page.getByRole('button', { name: 'Log last night' }).click();
 	// The API refuses a night of zero minutes; the message sits in the form.
-	await expect(page.locator('p.text-red-500').first()).toBeVisible();
+	await expect(page.locator('p.text-destructive').first()).toBeVisible();
 
-	await page.getByLabel('Hours').fill('7');
-	await page.getByLabel('Minutes').fill('30');
+	await page.getByLabel('Hours', { exact: true }).fill('7');
+	await page.getByLabel('Minutes', { exact: true }).fill('30');
 	await page.getByRole('button', { name: 'Log last night' }).click();
 	await expect(page.getByText('Last night: 7h 30m')).toBeVisible();
 	await expect(page.getByRole('button', { name: 'Update last night' })).toBeVisible();
-	await expect(page.locator('p.text-red-500')).toHaveCount(0);
+	await expect(page.locator('p.text-destructive')).toHaveCount(0);
 	// The form went back to empty after the save.
-	await expect(page.getByLabel('Hours')).toHaveValue('');
+	await expect(page.getByLabel('Hours', { exact: true })).toHaveValue('');
 });
 
 test('a habit is added, ticked, unticked and deleted', async ({ page, request }) => {

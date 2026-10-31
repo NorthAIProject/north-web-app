@@ -11,6 +11,7 @@ import { invalidate } from '$app/navigation';
 import { isApiError } from '#lib/api/errors.js';
 import { mascot } from '#lib/components/khepri/mascot.svelte.js';
 import { openStream, type StreamEvent } from './stream.js';
+import { announcement } from './transcript.js';
 
 // Go friendly(): the default when a stream breaks without saying why.
 const BROKEN = 'Something went wrong while writing that reply.';
@@ -32,6 +33,12 @@ export class ChatStream {
 	exchange: Exchange | null = $state(null);
 	/** A refusal before anything was sent, shown above the composer. */
 	composerError = $state('');
+	/**
+	 * The finished reply as plain words, for the page's polite live region:
+	 * set once when a stream closes cleanly, never token by token. A failure
+	 * is announced by the bubble's alert instead.
+	 */
+	announced = $state('');
 
 	#abort: AbortController | null = null;
 
@@ -105,6 +112,7 @@ export class ChatStream {
 		this.#abort = abort;
 		this.exchange = { ...start, text: '', error: '', streaming: true };
 		const exchange = this.exchange;
+		this.announced = '';
 
 		mascot.streamOpened();
 		let failed = false;
@@ -132,6 +140,7 @@ export class ChatStream {
 		if (abort.signal.aborted) return 'failed';
 		exchange.streaming = false;
 		mascot.streamClosed();
+		if (!failed) this.announced = announcement(exchange.text);
 
 		await invalidate('north:chat');
 		const outcome = refused ? 'refused' : failed ? 'failed' : 'done';

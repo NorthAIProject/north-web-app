@@ -50,7 +50,7 @@ test('create refuses an empty name', async ({ page, request }) => {
 	const user = await createUser(request);
 	await signIn(page, user, '/app/crews');
 	await page.getByRole('button', { name: 'Create' }).click();
-	await expect(page.locator('p.text-red-500')).toBeVisible();
+	await expect(page.locator('p.text-destructive')).toBeVisible();
 	await expect(page).toHaveURL(/\/app\/crews$/);
 });
 
@@ -79,7 +79,7 @@ test('first post asks for the crew rules, then send, edit, react, pin and delete
 	await expect(page.locator('article', { hasText: 'hello again crew' })).toContainText('(edited)');
 
 	await menuFor(page, 'hello again crew');
-	await page.getByRole('menuitem', { name: 'fire' }).click();
+	await page.getByRole('menuitem', { name: 'React with 🔥' }).click();
 	await expect(page.locator('article', { hasText: 'hello again crew' }).getByRole('button', { name: '🔥 1' })).toBeVisible();
 
 	await menuFor(page, 'hello again crew');

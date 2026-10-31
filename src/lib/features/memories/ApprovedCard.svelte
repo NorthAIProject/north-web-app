@@ -10,6 +10,7 @@
 	import { Button, buttonVariants } from '#lib/components/ui/button/index.js';
 	import * as Card from '#lib/components/ui/card/index.js';
 	import * as Dialog from '#lib/components/ui/dialog/index.js';
+	import { FieldMessage, describedBy, withInvalidFocus } from '#lib/components/ui/field-message/index.js';
 	import { Label } from '#lib/components/ui/label/index.js';
 	import { Textarea } from '#lib/components/ui/textarea/index.js';
 	import DictateField from '#lib/features/voice/DictateField.svelte';
@@ -43,7 +44,7 @@
 	<Card.Root class="border-hairline border-destructive/40">
 		<Card.Content class="space-y-3 py-4">
 			<p class="text-sm font-medium">{i18n.t('memories.fix.title')}</p>
-			<form method="post" action="?/update" class="space-y-3" use:enhance>
+			<form method="post" action="?/update" class="space-y-3" use:enhance={withInvalidFocus()}>
 				{@render hidden()}
 				<CategoryField id="category-{m.id}" selected={edit.category} error={edit.errors?.category ?? ''} />
 				<div class="space-y-2">
@@ -55,13 +56,12 @@
 							rows={3}
 							value={edit.content}
 							aria-invalid={edit.errors?.content ? true : undefined}
+							aria-describedby={describedBy(contentId, edit.errors?.content)}
 						/>
 					</DictateField>
-					{#if edit.errors?.content}
-						<p class="text-[0.8rem] font-medium text-red-500">{edit.errors.content}</p>
-					{/if}
+					<FieldMessage id={contentId} error={edit.errors?.content} />
 				</div>
-				<Button type="submit" size="sm" class="bg-signal text-background hover:bg-signal/90">
+				<Button type="submit" size="sm">
 					{i18n.t('memories.save')}
 				</Button>
 			</form>
@@ -72,7 +72,7 @@
 		<Card.Content class="space-y-3 py-4">
 			<div class="flex flex-wrap items-center gap-2">
 				{#if m.pinned}
-					<Badge variant="outline" class="border-signal/40 bg-signal/12 text-signal">{i18n.t('memories.badge.pinned')}</Badge>
+					<Badge variant="outline" class="border-signal/40 bg-signal/12 text-signal-text">{i18n.t('memories.badge.pinned')}</Badge>
 				{/if}
 				{#if m.excluded}
 					<Badge variant="secondary">{i18n.t('memories.badge.hidden')}</Badge>
@@ -104,7 +104,7 @@
 								<Textarea id={contentId} name="content" rows={3} value={m.content} />
 							</DictateField>
 							<div class="flex flex-wrap gap-2">
-								<Button type="submit" size="sm" class="bg-signal text-background hover:bg-signal/90">
+								<Button type="submit" size="sm">
 									{i18n.t('memories.save')}
 								</Button>
 								<Button type="button" size="sm" variant="outline" onclick={() => (editing = false)}>

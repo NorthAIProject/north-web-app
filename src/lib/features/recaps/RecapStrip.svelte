@@ -5,6 +5,10 @@
 	paint; this does the same with a browser fetch after mount. A failed read
 	renders nothing: the strip is a garnish, the page is whole without it.
 
+	The sparkline's chart code (SpecChart, LayerChart) is imported alongside
+	that fetch rather than with the page, so My Day's first download carries
+	no chart library for a garnish that arrives late anyway.
+
 	Mount it on My Day: <RecapStrip />
 -->
 <script lang="ts">
@@ -14,20 +18,26 @@
 	import SmilePlusIcon from '@lucide/svelte/icons/smile-plus';
 	import { browserApi } from '#lib/api/client.js';
 	import MonoLabel from '#lib/components/khepri/MonoLabel.svelte';
-	import { SpecChart } from '#lib/components/ui/chart/index.js';
+	import type { Component } from 'svelte';
+	import type { ChartSpec } from '#lib/components/ui/chart/index.js';
 	import { useI18n } from '#lib/i18n/index.js';
 	import { buildStrip, type Strip } from './view.js';
 
 	const i18n = useI18n();
 	let strip = $state<Strip | null>(null);
 	let settled = $state(false);
+	let SpecChart = $state.raw<Component<ChartSpec> | null>(null);
 
 	$effect(() => {
 		let cancelled = false;
-		browserApi()
-			.GET('/recap', { params: { query: { range: 'week' } } })
-			.then(({ data }) => {
-				if (!cancelled && data) strip = buildStrip(data);
+		Promise.all([
+			browserApi().GET('/recap', { params: { query: { range: 'week' } } }),
+			import('#lib/components/ui/chart/spec-chart.svelte')
+		])
+			.then(([{ data }, chart]) => {
+				if (cancelled || !data) return;
+				SpecChart = chart.default as Component<ChartSpec>;
+				strip = buildStrip(data);
 			})
 			.catch(() => {})
 			.finally(() => {
@@ -39,7 +49,7 @@
 	});
 </script>
 
-{#if strip}
+{#if strip && SpecChart}
 	<a
 		href="/app/recap?range=week"
 		class="border-hairline bg-surface hover:bg-accent/40 flex items-center gap-4 rounded-xl border px-4 py-3 transition-colors"

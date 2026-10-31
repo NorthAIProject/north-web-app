@@ -19,7 +19,9 @@
 	const rows = $derived(paletteRows(i18n));
 	const visible = $derived(filterRows(rows, q));
 	const activeRow = $derived(visible[Math.min(active, visible.length - 1)]);
-	const apple = typeof navigator !== 'undefined' && /Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent);
+	const apple =
+		typeof navigator !== 'undefined' &&
+		/Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent);
 	const hotkeyLabel = apple ? '⌘K' : 'Ctrl K';
 
 	$effect(() => {
@@ -80,22 +82,30 @@
 	variant="outline"
 	size="sm"
 	class="max-w-64 min-w-0 shrink gap-2 overflow-hidden font-normal text-muted-foreground sm:justify-start lg:max-w-80"
-	aria-label={i18n.t('palette.aria')}
+	aria-keyshortcuts={apple ? 'Meta+K' : 'Control+K'}
 	onclick={() => (open = true)}
 >
-	<SearchIcon class="size-4" />
-	<span class="hidden min-w-0 truncate sm:inline">{i18n.t('palette.trigger')}</span>
+	<SearchIcon class="size-4" aria-hidden="true" />
+	<!-- The visible word is the name (WCAG 2.5.3); on phones it is the icon's name. -->
+	<span class="sr-only sm:not-sr-only sm:min-w-0 sm:truncate">{i18n.t('palette.trigger')}</span>
+	<!-- Drawn from an attribute so the hint is not read into the name. -->
 	<kbd
-		class="hidden shrink-0 rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground sm:ml-auto sm:inline"
-		>{hotkeyLabel}</kbd
-	>
+		aria-hidden="true"
+		data-key={hotkeyLabel}
+		class="hidden shrink-0 rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground after:content-[attr(data-key)] sm:ml-auto sm:inline"
+	></kbd>
 </Button>
 
 <Dialog.Root bind:open onOpenChange={(o) => !o && reset()}>
-	<Dialog.Content showCloseButton={false} class="top-[12%] translate-y-0 gap-0 overflow-hidden p-0 sm:max-w-2xl">
+	<Dialog.Content
+		showCloseButton={false}
+		class="top-[12%] translate-y-0 gap-0 overflow-hidden p-0 sm:max-w-2xl"
+	>
 		<Dialog.Title class="sr-only">{i18n.t('palette.title')}</Dialog.Title>
 		<div class="relative border-b border-border">
-			<span class="pointer-events-none absolute top-1/2 left-4 -translate-y-1/2 text-muted-foreground">
+			<span
+				class="pointer-events-none absolute top-1/2 left-4 -translate-y-1/2 text-muted-foreground"
+			>
 				<SearchIcon class="size-4" />
 			</span>
 			<input
@@ -122,7 +132,10 @@
 		>
 			{#if !q.trim()}
 				{#each groups as group (group)}
-					<div role="presentation" class="px-2 pt-3 pb-1 text-xs font-medium tracking-wide text-muted-foreground first:pt-1">
+					<div
+						role="presentation"
+						class="px-2 pt-3 pb-1 text-xs font-medium tracking-wide text-muted-foreground first:pt-1"
+					>
 						{groupLabel(i18n, group)}
 					</div>
 					{#each visible.filter((r) => r.destination.group === group) as row (row.index)}
@@ -137,10 +150,15 @@
 		</div>
 		{#if visible.length === 0}
 			<p class="px-4 py-6 text-center text-sm text-muted-foreground">
-				{i18n.t('palette.empty.before')} <span class="font-medium text-foreground">{q}</span>{i18n.t('palette.empty.after')}
+				{i18n.t('palette.empty.before')}
+				<span class="font-medium text-foreground">{q}</span>{i18n.t('palette.empty.after')}
 			</p>
 		{/if}
-		<span class="sr-only" aria-live="polite">{visible.length === 1 ? '1 page' : `${visible.length} pages`}</span>
+		<span class="sr-only" aria-live="polite"
+			>{visible.length === 1
+				? i18n.t('palette.count.one')
+				: i18n.tf('palette.count.many', visible.length)}</span
+		>
 		<div class="flex gap-4 border-t border-border px-4 py-2 text-[11px] text-muted-foreground">
 			<span>↑↓ {i18n.t('palette.hint.navigate')}</span>
 			<span>⏎ {i18n.t('palette.hint.open')}</span>
@@ -156,7 +174,10 @@
 		role="option"
 		id="command-palette-row-{row.index}"
 		aria-selected={row === activeRow}
-		class={['flex items-center gap-3 rounded-md px-2 py-2 text-sm text-foreground no-underline', row === activeRow && 'bg-accent']}
+		class={[
+			'flex items-center gap-3 rounded-md px-2 py-2 text-sm text-foreground no-underline',
+			row === activeRow && 'bg-accent'
+		]}
 		onmouseenter={() => (active = visible.indexOf(row))}
 		onclick={(e) => {
 			e.preventDefault();
@@ -165,6 +186,8 @@
 	>
 		<span class="shrink-0 text-muted-foreground"><Icon class="size-4" /></span>
 		<span class="min-w-0 flex-1 truncate">{row.label}</span>
-		<span class="hidden truncate text-xs text-muted-foreground sm:block sm:max-w-[55%]">{row.description}</span>
+		<span class="hidden truncate text-xs text-muted-foreground sm:block sm:max-w-[55%]"
+			>{row.description}</span
+		>
 	</a>
 {/snippet}

@@ -36,7 +36,7 @@
 </script>
 
 <section id="patterns" class="border-hairline relative scroll-mt-20 border-t py-24">
-	<SectionHeading eyebrow={t('land.stats.eyebrow')} title={t('land.stats.title')} body={t('land.stats.body')} />
+	<SectionHeading title={t('land.stats.title')} body={t('land.stats.body')} />
 	<div class="mt-10 grid gap-4 md:grid-cols-2">
 		{#each patterns as p (p.title)}
 			<Card.Root class="border-hairline bg-surface">
@@ -60,13 +60,17 @@
 			</Card.Root>
 		{/each}
 	</div>
-	<div class="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
+	<!-- The month's numbers as one key/value row under the patterns, the same
+	     size as the text around them: the patterns are the point, not these. -->
+	<dl class="border-hairline mt-6 grid gap-x-8 gap-y-4 border-t pt-6 sm:grid-cols-2 lg:grid-cols-4">
 		{#each stats as s (s.label)}
-			<div class="border-hairline bg-surface/60 rounded-lg border p-4">
-				<p class="text-muted-foreground font-mono text-[10px] tracking-[0.14em] uppercase">{s.label}</p>
-				<p class="mt-1 text-xl font-medium tabular-nums">{s.value}</p>
-				<p class="text-muted-foreground text-xs">{s.note}</p>
+			<div>
+				<dt class="text-muted-foreground text-sm">{s.label}</dt>
+				<dd class="mt-0.5 text-sm">
+					<span class="font-medium tabular-nums">{s.value}</span>
+					<span class="text-muted-foreground block">{s.note}</span>
+				</dd>
 			</div>
 		{/each}
-	</div>
+	</dl>
 </section>

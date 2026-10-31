@@ -4,6 +4,7 @@
 	import MonoLabel from '#lib/components/khepri/MonoLabel.svelte';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Card from '#lib/components/ui/card/index.js';
+	import { FieldMessage, describedBy, withInvalidFocus } from '#lib/components/ui/field-message/index.js';
 	import SearchSelect from '#lib/components/khepri/SearchSelect.svelte';
 	import { Textarea } from '#lib/components/ui/textarea/index.js';
 	import { suggestionLabel } from '#lib/features/inbox/inbox.js';
@@ -31,7 +32,7 @@
 
 	<Card.Root class="border-hairline bg-surface">
 		<Card.Content class="pt-6">
-			<form method="post" action="?/add" class="space-y-3" use:enhance>
+			<form method="post" action="?/add" class="space-y-3" use:enhance={withInvalidFocus()}>
 				<div class="space-y-2">
 					<Textarea
 						id="text"
@@ -39,11 +40,11 @@
 						rows={3}
 						value={form?.text ?? ''}
 						placeholder={i18n.t('inbox.ph')}
+						aria-label={i18n.t('inbox.text.label')}
 						aria-invalid={form?.error ? true : undefined}
+						aria-describedby={describedBy('text', form?.error)}
 					/>
-					{#if form?.error}
-						<p class="text-destructive text-sm font-medium">{form.error}</p>
-					{/if}
+					<FieldMessage id="text" error={form?.error} />
 				</div>
 				<Button type="submit">{i18n.t('inbox.save')}</Button>
 			</form>
@@ -95,6 +96,7 @@
 								items={goalItems}
 								value={picked[it.id] ?? ''}
 								placeholder={i18n.t('inbox.goal_ph')}
+								aria-label={i18n.t('inbox.goal_ph')}
 								onValueChange={(v) => (picked[it.id] = v)}
 							/>
 							<Button type="submit" variant="outline" size="sm">{i18n.t('inbox.dest.goal')}</Button>

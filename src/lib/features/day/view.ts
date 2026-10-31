@@ -687,25 +687,26 @@ export function bodyCaption(i18n: Translator, m: BodyMap | null): string {
 	return '';
 }
 
+/** The BMI word's colour: a tracker's text step, never its fill (4.5:1). */
 export function bmiClass(category: string): string {
 	switch (category) {
 		case 'healthy':
-			return 'text-day-food';
+			return 'text-day-food-text';
 		case 'overweight':
-			return 'text-day-fat';
+			return 'text-day-fat-text';
 		case 'obese':
-			return 'text-day-move';
+			return 'text-day-move-text';
 		default:
-			return 'text-day-water';
+			return 'text-day-water-text';
 	}
 }
 
 export function sorenessClass(severity: number): string {
 	switch (severity) {
 		case 3:
-			return 'bg-day-move/20 text-day-move';
+			return 'bg-day-move/20 text-day-move-text';
 		case 2:
-			return 'bg-day-move/12 text-day-move';
+			return 'bg-day-move/12 text-day-move-text';
 		default:
 			return 'bg-muted text-muted-foreground';
 	}

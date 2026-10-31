@@ -34,3 +34,14 @@ describe('analytics decisions', () => {
 		expect(ok('https://kheprios.com/privacy-extra')).toBe(false);
 	});
 });
+
+describe('vendored posthog files', () => {
+	it('name files that exist, with the version in the name', async () => {
+		const { existsSync } = await import('node:fs');
+		const { posthogScript, recorderScript } = await import('./analytics');
+		for (const src of [posthogScript, recorderScript]) {
+			expect(src).toMatch(/^\/assets\/js\/vendor\/posthog-[a-z-]+-\d+\.\d+\.\d+\.js$/);
+			expect(existsSync(`static${src}`)).toBe(true);
+		}
+	});
+});

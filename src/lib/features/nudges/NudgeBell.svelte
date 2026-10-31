@@ -113,9 +113,12 @@
 		</DropdownMenu.Root>
 	</div>
 </div>
-<a
-	data-nudge-toast
-	hidden={!toast}
-	href={toast?.href ?? '/app'}
-	class="bg-signal text-background fixed right-4 bottom-4 z-50 max-w-xs rounded-lg px-4 py-3 text-sm shadow-lg"
->{toast?.title ?? ''}</a>
+<!-- The live region stays mounted so a new note is announced, not only shown. -->
+<div aria-live="polite" aria-atomic="true">
+	<a
+		data-nudge-toast
+		hidden={!toast}
+		href={toast?.href ?? '/app'}
+		class="bg-signal text-signal-foreground fixed right-4 bottom-[max(1rem,env(safe-area-inset-bottom))] z-50 max-w-xs rounded-lg px-4 py-3 text-sm shadow-lg"
+	>{toast?.title ?? ''}</a>
+</div>

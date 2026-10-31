@@ -4,7 +4,7 @@
 	selector refreshes.
 
 	Go swapped #insights-panels with an htmx GET of the page's /body fragment
-	and pushed ?range=. Here each option is a plain link to ?range=: SvelteKit
+	and pushed ?range=. Here RangeTabs links each option to ?range=: SvelteKit
 	navigates client-side, the page's load refetches, and only the panels
 	re-render (the shell stays mounted, scroll and focus are kept). Without
 	JavaScript it is an ordinary link, as in Go.
@@ -13,6 +13,7 @@
 	import type { Snippet } from 'svelte';
 	import { page } from '$app/state';
 	import MonoLabel from '#lib/components/khepri/MonoLabel.svelte';
+	import RangeTabs from '#lib/components/khepri/RangeTabs.svelte';
 	import { useI18n } from '#lib/i18n/index.js';
 	import { pageTitle } from '#lib/brand.js';
 	import { sections, sectionTitle, type SectionKey } from './sections.js';
@@ -52,31 +53,13 @@
 					{i18n.tf('insights.intro', range.label)}
 				</p>
 			</div>
-			<nav
-				aria-label={i18n.t('insights.nav.period')}
-				class="border-hairline bg-surface/60 -mx-1 flex shrink-0 gap-1 overflow-x-auto rounded-lg border p-1"
-			>
-				{#each range.options as opt (opt.key)}
-					{#if opt.key === range.key}
-						<a
-							href={optionHref(opt.key)}
-							data-sveltekit-reset="false"
-							aria-current="true"
-							class="bg-signal text-background rounded-md px-3 py-1.5 text-xs font-medium whitespace-nowrap"
-						>
-							{opt.label}
-						</a>
-					{:else}
-						<a
-							href={optionHref(opt.key)}
-							data-sveltekit-reset="false"
-							class="text-muted-foreground hover:bg-accent/60 hover:text-foreground rounded-md px-3 py-1.5 text-xs font-medium whitespace-nowrap transition-colors"
-						>
-							{opt.label}
-						</a>
-					{/if}
-				{/each}
-			</nav>
+			<RangeTabs
+				label={i18n.t('insights.nav.period')}
+				value={range.key}
+				options={range.options}
+				hrefFor={optionHref}
+				class="-mx-1"
+			/>
 		</div>
 		<nav aria-label={i18n.t('insights.nav.sections')} class="-mx-1 flex gap-1 overflow-x-auto">
 			{#each sections as s (s.key)}
@@ -85,7 +68,7 @@
 					<a
 						href={s.href}
 						aria-current="page"
-						class="border-hairline bg-surface text-foreground flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs font-medium whitespace-nowrap"
+						class="border-hairline bg-surface text-foreground focus-visible:ring-ring flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs font-medium whitespace-nowrap outline-none focus-visible:ring-2 focus-visible:ring-inset pointer-coarse:min-h-11"
 					>
 						<Icon class="size-3.5" />
 						{sectionTitle(i18n, s.key)}
@@ -93,7 +76,7 @@
 				{:else}
 					<a
 						href={s.href}
-						class="text-muted-foreground hover:bg-accent/60 hover:text-foreground flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium whitespace-nowrap transition-colors"
+						class="text-muted-foreground hover:bg-accent/60 hover:text-foreground focus-visible:ring-ring flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium whitespace-nowrap transition-colors outline-none focus-visible:ring-2 focus-visible:ring-inset pointer-coarse:min-h-11"
 					>
 						<Icon class="size-3.5" />
 						{sectionTitle(i18n, s.key)}

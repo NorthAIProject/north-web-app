@@ -60,7 +60,7 @@
 
 <div id="meal-voice-{mealId}" class="space-y-3">
 	<form method="post" class="space-y-2" onsubmit={find}>
-		<Textarea id={textId} name="text" bind:value={text} rows={2} placeholder={i18n.t('capture.foods.ph')} maxlength={MAX_TEXT} />
+		<Textarea id={textId} name="text" bind:value={text} rows={2} placeholder={i18n.t('capture.foods.ph')} maxlength={MAX_TEXT} aria-label={i18n.t('capture.foods.label')} />
 		<div class="flex items-center justify-end gap-2">
 			<!-- Metered as a voice capture, not dictation: the words have a parse behind them. -->
 			<Dictate target={textId} surface="capture" variant="outline" />
@@ -96,12 +96,14 @@
 												bind:value={chosen[n]}
 												items={line.candidates.map((c) => ({ value: c.id, label: c.name }))}
 												placeholder={tf(i18n, 'capture.foods.which', line.query)}
+												aria-label={tf(i18n, 'capture.foods.which', line.query)}
 											/>
 										</div>
 										<div class="flex items-center gap-1">
 											<input
 												type="number"
 												name="quantity_grams_{n}"
+												aria-label="{line.query}: {i18n.t('nutrition.grams')}"
 												value={String(line.grams)}
 												step="any"
 												min="0"

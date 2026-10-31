@@ -46,7 +46,7 @@ test('set a handle, and a taken-format one is refused', async ({ page, request }
 	await signIn(page, user, '/app/friends');
 	await page.locator('#handle').fill('x');
 	await page.locator('form[action$="?/handle"] button[type=submit]').click();
-	await expect(page.locator('form[action$="?/handle"] p.text-red-500')).toBeVisible();
+	await expect(page.locator('form[action$="?/handle"] p.text-destructive')).toBeVisible();
 
 	const handle = handleFor('h');
 	await page.locator('#handle').fill(handle);
@@ -168,7 +168,7 @@ test('verify a phone number with the dev code, then remove it', async ({ page, r
 	await slot.click();
 	await page.keyboard.type('123456');
 	await card.getByRole('button', { name: 'Verify', exact: true }).click();
-	await expect(card.locator('p.text-red-500')).toBeVisible();
+	await expect(card.locator('p.text-destructive')).toBeVisible();
 
 	await expect(slot).toHaveValue('');
 	await slot.click();

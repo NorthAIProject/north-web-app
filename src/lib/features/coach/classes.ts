@@ -21,11 +21,11 @@ export const proseBody =
 
 export const proseClasses = 'text-sm ' + proseBody;
 
-// The Muse bubbles: radius 24, no avatar, no per-message name.
+// The Muse bubbles: radius from the scale (2xl), no avatar, no per-message name.
 export const museUserBubble =
-	'bg-muse-user text-muse-user-text max-w-[85%] rounded-[24px] px-4 py-2.5 text-[15px] leading-normal whitespace-pre-wrap';
+	'bg-muse-user text-muse-user-text max-w-[85%] rounded-2xl px-4 py-2.5 text-[15px] leading-normal whitespace-pre-wrap';
 export const museAgentBubble =
-	'bg-muse-agent text-foreground border-hairline max-w-[94%] rounded-[24px] border px-4 py-3 text-[15px] leading-normal dark:border-transparent';
+	'bg-muse-agent text-foreground border-hairline max-w-[94%] rounded-2xl border px-4 py-3 text-[15px] leading-normal dark:border-transparent';
 
 /** The 11px uppercase caption above a proactive bubble or a standing task. */
 export const museCaption = 'text-muted-foreground text-[11px] font-medium tracking-wider uppercase';

@@ -1,5 +1,6 @@
 <!-- The category picker in the add and edit forms (Go: memories.categoryField). -->
 <script lang="ts">
+	import { FieldMessage, describe, describedBy } from '#lib/components/ui/field-message/index.js';
 	import { Label } from '#lib/components/ui/label/index.js';
 	import SearchSelect from '#lib/components/khepri/SearchSelect.svelte';
 	import { useI18n } from '#lib/i18n/index.js';
@@ -13,8 +14,8 @@
 	let value = $derived(selected || CATEGORY_GENERAL);
 </script>
 
-<div class="space-y-2">
-	<Label>{i18n.t('memories.category')}</Label>
+<div class="space-y-2" {@attach describe(id, describedBy(id, error))}>
+	<Label for={id} {error}>{i18n.t('memories.category')}</Label>
 	<SearchSelect
 		{id}
 		name="category"
@@ -23,7 +24,5 @@
 		placeholder={i18n.t('memories.choose_one')}
 		invalid={Boolean(error)}
 	/>
-	{#if error}
-		<p class="text-[0.8rem] font-medium text-red-500">{error}</p>
-	{/if}
+	<FieldMessage {id} {error} />
 </div>

@@ -1,10 +1,12 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import { Label } from '#lib/components/ui/label/index.js';
+	import { FieldMessage, describe, describedBy } from '#lib/components/ui/field-message/index.js';
 
 	// A label, its control and the validation message beneath it (Go: the
 	// auth pages' field(), built on templUI form.Item / form.Message /
-	// form.Description). The hint shows only while there is no error.
+	// form.Description). The hint shows only while there is no error, and the
+	// control with this id is pointed at whichever is showing.
 	let {
 		id,
 		label,
@@ -14,12 +16,8 @@
 	}: { id: string; label: string; error?: string; hint?: string; children: Snippet } = $props();
 </script>
 
-<div class="space-y-2">
+<div class="space-y-2" {@attach describe(id, describedBy(id, error, hint))}>
 	<Label for={id} {error}>{label}</Label>
 	{@render children()}
-	{#if error}
-		<p class="text-[0.8rem] font-medium text-destructive" id="{id}-error">{error}</p>
-	{:else if hint}
-		<p class="text-sm text-muted-foreground">{hint}</p>
-	{/if}
+	<FieldMessage {id} {error} {hint} />
 </div>

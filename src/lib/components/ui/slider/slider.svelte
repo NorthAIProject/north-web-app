@@ -7,8 +7,24 @@
 		value = $bindable(),
 		orientation = "horizontal",
 		class: className,
+		id,
+		"aria-label": ariaLabel,
+		"aria-labelledby": ariaLabelledby,
+		"aria-describedby": ariaDescribedby,
 		...restProps
 	}: WithoutChildrenOrChild<SliderPrimitive.RootProps> = $props();
+
+	// The thumb is a span with role=slider, which <label for> cannot name (only
+	// native controls are labelable). So a <Label for={id}> beside the slider is
+	// found once mounted and pointed at with aria-labelledby.
+	let labelFor = $state<string | undefined>();
+	$effect(() => {
+		if (!id || ariaLabel || ariaLabelledby) return;
+		const label = document.querySelector<HTMLLabelElement>(`label[for="${CSS.escape(id)}"]`);
+		if (!label) return;
+		if (!label.id) label.id = `${id}-label`;
+		labelFor = label.id;
+	});
 </script>
 
 <!--
@@ -39,9 +55,15 @@ get along, so we shut typescript up by casting `value` to `never`.
 			/>
 		</span>
 		{#each thumbItems as thumb (thumb.index)}
+			<!-- The thumb is the role=slider element, so the name lands on it: a
+			     <Label for={id}> or aria-labelledby names the control, not the track. -->
 			<SliderPrimitive.Thumb
 				data-slot="slider-thumb"
 				index={thumb.index}
+				id={thumb.index === 0 ? id : undefined}
+				aria-label={ariaLabel}
+				aria-labelledby={ariaLabelledby ?? labelFor}
+				aria-describedby={ariaDescribedby}
 				class="block size-4 shrink-0 touch-none rounded-full bg-primary ring-offset-background select-none hover:bg-primary/90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none data-disabled:pointer-events-none"
 			/>
 		{/each}

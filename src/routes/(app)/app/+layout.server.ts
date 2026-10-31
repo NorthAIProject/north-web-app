@@ -6,10 +6,18 @@ import type { LayoutServerLoad } from './$types';
 // Everything under /app needs a session (Go: authMW.RequireAuth), and an
 // account that has not finished onboarding sees nothing but onboarding (Go:
 // onboarding.RequireOnboarded).
+//
+// This load runs once per visit to /app, not on every navigation inside it:
+// only an account still in onboarding reads the URL (which makes SvelteKit
+// re-run the load whenever the URL changes, so the redirect holds on every
+// page). Whatever ends the first week calls invalidate('north:first-week').
 export const load: LayoutServerLoad = async (event) => {
-	const { locals, url } = event;
+	const { locals } = event;
 	const user = locals.session?.user;
-	if (!user) redirect(303, `/login?next=${encodeURIComponent(url.pathname + url.search)}`);
+	if (!user) {
+		const next = event.untrack(() => event.url.pathname + event.url.search);
+		redirect(303, `/login?next=${encodeURIComponent(next)}`);
+	}
 
 	// Social slice (Go: socialHandler.RedeemInvite + crewHandler.JoinFromCookie,
 	// right after RequireAuth and before RequireOnboarded): a code carried from
@@ -17,12 +25,15 @@ export const load: LayoutServerLoad = async (event) => {
 	// cookie is dropped. Never fails the page.
 	await redeemLinkCookies(event);
 
-	const onboarding = url.pathname.startsWith('/app/onboarding');
-	if (user.needsOnboarding && !onboarding) redirect(303, '/app/onboarding');
+	if (user.needsOnboarding) {
+		if (!event.url.pathname.startsWith('/app/onboarding')) redirect(303, '/app/onboarding');
+	}
 
+	event.depends('north:first-week');
 	return {
 		user: { id: user.id, email: user.email, displayName: user.displayName, timezone: user.timezone },
-		simpleNav: onboarding ? false : await inFirstWeek(event)
+		// Onboarding renders bare (no rail), so it never needs the lookup.
+		simpleNav: user.needsOnboarding ? false : await inFirstWeek(event)
 	};
 };
 
