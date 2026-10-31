@@ -40,19 +40,19 @@
 		</div>
 		<dl class="mt-3 grid grid-cols-2 gap-x-6 gap-y-2 text-xs text-muted-foreground sm:grid-cols-4">
 			<div>
-				<dt class="text-[10px] tracking-wide uppercase opacity-70">{i18n.t('knowledge.col.kind')}</dt>
+				<dt class="text-[10px] tracking-wide uppercase">{i18n.t('knowledge.col.kind')}</dt>
 				<dd class="mt-0.5 text-foreground">{fileTypeLabel(i18n, doc)}</dd>
 			</div>
 			<div>
-				<dt class="text-[10px] tracking-wide uppercase opacity-70">{i18n.t('knowledge.col.size')}</dt>
+				<dt class="text-[10px] tracking-wide uppercase">{i18n.t('knowledge.col.size')}</dt>
 				<dd class="mt-0.5 text-foreground tabular-nums">{documentSize(i18n, doc)}</dd>
 			</div>
 			<div>
-				<dt class="text-[10px] tracking-wide uppercase opacity-70">{i18n.t('knowledge.col.lines')}</dt>
+				<dt class="text-[10px] tracking-wide uppercase">{i18n.t('knowledge.col.lines')}</dt>
 				<dd class="mt-0.5 text-foreground tabular-nums">{documentLines(doc)}</dd>
 			</div>
 			<div>
-				<dt class="text-[10px] tracking-wide uppercase opacity-70">{i18n.t('knowledge.col.read')}</dt>
+				<dt class="text-[10px] tracking-wide uppercase">{i18n.t('knowledge.col.read')}</dt>
 				<dd class="mt-0.5 text-foreground">{readWhen(i18n, doc, data.user.timezone)}</dd>
 			</div>
 		</dl>
@@ -99,7 +99,7 @@
 					{#each lines as text, i (i)}
 						<tr id="L{i + 1}" class={['scroll-mt-24', highlighted(i + 1) && 'bg-signal/12']}>
 							<td
-								class="w-12 border-r border-hairline px-2 py-0.5 text-right align-top text-muted-foreground/60 tabular-nums select-none"
+								class="w-12 border-r border-hairline px-2 py-0.5 text-right align-top text-muted-foreground tabular-nums select-none"
 							>
 								{i + 1}
 							</td>

@@ -59,20 +59,70 @@ export function toRGBA(value: string): string {
 	return 'rgba(' + d[0] + ',' + d[1] + ',' + d[2] + ',' + +(d[3] / 255).toFixed(3) + ')';
 }
 
-const CSS_VAR = /^var\(\s*(--[A-Za-z0-9_-]+)\s*\)$/;
+// Colour functions a canvas can parse but ECharts' zrender cannot.
+const CSS_COLOR_FN = /^\s*(?:color-mix|oklch|oklab|lch|lab|hwb|color)\(/;
 
 /**
- * Walks an option tree and replaces every "var(--token)" string with the
- * token's current value as rgba(). An unset property leaves the string alone,
- * so a typo is visible instead of invisible.
+ * Replaces the first var(--name[, fallback]) in s, or returns null when there
+ * is none or it cannot be resolved (unset and no fallback).
+ */
+function substituteVar(s: string, root: CSSStyleDeclaration): string | null {
+	const start = s.indexOf('var(');
+	if (start < 0) return null;
+	let depth = 0;
+	let end = -1;
+	let comma = -1;
+	for (let i = start + 3; i < s.length; i++) {
+		const ch = s[i];
+		if (ch === '(') depth++;
+		else if (ch === ')' && --depth === 0) {
+			end = i;
+			break;
+		} else if (ch === ',' && depth === 1 && comma < 0) comma = i;
+	}
+	if (end < 0) return null;
+	const name = s.slice(start + 4, comma < 0 ? end : comma).trim();
+	const fallback = comma < 0 ? '' : s.slice(comma + 1, end).trim();
+	const value = root.getPropertyValue(name).trim() || fallback;
+	if (!value) return null;
+	return s.slice(0, start) + value + s.slice(end + 1);
+}
+
+/**
+ * Resolves one string that names a theme colour — a bare "var(--token)" or
+ * any expression containing var(), such as
+ * "color-mix(in oklch, var(--north-signal) 20%, var(--background))" — to
+ * rgba(). Each var() is replaced by the token's computed value, then the
+ * whole expression is painted through the 1x1 canvas, which understands
+ * oklch() and color-mix(). Strings without var() or a modern colour function
+ * pass through untouched. A var() naming an unset property (and with no
+ * fallback) leaves the string alone, so a typo is visible instead of invisible.
+ */
+export function resolveColor(value: string): string {
+	const hasVar = value.includes('var(');
+	if (!hasVar && !CSS_COLOR_FN.test(value)) return value;
+	let out = value;
+	if (hasVar) {
+		const root = getComputedStyle(document.documentElement);
+		// Computed custom properties already have their own var()s substituted;
+		// the bound guards a fallback that names a token, and a cycle.
+		for (let i = 0; i < 16 && out.includes('var('); i++) {
+			const next = substituteVar(out, root);
+			if (next === null) return value;
+			out = next;
+		}
+		if (out.includes('var(')) return value;
+	}
+	return toRGBA(out);
+}
+
+/**
+ * Walks an option tree and resolves every colour string in it to rgba()
+ * (see resolveColor), so nothing ECharts cannot parse reaches setOption —
+ * an unparsed colour is drawn black.
  */
 export function resolveColors<T>(node: T): T {
-	if (typeof node === 'string') {
-		const match = node.match(CSS_VAR);
-		if (!match) return node;
-		const value = getComputedStyle(document.documentElement).getPropertyValue(match[1]).trim();
-		return (value ? toRGBA(value) : node) as T;
-	}
+	if (typeof node === 'string') return resolveColor(node) as T;
 	if (Array.isArray(node)) return node.map(resolveColors) as T;
 	if (node && typeof node === 'object') {
 		const out: Record<string, unknown> = {};

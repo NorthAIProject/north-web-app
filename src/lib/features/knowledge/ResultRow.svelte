@@ -17,7 +17,7 @@
 		{#if trail}
 			<span class="text-xs text-muted-foreground">{'› ' + trail}</span>
 		{/if}
-		<span class="font-mono text-[10px] text-muted-foreground/70 tabular-nums">{hitLines(hit)}</span>
+		<span class="font-mono text-[10px] text-muted-foreground tabular-nums">{hitLines(hit)}</span>
 	</div>
 	<p class="text-sm leading-relaxed text-muted-foreground">
 		{#if hit.segments.length > 0}

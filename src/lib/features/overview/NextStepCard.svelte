@@ -24,7 +24,7 @@
 				<Mascot size="md" />
 			</div>
 			<EmptyState eyebrow={step.eyebrow} title={step.title} body={step.body}>
-				<Button href={step.href} class="bg-signal text-background hover:bg-signal/90">{step.cta}</Button>
+				<Button href={step.href}>{step.cta}</Button>
 				{#if dismiss}
 					<Button variant="ghost" size="sm" data-push-dismiss onclick={dismiss}>{i18n.t('dash.notnow')}</Button>
 				{/if}

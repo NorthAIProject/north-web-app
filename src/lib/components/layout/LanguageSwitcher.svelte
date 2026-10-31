@@ -15,25 +15,25 @@
 	};
 </script>
 
+<!-- No submit on change: arrowing through the list would reload on the first
+     keypress. Pick, then press Change (or Enter on it). Each option carries its
+     own lang so a screen reader says "Español" in Spanish. -->
 <form method="post" action="/locale" class="flex items-center gap-2" data-sveltekit-reload>
 	<input type="hidden" name="next" value={page.url.pathname + page.url.search} />
 	<label for="footer-locale" class="sr-only">{i18n.t('footer.language')}</label>
 	<select
 		id="footer-locale"
 		name="locale"
-		class="rounded-md border border-hairline bg-surface px-2 py-1 font-mono text-[10px] tracking-[0.14em] text-muted-foreground uppercase"
-		onchange={(e) => e.currentTarget.form?.requestSubmit()}
+		class="h-8 rounded-md border border-hairline bg-surface px-2 text-sm text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none pointer-coarse:h-11"
 	>
 		{#each locales as tag (tag)}
-			<option value={tag} selected={tag === i18n.locale}>{labels[tag]}</option>
+			<option value={tag} lang={tag} selected={tag === i18n.locale}>{labels[tag]}</option>
 		{/each}
 	</select>
-	<noscript>
-		<button
-			type="submit"
-			class="rounded-md border border-hairline px-2 py-1 font-mono text-[10px] tracking-[0.14em] text-muted-foreground uppercase"
-		>
-			{i18n.t('footer.language.go')}
-		</button>
-	</noscript>
+	<button
+		type="submit"
+		class="h-8 cursor-pointer rounded-md border border-hairline px-2 text-sm text-muted-foreground hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none pointer-coarse:h-11"
+	>
+		{i18n.t('footer.language.go')}
+	</button>
 </form>

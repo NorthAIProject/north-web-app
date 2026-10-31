@@ -11,10 +11,9 @@
 	import { donutOption } from '#lib/features/viz/echarts.js';
 	import Highlights from '../Highlights.svelte';
 	import PanelEmpty from '../PanelEmpty.svelte';
-	import StatTile from '../StatTile.svelte';
+	import StatRow from '../StatRow.svelte';
 	import BarsCard from '../stats/BarsCard.svelte';
 	import RowsCard from '../stats/RowsCard.svelte';
-	import StatsTiles from '../stats/StatsTiles.svelte';
 	import { formatCount, type NutritionView } from '../domains.js';
 
 	let { view }: { view: NutritionView } = $props();
@@ -34,28 +33,22 @@
 	/>
 {:else}
 	<div class="space-y-6">
-		<div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-			<StatTile
-				label={i18n.t('insights.nutrition.avgDay')}
-				value={view.avgCalories}
-				note={goalNote(view.goalCalories)}
-			/>
-			<StatTile
-				label={i18n.t('insights.nutrition.avgProtein')}
-				value={view.avgProtein}
-				note={goalNote(view.goalProtein)}
-			/>
-			<StatTile
-				label={i18n.t('insights.nutrition.days')}
-				value={formatCount(view.daysLogged)}
-				note={i18n.t('insights.nutrition.days.note')}
-			/>
-			<StatTile
-				label={i18n.t('insights.nutrition.entries')}
-				value={formatCount(view.entries)}
-				note={i18n.t('insights.nutrition.entries.note')}
-			/>
-		</div>
+		<StatRow
+			items={[
+				{ label: i18n.t('insights.nutrition.avgDay'), value: view.avgCalories, note: goalNote(view.goalCalories) },
+				{ label: i18n.t('insights.nutrition.avgProtein'), value: view.avgProtein, note: goalNote(view.goalProtein) },
+				{
+					label: i18n.t('insights.nutrition.days'),
+					value: formatCount(view.daysLogged),
+					note: i18n.t('insights.nutrition.days.note')
+				},
+				{
+					label: i18n.t('insights.nutrition.entries'),
+					value: formatCount(view.entries),
+					note: i18n.t('insights.nutrition.entries.note')
+				}
+			]}
+		/>
 		<div class="grid gap-3 lg:grid-cols-3">
 			<div class="border-hairline bg-surface/60 space-y-3 rounded-lg border p-4 lg:col-span-2">
 				<MonoLabel text={i18n.t('insights.nutrition.calories')} />
@@ -80,18 +73,19 @@
 		{/if}
 		{#if view.eating.hasData}
 			<section class="space-y-4" data-testid="insights-eating">
-				<h2 class="text-muted-foreground font-mono text-[11px] tracking-[0.14em] uppercase">
+				<h2 class="text-muted-foreground text-sm font-medium">
 					{i18n.t('insights.eating.title')}
 				</h2>
-				<StatsTiles rows={view.eating.tiles} />
+				<StatRow items={view.eating.tiles} />
 				<div class="grid gap-4 lg:grid-cols-3">
 					<BarsCard
+						level={3}
 						title={i18n.t('insights.eating.slots')}
 						description={i18n.t('insights.eating.slots.desc')}
 						bars={view.eating.slots}
 					/>
-					<RowsCard title={i18n.t('insights.eating.foods')} rows={view.eating.foods} />
-					<RowsCard title={i18n.t('insights.eating.habits')} rows={view.eating.notes} />
+					<RowsCard level={3} title={i18n.t('insights.eating.foods')} rows={view.eating.foods} />
+					<RowsCard level={3} title={i18n.t('insights.eating.habits')} rows={view.eating.notes} />
 				</div>
 			</section>
 		{/if}

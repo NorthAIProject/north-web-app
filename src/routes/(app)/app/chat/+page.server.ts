@@ -11,7 +11,8 @@ export const load: PageServerLoad = async (event) => {
 	const list = data?.conversations ?? [];
 	if (list.length > 0) redirect(303, `/app/chat/${list[0].id}`);
 	const { data: stats } = await api.GET('/conversations/stats');
-	return { list, stats: stats ?? { threadCount: 0, messagesThisWeek: 0 } };
+	// Wide, like a conversation, so moving between the two keeps one shell.
+	return { wide: true as const, list, stats: stats ?? { threadCount: 0, messagesThisWeek: 0 } };
 };
 
 // POST /app/chat (Go startConversation): every "New conversation", "New chat",

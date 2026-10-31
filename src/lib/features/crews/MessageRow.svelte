@@ -95,7 +95,9 @@
 	<article
 		id="m-{m.id}"
 		class={cn(
-			'group hover:bg-accent/40 relative flex gap-3 px-4',
+			// Touch has no hover, so the actions button always shows there:
+			// the row keeps it clear of the text and tall enough for a thumb.
+			'group hover:bg-accent/40 relative flex gap-3 px-4 pointer-coarse:min-h-11 pointer-coarse:pr-14',
 			compact ? 'pt-0.5' : 'pt-3',
 			m.mentionsMe && 'bg-signal/5'
 		)}
@@ -150,7 +152,8 @@
 								type="button"
 								variant={r.mine ? 'secondary' : 'outline'}
 								size="sm"
-								class="h-7 gap-1 rounded-full px-2 text-xs"
+								class="h-8 gap-1 rounded-full px-2.5 text-xs pointer-coarse:h-11"
+								aria-pressed={r.mine}
 								onclick={() => onreact(r.emoji, !r.mine)}
 							>
 								<span>{glyph(r.emoji)}</span>
@@ -162,13 +165,20 @@
 			{/if}
 		</div>
 		{#if !m.deleted}
+			<!-- Hover reveals it where there is hover; touch sees it at rest, dimmed. -->
 			<div
-				class="absolute top-1 right-2 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100 has-[[data-state=open]]:opacity-100"
+				class="absolute top-1 right-2 opacity-60 transition-opacity group-hover:opacity-100 focus-within:opacity-100 has-[[data-state=open]]:opacity-100 pointer-coarse:top-0 pointer-coarse:right-1 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100"
 			>
 				<DropdownMenu.Root>
 					<DropdownMenu.Trigger>
 						{#snippet child({ props })}
-							<Button {...props} variant="ghost" size="icon" class="size-7" aria-label={i18n.t('crews.msg.actions')}>
+							<Button
+								{...props}
+								variant="ghost"
+								size="icon"
+								class="size-8 pointer-coarse:size-11"
+								aria-label={i18n.t('crews.msg.actions')}
+							>
 								<EllipsisIcon class="size-4" />
 							</Button>
 						{/snippet}
@@ -178,7 +188,7 @@
 							{#each reactionEmoji as e (e.key)}
 								<DropdownMenu.Item
 									class="size-8 justify-center p-0 text-base"
-									aria-label={e.key}
+									aria-label={i18n.tf('crews.react.add', e.glyph)}
 									onSelect={() => onreact(e.key, true)}>{e.glyph}</DropdownMenu.Item
 								>
 							{/each}

@@ -58,7 +58,7 @@ test('timezone picker searches by label and clears', async ({ page, request }) =
 	await expect.poll(async () => (await api(request, user, 'GET', '/settings/profile')).timezone).toBe('Europe/Lisbon');
 
 	await page.waitForLoadState('networkidle');
-	await page.locator('#timezone').getByRole('button', { name: 'Clear selection' }).click();
+	await page.locator('div:has(> #timezone)').getByRole('button', { name: 'Clear selection' }).click();
 	await expect(page.locator('input[type=hidden][name=timezone]')).toHaveValue('');
 	await expect(page.locator('#timezone')).not.toContainText('Europe/Lisbon');
 });
@@ -180,7 +180,7 @@ test('account delete: wrong email refused, right email signs out', async ({ page
 	await page.getByRole('button', { name: 'Delete my account' }).click();
 	await page.locator('#confirm_email').fill('someone-else@khepri.local');
 	await page.getByRole('button', { name: 'Delete everything' }).click();
-	await expect(page.locator('p.text-red-500')).toBeVisible();
+	await expect(page.locator('p.text-destructive')).toBeVisible();
 
 	await page.getByRole('button', { name: 'Delete my account' }).click();
 	await page.locator('#confirm_email').fill(user.email);

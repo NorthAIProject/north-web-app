@@ -1,0 +1,32 @@
+# Cache headers for the static assets (Workers static assets read this file;
+# adapter-cloudflare copies it into the build and appends its own rules for
+# /_app/*, which are immutable already). Pages are rendered by the Worker and
+# never match these paths.
+#
+# Without it every file under /assets/ is served max-age=0 and revalidated on
+# each load, and with font-display: optional a slow revalidate means the font
+# never applies.
+#
+# A later rule adds its headers to an earlier match; "! Cache-Control" drops
+# the general one first so each path ends up with exactly one.
+
+# Art, icons, posters, exercise frames: a day fresh, then served from cache
+# while a week's revalidation runs in the background.
+/assets/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+
+# Fonts keep their names across releases, so not immutable; a month fresh is
+# what lets font-display: optional apply on a returning visit.
+/assets/fonts/*
+  ! Cache-Control
+  Cache-Control: public, max-age=2592000, stale-while-revalidate=31536000
+
+# Versioned file names (the content hash or library version is in the name);
+# a change is a new URL.
+/assets/models/*
+  ! Cache-Control
+  Cache-Control: public, max-age=31536000, immutable
+
+/assets/js/vendor/*
+  ! Cache-Control
+  Cache-Control: public, max-age=31536000, immutable

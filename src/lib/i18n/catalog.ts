@@ -11,7 +11,13 @@ const loaders: Record<Locale, () => Promise<{ default: Messages }>> = {
 	'pt-BR': () => import('./catalogs/pt-BR.json')
 };
 
+/**
+ * The locale's catalogue, and the one a missing key falls back to. Every
+ * catalogue carries every key (catalog.spec.ts), so that is the same one: an
+ * es or pt reader no longer downloads the English catalogue (~58 KB gz) as
+ * well, only for it never to be read.
+ */
 export async function loadMessages(locale: Locale): Promise<{ messages: Messages; fallback: Messages }> {
-	const [own, english] = await Promise.all([loaders[locale](), locale === 'en' ? null : loaders.en()]);
-	return { messages: own.default, fallback: english ? english.default : own.default };
+	const own = (await loaders[locale]()).default;
+	return { messages: own, fallback: own };
 }

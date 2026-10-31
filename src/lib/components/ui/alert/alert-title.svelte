@@ -7,10 +7,10 @@
 		class: className,
 		children,
 		...restProps
-	}: WithElementRef<HTMLAttributes<HTMLHeadingElement>> = $props();
+	}: WithElementRef<HTMLAttributes<HTMLDivElement>> = $props();
 </script>
 
-<h5
+<div
 	bind:this={ref}
 	data-slot="alert-title"
 	class={cn(
@@ -20,4 +20,4 @@
 	{...restProps}
 >
 	{@render children?.()}
-</h5>
+</div>

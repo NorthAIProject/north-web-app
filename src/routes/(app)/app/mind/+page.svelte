@@ -7,6 +7,7 @@
 	import { formatTime } from '#lib/components/khepri/dates.js';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Card from '#lib/components/ui/card/index.js';
+	import { FieldMessage, describe, describedBy, withInvalidFocus } from '#lib/components/ui/field-message/index.js';
 	import { Label } from '#lib/components/ui/label/index.js';
 	import SearchSelect from '#lib/components/khepri/SearchSelect.svelte';
 	import { Textarea } from '#lib/components/ui/textarea/index.js';
@@ -67,7 +68,7 @@
 				<MoodEnergyChart id="mind-mood-energy" days={inst.days} />
 			{:else}
 				<p class="text-muted-foreground mb-4 text-sm">{i18n.t('mind.chart.empty')}</p>
-				<Button href="/app/check-ins" class="bg-signal text-background hover:bg-signal/90">{i18n.t('mind.check_in')}</Button>
+				<Button href="/app/check-ins">{i18n.t('mind.check_in')}</Button>
 			{/if}
 		</Card.Content>
 	</Card.Root>
@@ -81,7 +82,7 @@
 				method="post"
 				action="?/journal"
 				class="space-y-4"
-				use:enhance={({ formElement }) => {
+				use:enhance={withInvalidFocus(({ formElement }) => {
 					submitting = true;
 					return async ({ result, update }) => {
 						await update({ reset: false });
@@ -92,7 +93,7 @@
 							mood = '';
 						}
 					};
-				}}
+				})}
 			>
 				<div class="space-y-2">
 					<Label for="content">{i18n.t('mind.form.reflection')}</Label>
@@ -104,20 +105,24 @@
 							placeholder={i18n.t('mind.form.ph')}
 							value={form?.values?.content ?? ''}
 							aria-invalid={errors.content ? 'true' : undefined}
+							aria-describedby={describedBy('content', errors.content)}
 						/>
 					</DictateField>
-					{#if errors.content}
-						<p class="text-[0.8rem] font-medium text-red-500">{errors.content}</p>
-					{/if}
+					<FieldMessage id="content" error={errors.content} />
 				</div>
-				<div class="space-y-2">
+				<div class="space-y-2" {@attach describe('mood', describedBy('mood', errors.mood))}>
 					<Label for="mood">{i18n.t('mind.form.mood')}</Label>
-					<SearchSelect id="mood" name="mood" bind:value={mood} items={moodItems} placeholder={i18n.t('mind.form.no_rating')} />
-					{#if errors.mood}
-						<p class="text-[0.8rem] font-medium text-red-500">{errors.mood}</p>
-					{/if}
+					<SearchSelect
+						id="mood"
+						name="mood"
+						bind:value={mood}
+						items={moodItems}
+						placeholder={i18n.t('mind.form.no_rating')}
+						invalid={Boolean(errors.mood)}
+					/>
+					<FieldMessage id="mood" error={errors.mood} />
 				</div>
-				<Button type="submit" class="bg-signal text-background hover:bg-signal/90" disabled={submitting}>
+				<Button type="submit" disabled={submitting}>
 					{i18n.t('mind.form.save')}
 				</Button>
 			</form>

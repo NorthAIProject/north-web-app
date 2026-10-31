@@ -7,6 +7,7 @@
 	import MonoLabel from '#lib/components/khepri/MonoLabel.svelte';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Card from '#lib/components/ui/card/index.js';
+	import { FieldMessage, describedBy, withInvalidFocus } from '#lib/components/ui/field-message/index.js';
 	import { Label } from '#lib/components/ui/label/index.js';
 	import { Textarea } from '#lib/components/ui/textarea/index.js';
 	import ApprovedCard from '#lib/features/memories/ApprovedCard.svelte';
@@ -76,11 +77,13 @@
 				method="post"
 				action="?/create"
 				class="space-y-4"
-				use:enhance={({ formElement }) =>
-					async ({ result, update }) => {
-						await update();
-						if (result.type === 'redirect') formElement.reset();
-					}}
+				use:enhance={withInvalidFocus(
+					({ formElement }) =>
+						async ({ result, update }) => {
+							await update();
+							if (result.type === 'redirect') formElement.reset();
+						}
+				)}
 			>
 				<CategoryField id="category" selected={create?.category ?? ''} error={create?.errors?.category ?? ''} />
 				<div class="space-y-2">
@@ -93,13 +96,12 @@
 							placeholder={i18n.t('memories.add.ph')}
 							value={create?.content ?? ''}
 							aria-invalid={create?.errors?.content ? true : undefined}
+							aria-describedby={describedBy('content', create?.errors?.content)}
 						/>
 					</DictateField>
-					{#if create?.errors?.content}
-						<p class="text-[0.8rem] font-medium text-red-500">{create.errors.content}</p>
-					{/if}
+					<FieldMessage id="content" error={create?.errors?.content} />
 				</div>
-				<Button type="submit" class="bg-signal text-background hover:bg-signal/90">{i18n.t('memories.add.save')}</Button>
+				<Button type="submit">{i18n.t('memories.add.save')}</Button>
 			</form>
 		</Card.Content>
 	</Card.Root>

@@ -22,8 +22,10 @@
 	data-size={size}
 	class={cn(
 		"peer group/switch relative inline-flex shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors outline-none h-5 w-9 data-[size=sm]:h-4 data-[size=sm]:w-7",
-		// North: off track at 80%/35% muted-foreground gives 3:1 on a card.
-		"bg-muted-foreground/80 dark:bg-muted-foreground/35 data-[state=checked]:bg-primary dark:data-[state=checked]:bg-primary",
+		// North: the off track is --input, the field-edge token: 3.5:1 (light)
+		// and 3.1:1 (dark) on a card, and the card-coloured thumb reads on it
+		// by the same margin (scripts/brand/contrast.mjs).
+		"bg-input data-[state=checked]:bg-primary",
 		"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
 		"data-disabled:cursor-not-allowed data-disabled:opacity-50",
 		className

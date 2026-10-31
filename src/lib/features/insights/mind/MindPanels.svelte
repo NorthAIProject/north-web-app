@@ -7,7 +7,7 @@
 	import { bar, moodEnergyLine } from '#lib/features/viz/chartjs.js';
 	import { heatmapOption } from '#lib/features/viz/echarts.js';
 	import PanelEmpty from '../PanelEmpty.svelte';
-	import StatTile from '../StatTile.svelte';
+	import StatRow from '../StatRow.svelte';
 	import { formatScore } from '../format.js';
 	import { formatCount, type MindView } from '../domains.js';
 
@@ -25,24 +25,22 @@
 </script>
 
 <div class="space-y-6">
-	<div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-		<StatTile
-			label={i18n.t('insights.mind.checkins')}
-			value={formatCount(view.checkInCount)}
-			note={i18n.t('insights.mind.checkins.note')}
-		/>
-		<StatTile
-			label={i18n.t('insights.mind.mood')}
-			value={formatScore(i18n, view.avgMood)}
-			note={i18n.t('insights.mind.overDays')}
-		/>
-		<StatTile
-			label={i18n.t('insights.mind.energy')}
-			value={formatScore(i18n, view.avgEnergy)}
-			note={i18n.t('insights.mind.overDays')}
-		/>
-		<StatTile label={i18n.t('insights.mind.journal')} value={formatCount(view.journalCount)} />
-	</div>
+	<StatRow
+		items={[
+			{
+				label: i18n.t('insights.mind.checkins'),
+				value: formatCount(view.checkInCount),
+				note: i18n.t('insights.mind.checkins.note')
+			},
+			{ label: i18n.t('insights.mind.mood'), value: formatScore(i18n, view.avgMood), note: i18n.t('insights.mind.overDays') },
+			{
+				label: i18n.t('insights.mind.energy'),
+				value: formatScore(i18n, view.avgEnergy),
+				note: i18n.t('insights.mind.overDays')
+			},
+			{ label: i18n.t('insights.mind.journal'), value: formatCount(view.journalCount) }
+		]}
+	/>
 	<Card class="border-hairline bg-surface">
 		<CardHeader>
 			<CardTitle>{i18n.t('insights.mind.moodEnergy')}</CardTitle>

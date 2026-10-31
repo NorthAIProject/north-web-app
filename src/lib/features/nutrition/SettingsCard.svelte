@@ -7,7 +7,7 @@
 	import { Input } from '#lib/components/ui/input/index.js';
 	import { Label } from '#lib/components/ui/label/index.js';
 	import { useI18n } from '#lib/i18n/index.js';
-	import FieldMessage from './FieldMessage.svelte';
+	import { FieldMessage, describedBy, withInvalidFocus } from '#lib/components/ui/field-message/index.js';
 	import PlanTypeFields from './PlanTypeFields.svelte';
 	import { advanced, errorFor, errorsFor, type PlanPage } from './plan-page.js';
 	import { gramsValue } from './view.js';
@@ -29,7 +29,7 @@
 		<Card.Title>{i18n.t('nutrition.settings.title')}</Card.Title>
 	</Card.Header>
 	<Card.Content class="space-y-4">
-		<form method="post" action="?/settings" class="space-y-4" use:enhance>
+		<form method="post" action="?/settings" class="space-y-4" use:enhance={withInvalidFocus()}>
 			<input type="hidden" name="mode" value={plan.mode} />
 			<fieldset class="space-y-4" {disabled}>
 				<div class="space-y-2">
@@ -40,8 +40,9 @@
 						value={plan.name}
 						required
 						aria-invalid={errorFor(page, 'settings', 'name') ? 'true' : undefined}
+						aria-describedby={describedBy('plan-name', errorFor(page, 'settings', 'name'))}
 					/>
-					<FieldMessage message={errorFor(page, 'settings', 'name')} />
+					<FieldMessage id="plan-name" error={errorFor(page, 'settings', 'name')} />
 				</div>
 				<div class="space-y-2">
 					<Label for="plan-description">{i18n.t('nutrition.field.description')}</Label>

@@ -10,7 +10,7 @@
 
 <div class="mt-2 flex flex-wrap gap-3">
 	{#each weekdays as d (d)}
-		<label class="flex items-center gap-1 text-sm">
+		<label class="flex min-h-6 items-center gap-1.5 text-sm pointer-coarse:min-h-11 pointer-coarse:pr-2">
 			<Checkbox id="{idPrefix}-{d}" name="days_of_week" value={String(d)} checked={checked(d)} />
 			{weekdayLabel(i18n, d)}
 		</label>

@@ -3,7 +3,7 @@
 	import MonoLabel from '#lib/components/khepri/MonoLabel.svelte';
 	import { useI18n } from '#lib/i18n/index.js';
 	import PanelEmpty from '../PanelEmpty.svelte';
-	import StatTile from '../StatTile.svelte';
+	import StatRow from '../StatRow.svelte';
 	import { formatTokens } from './format.js';
 	import type { SpendLine, SpendView } from './types.js';
 
@@ -39,19 +39,21 @@
 	<PanelEmpty message={i18n.t('insights.spend.empty')} />
 {:else}
 	<div class="space-y-6" data-testid="insights-spend">
-		<div class="grid gap-3 sm:grid-cols-3">
-			<StatTile label={i18n.t('insights.spend.cost')} value={view.totalCost} note={i18n.t('insights.spend.cost.note')} />
-			<StatTile
-				label={i18n.t('insights.spend.generations')}
-				value={String(view.generations)}
-				note={i18n.t('insights.spend.generations.note')}
-			/>
-			<StatTile
-				label={i18n.t('insights.spend.tokens')}
-				value={formatTokens(i18n, view.totalTokens)}
-				note={i18n.t('insights.spend.tokens.note')}
-			/>
-		</div>
+		<StatRow
+			items={[
+				{ label: i18n.t('insights.spend.cost'), value: view.totalCost, note: i18n.t('insights.spend.cost.note') },
+				{
+					label: i18n.t('insights.spend.generations'),
+					value: String(view.generations),
+					note: i18n.t('insights.spend.generations.note')
+				},
+				{
+					label: i18n.t('insights.spend.tokens'),
+					value: formatTokens(i18n, view.totalTokens),
+					note: i18n.t('insights.spend.tokens.note')
+				}
+			]}
+		/>
 		{@render spendTable(i18n.t('insights.spend.surfaces'), view.surfaces)}
 		{@render spendTable(i18n.t('insights.spend.models'), view.models)}
 	</div>

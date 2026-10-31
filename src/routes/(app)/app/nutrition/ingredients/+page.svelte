@@ -6,10 +6,10 @@
 	import { Badge } from '#lib/components/ui/badge/index.js';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Card from '#lib/components/ui/card/index.js';
+	import { FieldMessage, describe, describedBy } from '#lib/components/ui/field-message/index.js';
 	import { Input } from '#lib/components/ui/input/index.js';
 	import { Label } from '#lib/components/ui/label/index.js';
 	import SearchSelect from '#lib/components/khepri/SearchSelect.svelte';
-	import FieldMessage from '#lib/features/nutrition/FieldMessage.svelte';
 	import { clearOnSuccess } from '#lib/features/nutrition/enhance.js';
 	import { CATEGORIES, categoryLabel, whole } from '#lib/features/nutrition/view.js';
 	import { useI18n } from '#lib/i18n/index.js';
@@ -43,24 +43,32 @@
 				<div class="grid grid-cols-2 gap-4">
 					<div class="space-y-2">
 						<Label for="name">{i18n.t('nutrition.field.name')}</Label>
-						<Input id="name" name="name" value={values?.name ?? ''} required aria-invalid={errors.name ? 'true' : undefined} />
-						<FieldMessage message={errors.name} />
+						<Input
+							id="name"
+							name="name"
+							value={values?.name ?? ''}
+							required
+							aria-invalid={errors.name ? 'true' : undefined}
+							aria-describedby={describedBy('name', errors.name)}
+						/>
+						<FieldMessage id="name" error={errors.name} />
 					</div>
 					<div class="space-y-2">
 						<Label for="brand">{i18n.t('nutrition.field.brand')}</Label>
 						<Input id="brand" name="brand" value={values?.brand ?? ''} />
 					</div>
 				</div>
-				<div class="space-y-2">
-					<Label>{i18n.t('nutrition.field.category')}</Label>
+				<div class="space-y-2" {@attach describe('category', describedBy('category', errors.category))}>
+					<Label for="category">{i18n.t('nutrition.field.category')}</Label>
 					<SearchSelect
 						id="category"
 						name="category"
 						bind:value={category}
 						items={categoryItems}
 						placeholder={i18n.t('nutrition.category.other')}
+						invalid={Boolean(errors.category)}
 					/>
-					<FieldMessage message={errors.category} />
+					<FieldMessage id="category" error={errors.category} />
 				</div>
 				<div class="grid grid-cols-2 gap-4">
 					<div class="space-y-2">
@@ -72,8 +80,9 @@
 							value={values?.calories_per_100g ?? ''}
 							required
 							aria-invalid={errors.calories_per_100g ? 'true' : undefined}
+							aria-describedby={describedBy('calories_per_100g', errors.calories_per_100g)}
 						/>
-						<FieldMessage message={errors.calories_per_100g} />
+						<FieldMessage id="calories_per_100g" error={errors.calories_per_100g} />
 					</div>
 					<div class="space-y-2">
 						<Label for="serving_size_grams">{i18n.t('nutrition.field.serving')}</Label>
@@ -94,7 +103,7 @@
 						<Input id="carbs_g_per_100g" name="carbs_g_per_100g" type="number" value={values?.carbs_g_per_100g ?? ''} />
 					</div>
 				</div>
-				<Button type="submit" class="bg-signal text-background hover:bg-signal/90">{i18n.t('nutrition.ingredients.add.submit')}</Button>
+				<Button type="submit">{i18n.t('nutrition.ingredients.add.submit')}</Button>
 			</form>
 		</Card.Content>
 	</Card.Root>
@@ -104,7 +113,13 @@
 		</Card.Header>
 		<Card.Content>
 			<form method="get" action="/app/nutrition/ingredients" class="mb-4">
-				<Input name="q" value={data.query} placeholder={i18n.t('nutrition.ingredients.search.placeholder')} />
+				<Input
+					name="q"
+					type="search"
+					value={data.query}
+					placeholder={i18n.t('nutrition.ingredients.search.placeholder')}
+					aria-label={i18n.t('nutrition.ingredients.search.title')}
+				/>
 			</form>
 			{#if data.ingredients.length === 0}
 				<p class="text-muted-foreground text-sm">{i18n.t('nutrition.ingredients.none')}</p>

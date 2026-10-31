@@ -16,12 +16,13 @@
 	import TrophyIcon from '@lucide/svelte/icons/trophy';
 	import BrandMark from '#lib/components/brand/BrandMark.svelte';
 	import { useI18n } from '#lib/i18n/index.js';
-	import { backSlots, frontSlots, wallDeck, wallHabitGrid, type WallCard, type WallSlot } from './herowall.js';
+	import { backSlots, frontSlots, phoneSlots, wallDeck, wallHabitGrid, type WallCard, type WallSlot } from './herowall.js';
 
 	const i18n = useI18n();
 	const deck = $derived(wallDeck(i18n.t));
 	const back = $derived(backSlots(deck));
 	const front = $derived(frontSlots(deck));
+	const phone = $derived(phoneSlots(deck));
 	const liftBars = ['35%', '45%', '50%', '62%', '70%', '100%'];
 </script>
 
@@ -219,8 +220,13 @@
 			{@render slot(s)}
 		{/each}
 	</div>
-	<div class="hero-wall-row hero-wall-front">
+	<div class="hero-wall-row hero-wall-front hidden md:block">
 		{#each front as s, i (i)}
+			{@render slot(s)}
+		{/each}
+	</div>
+	<div class="hero-wall-row hero-wall-front md:hidden">
+		{#each phone as s, i (i)}
 			{@render slot(s)}
 		{/each}
 	</div>

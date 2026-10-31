@@ -68,7 +68,7 @@
 						{i18n.t('workouts.status.completed')}
 					</Badge>
 				{:else if day.isNext}
-					<Badge class="bg-signal text-background" data-testid="day-next">{i18n.t('workouts.status.next')}</Badge>
+					<Badge class="bg-signal text-signal-foreground" data-testid="day-next">{i18n.t('workouts.status.next')}</Badge>
 				{/if}
 			</div>
 			<!-- When the session starts, edited in place; the phone reminds shortly before. -->

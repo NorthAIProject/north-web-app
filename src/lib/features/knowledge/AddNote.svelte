@@ -7,6 +7,7 @@
 	import { enhance } from '$app/forms';
 	import FileUp from '@lucide/svelte/icons/file-up';
 	import { Button } from '#lib/components/ui/button/index.js';
+	import { FieldMessage, describedBy, withInvalidFocus } from '#lib/components/ui/field-message/index.js';
 	import { Input } from '#lib/components/ui/input/index.js';
 	import { Label } from '#lib/components/ui/label/index.js';
 	import { Separator } from '#lib/components/ui/separator/index.js';
@@ -53,14 +54,14 @@
 			over = false;
 		}}
 		ondrop={drop}
-		use:enhance={({ formElement }) => {
+		use:enhance={withInvalidFocus(({ formElement }) => {
 			uploading = true;
 			return async ({ result, update }) => {
 				if (result.type === 'redirect') formElement.reset();
 				await update();
 				uploading = false;
 			};
-		}}
+		})}
 	>
 		<label
 			for="file"
@@ -81,19 +82,19 @@
 				name="file"
 				accept=".pdf,.md,.markdown,.txt,.text,.log,.csv,application/pdf"
 				class="sr-only"
+				aria-invalid={errorOf('file') ? true : undefined}
+				aria-describedby={describedBy('file', errorOf('file'))}
 				onchange={(e) => e.currentTarget.form?.requestSubmit()}
 			/>
 		</label>
-		{#if errorOf('file')}
-			<p class="text-[0.8rem] font-medium text-red-500">{errorOf('file')}</p>
-		{/if}
+		<FieldMessage id="file" error={errorOf('file')} />
 	</form>
 	<Separator />
 	<form
 		method="post"
 		action="/app/knowledge?/note"
 		class="space-y-3"
-		use:enhance={({ formElement }) => {
+		use:enhance={withInvalidFocus(({ formElement }) => {
 			saving = true;
 			return async ({ result, update }) => {
 				// Go answered a saved note with a fresh page: an empty form.
@@ -101,7 +102,7 @@
 				await update();
 				saving = false;
 			};
-		}}
+		})}
 	>
 		<div class="space-y-2">
 			<Label for="title" class={errorOf('title') ? 'text-destructive' : ''}>{i18n.t('knowledge.add.note_label')}</Label>
@@ -111,10 +112,9 @@
 				value={form?.title ?? ''}
 				placeholder={i18n.t('knowledge.add.title_ph')}
 				aria-invalid={errorOf('title') ? true : undefined}
+				aria-describedby={describedBy('title', errorOf('title'))}
 			/>
-			{#if errorOf('title')}
-				<p class="text-[0.8rem] font-medium text-red-500">{errorOf('title')}</p>
-			{/if}
+			<FieldMessage id="title" error={errorOf('title')} />
 		</div>
 		<div class="space-y-2">
 			<DictateField target="body">
@@ -124,14 +124,14 @@
 					rows={5}
 					placeholder={i18n.t('knowledge.add.body_ph')}
 					value={form?.body ?? ''}
+					aria-label={i18n.t('knowledge.add.body_label')}
 					aria-invalid={errorOf('body') ? true : undefined}
+					aria-describedby={describedBy('body', errorOf('body'))}
 				/>
 			</DictateField>
-			{#if errorOf('body')}
-				<p class="text-[0.8rem] font-medium text-red-500">{errorOf('body')}</p>
-			{/if}
+			<FieldMessage id="body" error={errorOf('body')} />
 		</div>
-		<Button type="submit" class="w-full bg-signal text-background hover:bg-signal/90" disabled={saving}>
+		<Button type="submit" class="w-full" disabled={saving}>
 			{i18n.t('knowledge.add.save')}
 		</Button>
 	</form>

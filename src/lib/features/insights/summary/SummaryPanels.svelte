@@ -16,6 +16,7 @@
 	import { gaugeOption } from '#lib/features/viz/echarts.js';
 	import { sparkline } from '#lib/features/viz/chartjs.js';
 	import DeltaChip from '../DeltaChip.svelte';
+	import { formatDelta } from '../format.js';
 	import PanelEmpty from '../PanelEmpty.svelte';
 	import { sectionIcons } from '../sections.js';
 	import type { SummaryView } from './types.js';
@@ -51,12 +52,12 @@
 					{@const Icon = sectionIcons[s.key]}
 					<a
 						href="/app/insights/{s.key}"
-						class="border-hairline bg-surface/60 hover:bg-accent/40 block space-y-3 rounded-lg border p-4 transition-colors"
+						class="border-hairline bg-surface/60 hover:bg-accent/40 focus-visible:ring-ring block space-y-3 rounded-lg border p-4 transition-colors outline-none focus-visible:ring-2"
 						data-testid="insights-score-{s.key}"
 					>
 						<div class="flex items-center gap-1.5">
 							{#if Icon}<Icon class="text-muted-foreground size-3.5" />{/if}
-							<MonoLabel text={s.label} />
+							<span class="text-muted-foreground text-[13px]">{s.label}</span>
 						</div>
 						{#if s.hasData}
 							<EChart id="insights-score-{s.key}" option={gaugeOption(s.label, s.points)} class="min-h-32 w-full" />
@@ -109,16 +110,16 @@
 						{@const meta = pinnedMeta[c.metricKey ?? '']}
 						<a
 							href={c.metricKey ? `/app/insights/metric/${c.metricKey}` : '/app/insights'}
-							class="border-hairline bg-surface/60 hover:bg-accent/40 block space-y-1 rounded-lg border p-4 transition-colors"
+							class="border-hairline bg-surface/60 hover:bg-accent/40 focus-visible:ring-ring block space-y-1 rounded-lg border p-4 transition-colors outline-none focus-visible:ring-2"
 							data-testid="insights-pinned-{c.metricKey}"
 						>
 							<div class="flex items-center gap-1.5">
 								{#if meta}<meta.icon class="text-muted-foreground size-3.5" />{/if}
-								<MonoLabel text={c.label} />
+								<span class="text-muted-foreground text-[13px]">{c.label}</span>
 							</div>
 							<div class="flex items-baseline gap-2">
 								<p class="text-xl font-medium tabular-nums">{c.value}</p>
-								<DeltaChip delta={c.delta} />
+								<DeltaChip change={formatDelta(c.delta)} />
 							</div>
 							{#if c.chart}
 								<SpecChart
@@ -143,14 +144,14 @@
 							<tr class="border-hairline border-b">
 								<th
 									scope="col"
-									class="text-muted-foreground px-4 py-2 text-left font-mono text-[10px] font-normal uppercase tracking-[0.14em]"
+									class="text-muted-foreground px-4 py-2 text-left text-xs font-normal"
 								>
 									{i18n.t('insights.summary.day')}
 								</th>
 								{#each view.days[0].cells as c, i (i)}
 									<th
 										scope="col"
-										class="text-muted-foreground px-4 py-2 text-right font-mono text-[10px] font-normal uppercase tracking-[0.14em]"
+										class="text-muted-foreground px-4 py-2 text-right text-xs font-normal"
 									>
 										{c.label}
 									</th>
@@ -166,7 +167,7 @@
 											{#if c.filled}
 												<span class="text-foreground">{c.value}</span>
 											{:else}
-												<span class="text-muted-foreground/50">&mdash;</span>
+												<span class="text-muted-foreground">&mdash;</span>
 											{/if}
 										</td>
 									{/each}

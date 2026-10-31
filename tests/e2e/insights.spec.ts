@@ -277,7 +277,7 @@ test.describe('insights summary', () => {
 		await period.locator('a[href$="range=week"]').click();
 		await expect(page).toHaveURL(/range=week/);
 		await expect(period.locator('[aria-current="true"]')).toHaveAttribute('href', /range=week/);
-		await expect(page.locator('#insights-panels table tbody tr')).toHaveCount(7);
+		await expect(page.locator('#insights-panels table:not(.sr-only) tbody tr')).toHaveCount(7);
 		await expect(page.locator('[data-testid="insights-pinned-sleep"] [data-slot="chart"] svg').first()).toBeVisible();
 		await screenshot(page, 'summary');
 	});

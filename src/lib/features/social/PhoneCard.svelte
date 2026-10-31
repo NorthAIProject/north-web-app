@@ -3,12 +3,12 @@
 	import { Badge } from '#lib/components/ui/badge/index.js';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Card from '#lib/components/ui/card/index.js';
+	import { FieldMessage, describe, describedBy, withInvalidFocus } from '#lib/components/ui/field-message/index.js';
 	import { Input } from '#lib/components/ui/input/index.js';
 	import * as InputOTP from '#lib/components/ui/inputotp/index.js';
 	import { Label } from '#lib/components/ui/label/index.js';
 	import SearchSelect from '#lib/components/khepri/SearchSelect.svelte';
 	import { useI18n } from '#lib/i18n/index.js';
-	import FieldError from './FieldError.svelte';
 	import PostForm from './PostForm.svelte';
 	import { countryName } from './format.js';
 	import type { FriendsForm, PhoneCountries, PhoneView } from './types.js';
@@ -26,13 +26,13 @@
 	// svelte-ignore state_referenced_locally
 	let dial = $state(form.country || countries.defaultDial);
 	let busy = $state(false);
-	const submit = () => {
+	const submit = withInvalidFocus(() => {
 		busy = true;
-		return async ({ update }: { update: (o?: { reset?: boolean }) => Promise<void> }) => {
+		return async ({ update }) => {
 			await update({ reset: false });
 			busy = false;
 		};
-	};
+	});
 </script>
 
 <Card.Root id="phone-card" class="border-hairline bg-surface">
@@ -59,7 +59,7 @@
 						class="space-y-3"
 						use:enhance={submit}
 					>
-						<div class="space-y-2">
+						<div class="space-y-2" {@attach describe('code', describedBy('code', err('code')))}>
 							<Label for="code" error={err('code')}
 								>{i18n.tf('social.phone.code', phone.pending)}</Label
 							>
@@ -73,7 +73,7 @@
 									</InputOTP.Group>
 								</InputOTP.Root>
 							{/key}
-							<FieldError message={err('code')} />
+							<FieldMessage id="code" error={err('code')} />
 						</div>
 						<Button type="submit" disabled={busy}>{i18n.t('social.phone.verify')}</Button>
 					</form>
@@ -87,7 +87,7 @@
 						class="flex flex-wrap items-end gap-2"
 						use:enhance={submit}
 					>
-						<div class="space-y-2">
+						<div class="space-y-2" {@attach describe('countryCode', describedBy('countryCode', err('countryCode')))}>
 							<Label for="countryCode" error={err('countryCode')}
 								>{i18n.t('social.phone.country')}</Label
 							>
@@ -100,7 +100,7 @@
 								searchPlaceholder={i18n.t('social.phone.search')}
 								invalid={Boolean(err('countryCode'))}
 							/>
-							<FieldError message={err('countryCode')} />
+							<FieldMessage id="countryCode" error={err('countryCode')} />
 						</div>
 						<div class="flex-1 space-y-2">
 							<Label for="phone" error={err('phone')}>
@@ -113,8 +113,9 @@
 								value={form.phone ?? ''}
 								placeholder={i18n.t('social.phone.placeholder')}
 								aria-invalid={err('phone') ? 'true' : undefined}
+								aria-describedby={describedBy('phone', err('phone'))}
 							/>
-							<FieldError message={err('phone')} />
+							<FieldMessage id="phone" error={err('phone')} />
 						</div>
 						<Button type="submit" variant="secondary" disabled={busy}
 							>{i18n.t('social.phone.send')}</Button

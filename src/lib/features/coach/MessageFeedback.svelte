@@ -5,6 +5,7 @@
 -->
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { Button } from '#lib/components/ui/button/index.js';
 	import { useI18n } from '#lib/i18n/index.js';
 
 	let { messageId, helpful: initial }: { messageId: string; helpful?: boolean | null } = $props();
@@ -34,23 +35,31 @@
 	>
 		<input type="hidden" name="messageId" value={messageId} />
 		<input type="hidden" name="answer" {value} />
-		<button type="submit" class="text-muted-foreground hover:text-foreground text-xs underline-offset-2 hover:underline"
-			>{label}</button
+		<Button
+			type="submit"
+			variant="ghost"
+			size="sm"
+			class="text-muted-foreground hover:text-foreground h-8 px-2 text-xs pointer-coarse:min-h-11">{label}</Button
 		>
 	</form>
 {/snippet}
 
-<div id="feedback-{messageId}" class="flex flex-wrap items-center gap-2" data-testid="feedback">
+<!-- Hover-revealed only where there is hover (Bubble's group); touch always sees it. -->
+<div id="feedback-{messageId}" class="flex flex-wrap items-center gap-1" data-testid="feedback">
 	{#if helpful === true || helpful === false}
-		<span class="text-muted-foreground text-xs">
+		<span class="text-muted-foreground px-1 text-xs">
 			{helpful ? i18n.t('chat.feedback.helpful') : i18n.t('chat.feedback.nothelpful')}
 		</span>
 		{@render answer('clear', i18n.t('chat.feedback.undo'))}
 	{:else}
-		<span class="text-muted-foreground text-xs opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100">
+		<span
+			class="text-muted-foreground px-1 text-xs transition-opacity [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-focus-within:opacity-100 [@media(hover:hover)]:group-hover:opacity-100"
+		>
 			{i18n.t('chat.feedback.ask')}
 		</span>
-		<span class="flex gap-2 opacity-100 transition-opacity focus-within:opacity-100 sm:opacity-0 sm:group-hover:opacity-100">
+		<span
+			class="flex gap-1 transition-opacity focus-within:opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-focus-within:opacity-100 [@media(hover:hover)]:group-hover:opacity-100"
+		>
 			{@render answer('helpful', i18n.t('chat.feedback.yes'))}
 			{@render answer('unhelpful', i18n.t('chat.feedback.no'))}
 		</span>

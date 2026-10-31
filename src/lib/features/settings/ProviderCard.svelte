@@ -12,7 +12,7 @@
 	import { useI18n } from '#lib/i18n/index.js';
 	import BrandIcon from './BrandIcon.svelte';
 	import FieldDescription from './FieldDescription.svelte';
-	import FieldMessage from './FieldMessage.svelte';
+	import { FieldMessage, describedBy, withInvalidFocus } from '#lib/components/ui/field-message/index.js';
 	import type { FieldErrors } from './form.js';
 	import type { AISettings } from './types.js';
 
@@ -51,14 +51,15 @@
 			<p class="text-muted-foreground text-sm leading-relaxed">{i18n.t('conn.ai.noenc')}</p>
 		{:else}
 			{#if failing}
-				<FieldMessage message="{ai.current?.lastError} {i18n.t('settings.conn.ai.fallback')}" />
+				<p class="text-[0.8rem] font-medium text-destructive">{ai.current?.lastError} {i18n.t('settings.conn.ai.fallback')}</p>
 			{/if}
 			<!-- A working key that cannot run the coach's tools: nothing else about it looks wrong. -->
 			{#if toolsUnsupported}
-				<FieldMessage message={i18n.t('conn.ai.notools')} />
+				<p class="text-[0.8rem] font-medium text-destructive">{i18n.t('conn.ai.notools')}</p>
 			{/if}
-			<form method="post" action="?/ai" class="space-y-4" use:enhance={() => async ({ update }) => update({ reset: false })}>
-				<div class="space-y-2">
+			<form method="post" action="?/ai" class="space-y-4" use:enhance={withInvalidFocus(() => async ({ update }) => update({ reset: false }))}>
+				<fieldset class="space-y-2">
+					<legend class="sr-only">{i18n.t('conn.ai.title')}</legend>
 					<label class="flex items-start gap-2 text-sm">
 						<input type="radio" name="mode" value="north" bind:group={mode} class="mt-1" />
 						<span>
@@ -73,11 +74,11 @@
 							<span class="text-muted-foreground block text-xs leading-relaxed">{i18n.t('conn.ai.pays')}</span>
 						</span>
 					</label>
-				</div>
+				</fieldset>
 				{#if mode === 'own'}
 					<div class="space-y-4 pt-2">
-						<div class="space-y-2">
-							<Label>{i18n.t('conn.ai.provider')}</Label>
+						<fieldset class="space-y-2" aria-describedby={describedBy('provider', errors.provider)}>
+							<legend class="mb-2 text-sm leading-none font-medium">{i18n.t('conn.ai.provider')}</legend>
 							<div class="grid grid-cols-2 gap-2 sm:grid-cols-3">
 								{#each ai.providers as p (p.name)}
 									<!-- A real radio, visually hidden, with the tile as its label. -->
@@ -97,8 +98,8 @@
 									</label>
 								{/each}
 							</div>
-							<FieldMessage message={errors.provider} />
-						</div>
+							<FieldMessage id="provider" error={errors.provider} />
+						</fieldset>
 						<!-- Only for a provider with no public address of its own (Hermes). -->
 						{#if needsURL}
 							<div class="space-y-2">
@@ -109,8 +110,9 @@
 									value={initial.baseUrl}
 									placeholder="http://hermes-box.ts.net:8642/v1"
 									aria-invalid={errors.base_url ? true : undefined}
+									aria-describedby={describedBy('base_url', errors.base_url)}
 								/>
-								<FieldMessage message={errors.base_url} />
+								<FieldMessage id="base_url" error={errors.base_url} />
 								<FieldDescription>{i18n.t('conn.ai.instance')}</FieldDescription>
 							</div>
 						{/if}
@@ -122,8 +124,9 @@
 								type="password"
 								placeholder={keyPlaceholder}
 								aria-invalid={errors.api_key ? true : undefined}
+								aria-describedby={describedBy('api_key', errors.api_key)}
 							/>
-							<FieldMessage message={errors.api_key} />
+							<FieldMessage id="api_key" error={errors.api_key} />
 							<FieldDescription>
 								{ai.current ? i18n.tf('conn.ai.stored', ai.current.keyHint) : i18n.t('conn.ai.encrypted')}
 							</FieldDescription>
@@ -136,11 +139,12 @@
 								value={initial.model}
 								placeholder={entry?.defaultModel ?? ''}
 								aria-invalid={errors.model ? true : undefined}
+								aria-describedby={describedBy('model', errors.model)}
 							/>
-							<FieldMessage message={errors.model} />
+							<FieldMessage id="model" error={errors.model} />
 							<FieldDescription>{i18n.t('conn.ai.model.desc')}</FieldDescription>
 						</div>
-						<Button type="submit" class="bg-signal text-background hover:bg-signal/90">{i18n.t('conn.ai.save')}</Button>
+						<Button type="submit">{i18n.t('conn.ai.save')}</Button>
 						<p class="text-muted-foreground text-xs leading-relaxed">
 							{i18n.t('conn.ai.claude')}
 							<code class="font-mono">anthropic/</code>.

@@ -59,7 +59,7 @@
 			body={i18n.t('reports.empty.body')}
 		>
 			<form method="post" action="?/generate" use:enhance={submit}>
-				<Button type="submit" class="bg-signal text-background hover:bg-signal/90" disabled={generating}>
+				<Button type="submit" disabled={generating}>
 					{i18n.t('reports.generate')}
 				</Button>
 			</form>

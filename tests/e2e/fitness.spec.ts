@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { api, createUser, signIn, webUrl } from './helpers';
+import { api, apiUrl, createUser, signIn, webUrl } from './helpers';
 
 // Go: web/fitness/{fitness,activities}.templ + internal/fitness/handler.go.
 // Strava has no credentials locally, so the Strava card and the activities page
@@ -118,7 +118,7 @@ test('Strava sync and disconnect post back to the hub with a notice', async ({ p
 
 test('web connect refuses a callback that is not the callback page', async ({ request }) => {
 	const user = await createUser(request);
-	const res = await request.post('http://localhost:8090/api/v1/fitness/strava/connect/web', {
+	const res = await request.post(`${apiUrl}/fitness/strava/connect/web`, {
 		headers: { authorization: `Bearer ${user.token}` },
 		data: { callbackUrl: 'https://evil.example/elsewhere' }
 	});

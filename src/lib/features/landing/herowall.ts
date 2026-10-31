@@ -61,8 +61,9 @@ export function wallDeck(t: T): WallCard[] {
 	];
 }
 
-// Deck indexes, left to right. Neighbours differ, and the five front cards a
-// phone shows (0, 4, 7, 10, 14) carry the claim on their own.
+// Deck indexes, left to right. Neighbours differ. Phones get their own pair
+// (wallPhone) rather than a subset of this row: five overlapping cards in
+// 375 px covered each other's copy.
 const wallFront = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 5, 2, 12];
 const wallBack = [9, 5, 12, 11, 1, 6, 3, 2, 0, 4, 8, 1, 7, 6];
 
@@ -80,10 +81,9 @@ function slotStyle(x: number, rot: number, y: number, i: number, mid: number): s
 	return `--x:${x.toFixed(2)}%;--rot:${rot.toFixed(1)}deg;--y:${y.toFixed(1)}%;--delay:${(0.7 * (i % 5)).toFixed(1)}s;z-index:${z}`;
 }
 
-/** Keeps the wall readable as the viewport narrows. */
+/** Keeps the wall readable as the viewport narrows; the row starts at md. */
 function frontVisibility(i: number): string {
-	if ([0, 4, 7, 10, 14].includes(i)) return '';
-	if ([2, 5, 9, 12].includes(i)) return 'hidden md:block';
+	if ([0, 2, 4, 5, 7, 9, 10, 12, 14].includes(i)) return '';
 	return 'hidden lg:block';
 }
 
@@ -102,6 +102,23 @@ export function frontSlots(deck: WallCard[]): WallSlot[] {
 			class: frontVisibility(i)
 		};
 	});
+}
+
+// The phone pair: the coach remembering, and the goal it is working towards.
+// Both carry their copy in the top half, above the fade.
+const wallPhone = [7, 4];
+
+/**
+ * Below md: two whole cards side by side, tipped apart rather than stacked, so
+ * neither covers the other's copy. Centred at 26% and 74%, a 2:3 card at the
+ * 11rem–26vh height clears its neighbour down to 320 px.
+ */
+export function phoneSlots(deck: WallCard[]): WallSlot[] {
+	return wallPhone.map((d, i) => ({
+		card: deck[d],
+		style: slotStyle(i === 0 ? 26 : 74, i === 0 ? -6 : 6, 18, i, 0.5),
+		class: ''
+	}));
 }
 
 /** The back row, shown from md: 14 cards between the front ones, arched up in the middle. */

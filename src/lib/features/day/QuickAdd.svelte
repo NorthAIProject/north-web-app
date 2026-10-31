@@ -87,6 +87,7 @@
 			bind:value={supplement}
 			items={data.supplementPresets.map((p) => ({ value: p.key, label: p.label }))}
 			placeholder={i18n.t('day.supplement.pick')}
+			aria-label={i18n.t('day.supplement.pick')}
 			search={false}
 		/>
 		<div class="flex items-center gap-2">
@@ -108,7 +109,7 @@
 		<ul class="space-y-1">
 			{#each data.milestones as m (m.id)}
 				<li class="flex items-center justify-between gap-2 text-sm">
-					<span>{m.name} <span class={cn('text-xs', m.due ? 'text-day-move' : 'text-muted-foreground')}>{i18n.tf('day.tracker.months', m.months)}</span></span>
+					<span>{m.name} <span class={cn('text-xs', m.due ? 'text-day-move-text' : 'text-muted-foreground')}>{i18n.tf('day.tracker.months', m.months)}</span></span>
 					<form method="post" action="?/trackerDone" use:enhance={done}>
 						<input type="hidden" name="id" value={m.id} />
 						<Button type="submit" variant="ghost" size="sm">{i18n.t('day.tracker.done')}</Button>
@@ -118,7 +119,13 @@
 		</ul>
 	{/if}
 	<form method="post" action="?/tracker" class="grid grid-cols-[1fr_auto_auto] gap-2" use:enhance={done}>
-		<Input name="name" placeholder={i18n.t('day.tracker.name')} maxlength={40} required />
+		<Input
+			name="name"
+			placeholder={i18n.t('day.tracker.name')}
+			aria-label={i18n.t('day.tracker.name.label')}
+			maxlength={40}
+			required
+		/>
 		<Input name="last_done_on" type="date" aria-label={i18n.t('day.tracker.last')} />
 		<Button type="submit" variant="outline">{i18n.t('day.add.short')}</Button>
 	</form>
@@ -127,12 +134,12 @@
 <Dialog.Root bind:open>
 	<Dialog.Trigger>
 		{#snippet child({ props })}
-			<Button {...props} size="icon" class="bg-signal text-background hover:bg-signal/90 rounded-full" aria-label={i18n.t('day.add')}>
+			<Button {...props} size="icon" class="rounded-full" aria-label={i18n.t('day.add')}>
 				<PlusIcon class="size-4.5" />
 			</Button>
 		{/snippet}
 	</Dialog.Trigger>
-	<Dialog.Content class="max-h-[90vh] overflow-y-auto sm:max-w-md">
+	<Dialog.Content class="sm:max-w-md">
 		<Dialog.Header>
 			<Dialog.Title>{i18n.t('day.add')}</Dialog.Title>
 		</Dialog.Header>

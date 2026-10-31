@@ -76,13 +76,13 @@
 
 <section class="relative border-t border-hairline py-24" bind:this={root}>
 	<Waypoint distance={t('land.waypoint.week12')} />
-	<SectionHeading eyebrow={t('land.surf.eyebrow')} title={t('land.surf.title')} body={t('land.surf.body')} />
+	<SectionHeading title={t('land.surf.title')} body={t('land.surf.body')} />
 	<div class="mt-10">
 		<Tabs.Root bind:value={active}>
 			<Tabs.List class="flex h-auto w-full flex-wrap gap-1 border border-hairline bg-surface p-1" aria-label={t('land.surf.tabs.aria')}>
 				{#each list as s (s.key)}
 					{@const Icon = icons[s.key]}
-					<Tabs.Trigger value={s.key} class="gap-1.5 px-3 py-1.5 text-xs data-[state=active]:text-signal" onclick={pause}>
+					<Tabs.Trigger value={s.key} class="gap-1.5 px-3 py-1.5 text-xs data-[state=active]:text-signal-text" onclick={pause}>
 						<Icon class="size-3.5" />
 						{s.name}
 					</Tabs.Trigger>

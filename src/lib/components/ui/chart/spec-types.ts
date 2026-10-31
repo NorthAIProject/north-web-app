@@ -45,5 +45,7 @@ export type ChartSpec = {
 	yMin?: number;
 	yMax?: number;
 	beginAtZero?: boolean;
+	/** The chart's title for screen readers; the series summary follows it. */
+	label?: string;
 	class?: string;
 };

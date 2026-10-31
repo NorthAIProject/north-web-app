@@ -4,4 +4,4 @@
 	let { text, class: className = '' }: { text: string; class?: string } = $props();
 </script>
 
-<span class={cn('font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground', className)}>{text}</span>
+<span class={cn('font-mono text-xs uppercase tracking-[0.08em] text-muted-foreground', className)}>{text}</span>

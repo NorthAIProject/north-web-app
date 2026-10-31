@@ -8,7 +8,7 @@
 	import { bar } from '#lib/features/viz/chartjs.js';
 	import { donutOption } from '#lib/features/viz/echarts.js';
 	import PanelEmpty from '../PanelEmpty.svelte';
-	import StatTile from '../StatTile.svelte';
+	import StatRow from '../StatRow.svelte';
 	import { formatCount, type ProgressView } from '../domains.js';
 
 	let { view }: { view: ProgressView } = $props();
@@ -35,16 +35,18 @@
 </script>
 
 <div class="space-y-6">
-	<div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-		<StatTile label={i18n.t('insights.progress.active')} value={formatCount(view.activeCount)} note={opened} />
-		<StatTile
-			label={i18n.t('insights.progress.average')}
-			value={percent}
-			note={i18n.t('insights.progress.average.note')}
-		/>
-		<StatTile label={i18n.t('insights.progress.streak')} value={streak} />
-		<StatTile label={i18n.t('insights.progress.overdue')} value={formatCount(view.overdue)} note={overdueNote} />
-	</div>
+	<StatRow
+		items={[
+			{ label: i18n.t('insights.progress.active'), value: formatCount(view.activeCount), note: opened },
+			{
+				label: i18n.t('insights.progress.average'),
+				value: percent,
+				note: i18n.t('insights.progress.average.note')
+			},
+			{ label: i18n.t('insights.progress.streak'), value: streak },
+			{ label: i18n.t('insights.progress.overdue'), value: formatCount(view.overdue), note: overdueNote }
+		]}
+	/>
 	<div class="grid gap-4 lg:grid-cols-3">
 		<Card class="border-hairline bg-surface lg:col-span-2">
 			<CardHeader>
@@ -67,7 +69,7 @@
 										{#if g.deadline}
 											<span
 												class={[
-													'shrink-0 font-mono text-[10px] whitespace-nowrap',
+													'shrink-0 text-xs whitespace-nowrap tabular-nums',
 													g.overdue ? 'text-signal' : 'text-muted-foreground'
 												]}
 											>

@@ -1,7 +1,8 @@
 <!--
 	north-client web/insights/timeline.templ TimelineBody: the kind filter and
-	the feed. Each chip is a real link (?range=&kind=); SvelteKit navigates
-	client-side and the load refetches, as htmx swapped the panel in Go.
+	the feed. The filter is a RangeTabs whose options are real links
+	(?range=&kind=); SvelteKit navigates client-side and the load refetches,
+	as htmx swapped the panel in Go.
 -->
 <script lang="ts">
 	import type { Component } from 'svelte';
@@ -19,11 +20,12 @@
 	import TimerIcon from '@lucide/svelte/icons/timer';
 	import TimerOffIcon from '@lucide/svelte/icons/timer-off';
 	import UtensilsIcon from '@lucide/svelte/icons/utensils';
+	import RangeTabs from '#lib/components/khepri/RangeTabs.svelte';
 	import { Card, CardContent } from '#lib/components/ui/card/index.js';
 	import { useI18n } from '#lib/i18n/index.js';
 	import PanelEmpty from '../PanelEmpty.svelte';
 	import { relativeTime } from '../format.js';
-	import { chipHref, formatCount, type TimelineView } from '../domains.js';
+	import { chipHref, type TimelineView } from '../domains.js';
 
 	let { view, now, timeZone }: { view: TimelineView; now: Date; timeZone?: string } = $props();
 
@@ -48,21 +50,13 @@
 </script>
 
 <div class="space-y-4">
-	<nav aria-label={i18n.t('insights.timeline.filter')} class="-mx-1 flex flex-wrap gap-1">
-		{#each view.filters as chip (chip.key)}
-			<a
-				href={chipHref('/app/insights/timeline', view.range.key, chip.key)}
-				data-sveltekit-reset="false"
-				aria-current={chip.selected ? 'true' : undefined}
-				class={chip.selected
-					? 'bg-signal text-background flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium whitespace-nowrap'
-					: 'border-hairline text-muted-foreground hover:text-foreground flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-medium whitespace-nowrap transition-colors'}
-			>
-				{chip.label}
-				<span class="font-mono text-[10px] tabular-nums opacity-70">{formatCount(chip.count)}</span>
-			</a>
-		{/each}
-	</nav>
+	<RangeTabs
+		label={i18n.t('insights.timeline.filter')}
+		value={view.filters.find((c) => c.selected)?.key ?? ''}
+		options={view.filters.map((c) => ({ key: c.key, label: c.label, count: c.count }))}
+		hrefFor={(kind) => chipHref('/app/insights/timeline', view.range.key, kind)}
+		wrap
+	/>
 	<Card class="border-hairline bg-surface">
 		<CardContent>
 			{#if view.entries.length === 0}
@@ -89,10 +83,10 @@
 									{/if}
 								</span>
 								<span class="shrink-0 text-right">
-									<span class="text-muted-foreground block font-mono text-[10px] whitespace-nowrap tabular-nums">
+									<span class="text-muted-foreground block text-xs whitespace-nowrap tabular-nums">
 										{relativeTime(i18n, new Date(e.at), now, timeZone)}
 									</span>
-									<span class="text-muted-foreground block font-mono text-[10px] whitespace-nowrap opacity-60">
+									<span class="text-muted-foreground block text-xs whitespace-nowrap">
 										{e.label}
 									</span>
 								</span>

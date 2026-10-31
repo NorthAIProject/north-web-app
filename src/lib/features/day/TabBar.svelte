@@ -14,8 +14,8 @@
 <!-- The bar spans the viewport to centre the pill; only the pill takes clicks,
      so the sidebar footer (Sign out) underneath stays reachable. Go's bar
      swallowed those clicks. -->
-<nav class="pointer-events-none fixed inset-x-0 bottom-4 z-40 flex justify-center px-4" aria-label={i18n.t('day.tabs')}>
-	<div class="pointer-events-auto bg-background/90 border-hairline flex items-center gap-1 rounded-full border p-1 shadow-lg backdrop-blur">
+<nav class="pointer-events-none fixed inset-x-0 bottom-[max(1rem,env(safe-area-inset-bottom))] z-40 flex justify-center px-4" aria-label={i18n.t('day.tabs')}>
+	<div class="pointer-events-auto bg-background border-hairline flex items-center gap-1 rounded-full border p-1 shadow-lg">
 		<Button href="/app" variant="secondary" size="sm" class="rounded-full" aria-current="page"><CalendarDaysIcon class="size-4" />{i18n.t('day.tab.day')}</Button>
 		<Button href="/app/overview" variant="ghost" size="sm" class="rounded-full"><LayoutDashboardIcon class="size-4" />{i18n.t('day.tab.overview')}</Button>
 		<Button href="/app/insights/timeline" variant="ghost" size="sm" class="rounded-full"><FolderOpenIcon class="size-4" />{i18n.t('day.tab.records')}</Button>

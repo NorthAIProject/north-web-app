@@ -10,7 +10,7 @@
 	import PushRow from '#lib/features/push/PushRow.svelte';
 	import { useI18n } from '#lib/i18n/index.js';
 	import FieldDescription from './FieldDescription.svelte';
-	import FieldMessage from './FieldMessage.svelte';
+	import { FieldMessage, describedBy, withInvalidFocus } from '#lib/components/ui/field-message/index.js';
 	import FormSelect from './FormSelect.svelte';
 	import type { FieldErrors } from './form.js';
 	import { cadenceOrDefault, digestCadences, hourLabel, hours, photoEveryDays, photoReminderDays } from './options.js';
@@ -63,8 +63,16 @@
 {#snippet hourSelect(id: string, labelKey: string, value: number)}
 	<div class="space-y-2">
 		<Label for={id}>{i18n.t(labelKey)}</Label>
-		<FormSelect {id} name={id} value={String(value)} placeholder={hourLabel(value)} groups={hourGroups} error={Boolean(errors[id])} />
-		<FieldMessage message={errors[id]} />
+		<FormSelect
+			{id}
+			name={id}
+			value={String(value)}
+			placeholder={hourLabel(value)}
+			groups={hourGroups}
+			error={Boolean(errors[id])}
+			describedby={describedBy(id, errors[id])}
+		/>
+		<FieldMessage {id} error={errors[id]} />
 	</div>
 {/snippet}
 
@@ -74,7 +82,7 @@
 		<Card.Description>{i18n.t('settings.notif.desc')}</Card.Description>
 	</Card.Header>
 	<Card.Content>
-		<form method="post" action="?/notifications" class="space-y-4" use:enhance={() => async ({ update }) => update({ reset: false })}>
+		<form method="post" action="?/notifications" class="space-y-4" use:enhance={withInvalidFocus(() => async ({ update }) => update({ reset: false }))}>
 			{@render toggle('nudge_missed_checkin', values.nudgeMissedCheckIn, 'settings.notif.missed')}
 			{@render toggle('nudge_goal_deadline', values.nudgeGoalDeadline, 'settings.notif.goal')}
 			{@render toggle('coach_activity', values.coachActivity, 'settings.notif.coach', 'settings.notif.coach.desc')}
@@ -129,8 +137,9 @@
 					placeholder={i18n.t('settings.notif.digest.choose')}
 					groups={cadenceGroups}
 					error={Boolean(errors.stats_digest_cadence)}
+					describedby={describedBy('stats_digest_cadence', errors.stats_digest_cadence)}
 				/>
-				<FieldMessage message={errors.stats_digest_cadence} />
+				<FieldMessage id="stats_digest_cadence" error={errors.stats_digest_cadence} />
 				<FieldDescription>{i18n.t('settings.notif.digest.desc')}</FieldDescription>
 			</div>
 			{@render toggle('quiet_hours_enabled', values.quietHoursEnabled, 'settings.notif.quiet')}
@@ -144,8 +153,9 @@
 						type="time"
 						value={values.quietStart}
 						aria-invalid={errors.quiet_start ? true : undefined}
+						aria-describedby={describedBy('quiet_start', errors.quiet_start)}
 					/>
-					<FieldMessage message={errors.quiet_start} />
+					<FieldMessage id="quiet_start" error={errors.quiet_start} />
 				</div>
 				<div class="space-y-2">
 					<Label for="quiet_end">{i18n.t('settings.notif.quiet.to')}</Label>
@@ -155,11 +165,12 @@
 						type="time"
 						value={values.quietEnd}
 						aria-invalid={errors.quiet_end ? true : undefined}
+						aria-describedby={describedBy('quiet_end', errors.quiet_end)}
 					/>
-					<FieldMessage message={errors.quiet_end} />
+					<FieldMessage id="quiet_end" error={errors.quiet_end} />
 				</div>
 			</div>
-			<Button type="submit" class="bg-signal text-background hover:bg-signal/90">{i18n.t('settings.notif.save')}</Button>
+			<Button type="submit">{i18n.t('settings.notif.save')}</Button>
 		</form>
 		<!-- Go: if f.PushEnabled { @pushRow(f) }; PushRow hides itself otherwise. -->
 		<PushRow />

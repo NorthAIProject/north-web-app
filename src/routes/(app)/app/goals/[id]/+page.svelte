@@ -6,6 +6,7 @@
 	import { formatTime } from '#lib/components/khepri/dates.js';
 	import { Button, type ButtonVariant } from '#lib/components/ui/button/index.js';
 	import * as Card from '#lib/components/ui/card/index.js';
+	import { FieldMessage, describedBy, withInvalidFocus } from '#lib/components/ui/field-message/index.js';
 	import { Input } from '#lib/components/ui/input/index.js';
 	import { Label } from '#lib/components/ui/label/index.js';
 	import { Progress } from '#lib/components/ui/progress/index.js';
@@ -62,14 +63,15 @@
 	let busy = $state(false);
 	// Go answered every form with a redirect that reloaded the page, so a
 	// success starts each form afresh; a rejection keeps what was typed.
-	const submit = ({ formElement }: { formElement: HTMLFormElement }) => {
+	// A rejection then moves focus to the first field it names.
+	const submit = withInvalidFocus(({ formElement }) => {
 		busy = true;
-		return async ({ result, update }: { result: { type: string }; update: (o?: { reset?: boolean }) => Promise<void> }) => {
+		return async ({ result, update }) => {
 			await update({ reset: false });
 			busy = false;
 			if (result.type === 'redirect') formElement.reset();
 		};
-	};
+	});
 
 	const msError = (field: string, mid = '') =>
 		msFailure && msFailure.editing === mid ? (msFailure.errors as Record<string, string>)[field] : undefined;
@@ -95,12 +97,6 @@
 		<input type="hidden" name="status" value={status} />
 		<Button type="submit" size="sm" {variant} disabled={busy}>{label}</Button>
 	</form>
-{/snippet}
-
-{#snippet message(msg: string | undefined)}
-	{#if msg}
-		<p class="text-[0.8rem] font-medium text-red-500">{msg}</p>
-	{/if}
 {/snippet}
 
 <div class="mx-auto w-full max-w-3xl p-6 md:p-8">
@@ -234,8 +230,9 @@
 											value={editTitle(m)}
 											required
 											aria-invalid={msError('title', m.id) ? 'true' : undefined}
+											aria-describedby={describedBy(`milestone_title_${m.id}`, msError('title', m.id))}
 										/>
-										{@render message(msError('title', m.id))}
+										<FieldMessage id="milestone_title_{m.id}" error={msError('title', m.id)} />
 									</div>
 									<div class="space-y-2">
 										<Label for="milestone_date_{m.id}">{i18n.t('goals.ms.date')}</Label>
@@ -263,8 +260,9 @@
 							value={addValues.title}
 							placeholder={i18n.t('goals.ms.title.ph')}
 							aria-invalid={msError('title') ? 'true' : undefined}
+							aria-describedby={describedBy('milestone_title', msError('title'))}
 						/>
-						{@render message(msError('title'))}
+						<FieldMessage id="milestone_title" error={msError('title')} />
 					</div>
 					<div class="w-full space-y-2 sm:w-40">
 						<Label for="milestone_date">{i18n.t('goals.ms.date')}</Label>
@@ -293,10 +291,12 @@
 						name="note"
 						placeholder={i18n.t('goals.progress.ph')}
 						rows={2}
+						aria-label={i18n.t('goals.progress.q')}
 						aria-invalid={noteError ? 'true' : undefined}
+						aria-describedby={describedBy('note', noteError)}
 					/>
 				</DictateField>
-				{@render message(noteError)}
+				<FieldMessage id="note" error={noteError} />
 				<div class="flex items-end gap-3">
 					<div class="w-32">
 						<Label for="progress" class="text-xs">{i18n.t('goals.progress.pct')}</Label>

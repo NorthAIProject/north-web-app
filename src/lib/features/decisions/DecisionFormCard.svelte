@@ -7,6 +7,7 @@
 	import { enhance, type SubmitFunction } from '$app/forms';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Card from '#lib/components/ui/card/index.js';
+	import { FieldMessage, describedBy, withInvalidFocus } from '#lib/components/ui/field-message/index.js';
 	import { Input } from '#lib/components/ui/input/index.js';
 	import { Label } from '#lib/components/ui/label/index.js';
 	import * as RadioGroup from '#lib/components/ui/radio-group/index.js';
@@ -27,11 +28,14 @@
 
 	// The redirect lands back on the same page: a new decision empties the form
 	// as Go's full reload did, while an edit keeps showing what was saved.
-	const reload: SubmitFunction = ({ formElement }) =>
-		async ({ result, update }) => {
-			await update({ reset: false });
-			if (result.type === 'redirect' && !withOutcome) formElement.reset();
-		};
+	// A rejection then moves focus to the first field it names.
+	const reload: SubmitFunction = withInvalidFocus(
+		({ formElement }) =>
+			async ({ result, update }) => {
+				await update({ reset: false });
+				if (result.type === 'redirect' && !withOutcome) formElement.reset();
+			}
+	);
 	const err = (name: string) => f.errors?.[name] ?? '';
 	let held = $derived(f.held);
 
@@ -44,12 +48,6 @@
 			: [])
 	]);
 </script>
-
-{#snippet message(text: string)}
-	{#if text}
-		<p class="text-[0.8rem] font-medium text-red-500">{text}</p>
-	{/if}
-{/snippet}
 
 <Card.Root class="border-hairline bg-surface">
 	<Card.Header>
@@ -65,8 +63,9 @@
 					value={f.title}
 					placeholder={i18n.t('decisions.form.title_ph')}
 					aria-invalid={err('title') ? true : undefined}
+					aria-describedby={describedBy('title', err('title'))}
 				/>
-				{@render message(err('title'))}
+				<FieldMessage id="title" error={err('title')} />
 			</div>
 			{#each areas as a (a.name)}
 				<div class="space-y-2">
@@ -79,15 +78,22 @@
 							placeholder={i18n.t(a.placeholder)}
 							value={f[a.name]}
 							aria-invalid={err(a.name) ? true : undefined}
+							aria-describedby={describedBy(a.name, err(a.name))}
 						/>
 					</DictateField>
-					{@render message(err(a.name))}
+					<FieldMessage id={a.name} error={err(a.name)} />
 				</div>
 			{/each}
 			{#if withOutcome}
 				<div class="space-y-2">
-					<Label error={err('held')}>{i18n.t('decisions.form.held')}</Label>
-					<RadioGroup.Root name="held" bind:value={held} class="flex flex-wrap gap-4">
+					<Label id="held-label" error={err('held')}>{i18n.t('decisions.form.held')}</Label>
+					<RadioGroup.Root
+						name="held"
+						bind:value={held}
+						class="flex flex-wrap gap-4"
+						aria-labelledby="held-label"
+						aria-describedby={describedBy('held', err('held'))}
+					>
 						{#each heldChoices as c (c.id)}
 							<div class="flex items-center gap-2">
 								<RadioGroup.Item id="held-{c.id}" value={c.value} />
@@ -95,10 +101,10 @@
 							</div>
 						{/each}
 					</RadioGroup.Root>
-					{@render message(err('held'))}
+					<FieldMessage id="held" error={err('held')} />
 				</div>
 			{/if}
-			<Button type="submit" class="bg-signal text-background hover:bg-signal/90">{submit}</Button>
+			<Button type="submit">{submit}</Button>
 		</form>
 	</Card.Content>
 </Card.Root>

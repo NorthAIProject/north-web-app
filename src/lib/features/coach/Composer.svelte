@@ -80,13 +80,21 @@
 					<PaperclipIcon class="size-3" />
 					<span class="truncate">{fileName}</span>
 				</Badge>
-				<Button type="button" size="icon" variant="ghost" class="size-7" aria-label={i18n.t('chat.attach_remove')} onclick={clearFile}>
-					<XIcon class="size-3.5" />
+				<Button
+					type="button"
+					size="icon"
+					variant="ghost"
+					class="size-8 pointer-coarse:size-11"
+					aria-label={i18n.t('chat.attach_remove')}
+					onclick={clearFile}
+				>
+					<XIcon class="size-4" />
 				</Button>
 			</div>
 		{/if}
 		<div class="flex items-end gap-2">
-			<!-- Hidden input + icon: the control stays a 44px thumb target. -->
+			<!-- Hidden input + icon: the control stays a 44px thumb target. The
+				 paperclip is the one tab stop, so the input leaves the tab order. -->
 			<input
 				bind:this={fileInput}
 				type="file"
@@ -94,6 +102,8 @@
 				id="attachment"
 				accept="image/jpeg,image/png,image/webp,image/gif,.pdf,.docx,.xlsx,.csv,.tsv,.txt,.md,.json"
 				class="sr-only"
+				tabindex="-1"
+				aria-hidden="true"
 				onchange={(e) => pick((e.currentTarget as HTMLInputElement).files?.[0])}
 			/>
 			<Button
@@ -112,14 +122,15 @@
 				id="message"
 				name="message"
 				placeholder={i18n.t('chat.placeholder')}
+				aria-label={i18n.t('chat.message.label')}
 				bind:value
 				rows={1}
 				autoResize
-				class="bg-muse-pill dark:bg-muse-pill max-h-48 min-h-11 resize-none rounded-[24px] border-transparent px-4 py-2.5 text-[15px] shadow-none md:text-[15px]"
+				class="bg-muse-pill dark:bg-muse-pill border-input max-h-48 min-h-11 resize-none rounded-xl px-4 py-2.5 text-base shadow-none md:text-[15px]"
 				data-muse-listen=""
 				{onkeydown}
 			/>
-			<Button type="submit" size="icon" class="min-h-11 min-w-11">
+			<Button type="submit" size="icon" class="min-h-11 min-w-11" aria-label={i18n.t('chat.send')}>
 				<ArrowUpIcon class="size-4" />
 			</Button>
 		</div>

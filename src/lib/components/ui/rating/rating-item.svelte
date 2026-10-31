@@ -27,9 +27,9 @@
 
 	$effect(() => rating.register(value));
 
-	const colorClass = $derived(
-		style === "heart" ? "text-destructive" : style === "emoji" ? "text-yellow-500" : "text-yellow-400",
-	);
+	// Theme tokens, not the palette: gold stars and faces read 3:1 or more on
+	// a card in both themes; hearts stay destructive red.
+	const colorClass = $derived(style === "heart" ? "text-destructive" : "text-signal");
 
 	const FilledEmoji = $derived(
 		value <= 1 ? AngryIcon : value <= 2 ? FrownIcon : value <= 3 ? MehIcon : value <= 4 ? SmileIcon : LaughIcon,

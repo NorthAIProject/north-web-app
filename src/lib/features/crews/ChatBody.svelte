@@ -42,6 +42,17 @@
 	// The transcript stays pinned to the bottom while the reader is near it,
 	// and leaves them alone once they scroll up to read.
 	let near = true;
+	// The list is a log: a screen reader hears rows as they arrive. A bulk
+	// redraw (older history, a resync) is not news, so the log goes quiet
+	// while it lands and speaks again once it has.
+	let live = $state(true);
+	async function quietly(write: () => void) {
+		live = false;
+		await tick();
+		write();
+		await tick();
+		requestAnimationFrame(() => (live = true));
+	}
 
 	// One fetch of what is new at a time; a request asked for while one is in
 	// flight runs once after it, with the cursor as it is then (hx-sync queue last).
@@ -77,9 +88,10 @@
 	/** The latest page again, after a resync. The composer is untouched, so a half-typed message survives. */
 	export async function reload(): Promise<void> {
 		const page = await crewApi.getMessages(crewID, channel.id);
-		messages = page.messages;
-		hasMore = page.hasMore ?? false;
-		await tick();
+		await quietly(() => {
+			messages = page.messages;
+			hasMore = page.hasMore ?? false;
+		});
 		if (scroller) scroller.scrollTop = scroller.scrollHeight;
 	}
 
@@ -102,9 +114,10 @@
 		// the message they were on stays in place.
 		const fromBottom = scroller ? scroller.scrollHeight - scroller.scrollTop : 0;
 		const seen = new Set(messages.map((m) => m.id));
-		messages = [...page.messages.filter((m) => !seen.has(m.id)), ...messages];
-		hasMore = page.hasMore ?? false;
-		await tick();
+		await quietly(() => {
+			messages = [...page.messages.filter((m) => !seen.has(m.id)), ...messages];
+			hasMore = page.hasMore ?? false;
+		});
 		if (scroller) scroller.scrollTop = scroller.scrollHeight - fromBottom;
 	}
 
@@ -188,7 +201,13 @@
 			<Button type="button" variant="ghost" size="sm" onclick={older}>{i18n.t('crews.load-older')}</Button>
 		</div>
 	{/if}
-	<div id="crew-messages" class="pb-2">
+	<div
+		id="crew-messages"
+		class="pb-2"
+		role="log"
+		aria-live={live ? 'polite' : 'off'}
+		aria-relevant="additions"
+	>
 		{#if messages.length === 0}
 			<EmptyState title={i18n.t('crews.empty.title')} body={i18n.t('crews.empty.body')} />
 		{/if}

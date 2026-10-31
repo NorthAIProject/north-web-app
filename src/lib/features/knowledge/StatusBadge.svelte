@@ -12,7 +12,7 @@
 	{#if doc.stale}
 		<Badge variant="secondary">{i18n.t('knowledge.status.stale')}</Badge>
 	{:else}
-		<Badge variant="outline" class="border-signal/40 bg-signal/12 text-signal">{i18n.t('knowledge.status.read')}</Badge>
+		<Badge variant="outline" class="border-signal/40 bg-signal/12 text-signal-text">{i18n.t('knowledge.status.read')}</Badge>
 	{/if}
 {:else if doc.status === 'failed'}
 	<Badge variant="destructive">{i18n.t('knowledge.status.failed')}</Badge>

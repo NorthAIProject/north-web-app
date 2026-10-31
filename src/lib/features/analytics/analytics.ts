@@ -91,6 +91,64 @@ declare global {
 	}
 }
 
+/**
+ * The vendored posthog-js 1.428.2 files (static/assets/js/vendor). Versioned
+ * names, so they are cached as immutable; a bump renames both.
+ *
+ * array.js is the SDK without rrweb or any extension. Before replay starts,
+ * the recorder (posthog-js's "lazy-recorder" script) is loaded from here; it
+ * registers itself on window.__PosthogExtensions__, where array.js looks
+ * first, so the SDK never reaches for its CDN copy — which
+ * disable_external_dependency_loading would refuse anyway.
+ */
+export const posthogScript = '/assets/js/vendor/posthog-array-1.428.2.js';
+export const recorderScript = '/assets/js/vendor/posthog-lazy-recorder-1.428.2.js';
+
+const scripts = new Map<string, Promise<boolean>>();
+
+/** Appends a classic script once; resolves false if it fails to load. */
+export function loadScript(src: string): Promise<boolean> {
+	let pending = scripts.get(src);
+	if (!pending) {
+		pending = new Promise((resolve) => {
+			const script = document.createElement('script');
+			script.src = src;
+			script.async = true;
+			script.onload = () => resolve(true);
+			script.onerror = () => {
+				scripts.delete(src);
+				resolve(false);
+			};
+			document.head.appendChild(script);
+		});
+		scripts.set(src, pending);
+	}
+	return pending;
+}
+
+/**
+ * Runs fn once the browser is idle after the page has loaded, so analytics
+ * never competes with hydration or the first paint. Returns a cancel.
+ */
+export function whenIdle(fn: () => void, timeout = 4000): () => void {
+	let cancelled = false;
+	let idle = 0;
+	let timer: ReturnType<typeof setTimeout> | undefined;
+	const run = () => {
+		if (cancelled) return;
+		if ('requestIdleCallback' in window) idle = window.requestIdleCallback(() => !cancelled && fn(), { timeout });
+		else timer = setTimeout(() => !cancelled && fn(), 1);
+	};
+	if (document.readyState === 'complete') run();
+	else window.addEventListener('load', run, { once: true });
+	return () => {
+		cancelled = true;
+		window.removeEventListener('load', run);
+		if (idle) window.cancelIdleCallback(idle);
+		if (timer) clearTimeout(timer);
+	};
+}
+
 /** Reports an event when analytics is on; a no-op otherwise. */
 export function capture(event: string, properties?: Record<string, unknown>) {
 	if (typeof window !== 'undefined') window.posthog?.capture(event, properties);

@@ -81,7 +81,13 @@
 	</div>
 	<p class="text-muted-foreground mt-1 text-xs">{note}</p>
 	<form class="mt-3" onsubmit={(e) => e.preventDefault()}>
-		<Input name="q" type="search" bind:value={query} placeholder={i18n.t('workouts.picker.search')} />
+		<Input
+			name="q"
+			type="search"
+			bind:value={query}
+			placeholder={i18n.t('workouts.picker.search')}
+			aria-label={i18n.t('workouts.picker.search')}
+		/>
 	</form>
 	{#if loaded && searched === '' && options.length > 0}
 		<MonoLabel text={i18n.t('workouts.picker.suggested')} />

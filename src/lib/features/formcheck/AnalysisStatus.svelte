@@ -29,7 +29,7 @@
 			<Card.Content>
 				<div class="text-muted-foreground flex items-center gap-3 py-6 text-sm" role="status">
 					<span
-						class="border-muted-foreground/30 border-t-muted-foreground size-4 animate-spin rounded-full border-2"
+						class="border-muted-foreground/30 border-t-muted-foreground size-4 motion-safe:animate-spin rounded-full border-2"
 					></span>
 					{i18n.t('form.status.watching')}
 				</div>

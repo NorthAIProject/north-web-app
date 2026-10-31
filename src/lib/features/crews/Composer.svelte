@@ -83,11 +83,11 @@
 				type="button"
 				variant="ghost"
 				size="icon"
-				class="size-6"
+				class="size-8 pointer-coarse:size-11"
 				aria-label={i18n.t('crews.composer.cancel-reply')}
 				onclick={() => (reply = null)}
 			>
-				<XIcon class="size-3" />
+				<XIcon class="size-4" />
 			</Button>
 		</div>
 	{/if}

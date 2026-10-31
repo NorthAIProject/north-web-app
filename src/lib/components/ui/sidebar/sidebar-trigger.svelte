@@ -4,6 +4,7 @@
 	import { cn } from "#lib/utils.js";
 	import { useSidebar } from "./context.svelte.js";
 	import type { ComponentProps } from "svelte";
+	import { useI18n } from "#lib/i18n/index.js";
 
 	let {
 		ref = $bindable(null),
@@ -15,6 +16,7 @@
 	} = $props();
 
 	const sidebar = useSidebar();
+	const i18n = useI18n();
 </script>
 
 <Button
@@ -32,5 +34,5 @@
 	{...restProps}
 >
 	<PanelLeftIcon class="size-4 rtl:rotate-180" />
-	<span class="sr-only">Toggle Sidebar</span>
+	<span class="sr-only">{i18n.t("layout.sidebar.toggle")}</span>
 </Button>

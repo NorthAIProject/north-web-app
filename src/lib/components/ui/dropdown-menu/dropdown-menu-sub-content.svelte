@@ -25,8 +25,9 @@
 		{alignOffset}
 		{sideOffset}
 		class={cn(
-			// templUI SubContent: right-start, offset -4.
-		"z-[9999] m-0 min-w-[8rem] max-w-[min(24rem,calc(100vw-2rem))] overflow-hidden rounded-md border bg-popover p-1 text-sm text-popover-foreground shadow-lg outline-none transition-opacity duration-150 ease-out data-[starting-style]:opacity-0 data-[ending-style]:opacity-0 motion-reduce:transition-none",
+			// templUI SubContent: right-start, offset -4. Same layer as every other
+			// menu and popover (z-50), so it never paints over a dialog or a toast.
+			"z-50 m-0 min-w-[8rem] max-w-[min(24rem,calc(100vw-2rem))] overflow-hidden rounded-md border bg-popover p-1 text-sm text-popover-foreground shadow-lg outline-none transition-opacity duration-150 ease-out data-[starting-style]:opacity-0 data-[ending-style]:opacity-0 motion-reduce:transition-none",
 			className
 		)}
 		{...restProps}

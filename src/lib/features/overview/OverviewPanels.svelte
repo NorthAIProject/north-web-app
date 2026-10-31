@@ -6,8 +6,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import CircleCheckIcon from '@lucide/svelte/icons/circle-check';
-	import TrendingDownIcon from '@lucide/svelte/icons/trending-down';
-	import TrendingUpIcon from '@lucide/svelte/icons/trending-up';
 	import EChart from '#lib/components/khepri/EChart.svelte';
 	import KpiCell from '#lib/components/khepri/KpiCell.svelte';
 	import KpiStrip from '#lib/components/khepri/KpiStrip.svelte';
@@ -17,6 +15,8 @@
 	import * as Card from '#lib/components/ui/card/index.js';
 	import { Progress } from '#lib/components/ui/progress/index.js';
 	import Trends from '#lib/features/day/Trends.svelte';
+	import DeltaChip from '#lib/features/insights/DeltaChip.svelte';
+	import { formatDelta } from '#lib/features/insights/format.js';
 	import LighterDayCard from '#lib/features/lighterday/LighterDayCard.svelte';
 	import NewsTicker from '#lib/features/news/NewsTicker.svelte';
 	import NudgeCard from '#lib/features/nudges/NudgeCard.svelte';
@@ -33,7 +33,6 @@
 		checkInsHaveData,
 		completedLine,
 		formatLitres,
-		formatPct,
 		goalActivityLabel,
 		goalProgress,
 		habitsDescription,
@@ -94,33 +93,10 @@
 	<Button {href} variant="outline">{cta}</Button>
 {/snippet}
 
-{#snippet deltaChip(delta: Delta)}
-	{#if delta.hasPrior && delta.direction !== 0}
-		<span
-			class={[
-				'inline-flex items-center gap-0.5 font-mono text-[10px] tabular-nums',
-				delta.direction > 0 ? 'text-signal' : 'text-muted-foreground'
-			]}
-		>
-			{#if delta.direction > 0}
-				<TrendingUpIcon class="size-3" />
-			{:else}
-				<TrendingDownIcon class="size-3" />
-			{/if}
-			{formatPct(delta.pct)}
-		</span>
-	{/if}
-{/snippet}
-
 {#snippet kpiWithDelta(kpiLabel: string, value: string, href: string, cta: string, delta: Delta)}
-	<div class="space-y-1">
-		<p class="text-muted-foreground font-mono text-[10px] tracking-[0.14em] uppercase">{kpiLabel}</p>
-		<div class="flex items-baseline gap-2">
-			<p class="text-lg font-medium tabular-nums">{value}</p>
-			{@render deltaChip(delta)}
-		</div>
-		<a {href} class="text-signal text-xs hover:underline">{cta}</a>
-	</div>
+	<KpiCell label={kpiLabel} {value} {href} {cta}>
+		<DeltaChip change={formatDelta(delta)} />
+	</KpiCell>
 {/snippet}
 
 <div class="space-y-6">
@@ -174,7 +150,7 @@
 			{:else}
 				{@render emptyAction(i18n.t('dash.training.empty'), '/app/training', i18n.t('dash.training.build'))}
 			{/if}
-			<a href="/app/exercises" class="text-signal mt-4 block text-xs hover:underline">{i18n.t('dash.training.library')}</a>
+			<a href="/app/exercises" class="text-signal mt-4 text-xs focus-visible:ring-ring flex w-fit min-h-6 items-center rounded-sm outline-none hover:underline focus-visible:ring-2 pointer-coarse:min-h-11">{i18n.t('dash.training.library')}</a>
 		{/snippet}
 		{@render panel(i18n.t('dash.training.title'), '', training)}
 
@@ -274,7 +250,7 @@
 										<span class="text-muted-foreground block truncate text-xs">{e.detail}</span>
 									{/if}
 								</span>
-								<span class="text-muted-foreground shrink-0 font-mono text-[10px] whitespace-nowrap tabular-nums">
+								<span class="text-muted-foreground shrink-0 text-xs whitespace-nowrap tabular-nums">
 									{relativeTime(i18n, e.at, now, timezone)}
 								</span>
 							</a>
@@ -299,7 +275,7 @@
 			{:else}
 				<!-- Habits are not on the Today card, so this empty state keeps its own way in. -->
 				<p class="text-muted-foreground mb-3 text-sm">{i18n.t('dash.habits.none')}</p>
-				<a href="/app/care" class="text-signal text-xs hover:underline">{i18n.t('dash.habits.cta')}</a>
+				<a href="/app/care" class="text-signal text-xs focus-visible:ring-ring inline-flex min-h-6 items-center rounded-sm outline-none hover:underline focus-visible:ring-2 pointer-coarse:min-h-11">{i18n.t('dash.habits.cta')}</a>
 			{/if}
 		{/snippet}
 		{@render panel(i18n.t('dash.habits.title'), habitsDescription(i18n, overview), habits)}
@@ -312,7 +288,7 @@
 				<HydrationChart label={i18n.t('dash.hydration.series')} days={overview.hydrationDays} />
 			{:else}
 				<p class="text-muted-foreground mb-3 text-sm">{i18n.t('dash.hydration.none')}</p>
-				<a href="/app/care" class="text-signal text-xs hover:underline">{i18n.t('dash.hydration.cta')}</a>
+				<a href="/app/care" class="text-signal text-xs focus-visible:ring-ring inline-flex min-h-6 items-center rounded-sm outline-none hover:underline focus-visible:ring-2 pointer-coarse:min-h-11">{i18n.t('dash.hydration.cta')}</a>
 			{/if}
 		{/snippet}
 		{@render panel(i18n.t('dash.hydration.title'), hydrationDescription(i18n, overview), hydration)}

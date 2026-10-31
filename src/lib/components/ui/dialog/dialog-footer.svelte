@@ -3,6 +3,7 @@
 	import { Button } from "#lib/components/ui/button/index.js";
 	import { cn, type WithElementRef } from "#lib/utils.js";
 	import type { HTMLAttributes } from "svelte/elements";
+	import { useI18n } from "#lib/i18n/index.js";
 
 	let {
 		ref = $bindable(null),
@@ -13,6 +14,8 @@
 	}: WithElementRef<HTMLAttributes<HTMLDivElement>> & {
 		showCloseButton?: boolean;
 	} = $props();
+
+	const i18n = useI18n();
 </script>
 
 <div
@@ -25,7 +28,7 @@
 	{#if showCloseButton}
 		<DialogPrimitive.Close>
 			{#snippet child({ props })}
-				<Button variant="outline" {...props}>Close</Button>
+				<Button variant="outline" {...props}>{i18n.t("layout.close")}</Button>
 			{/snippet}
 		</DialogPrimitive.Close>
 	{/if}

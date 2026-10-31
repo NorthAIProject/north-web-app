@@ -20,8 +20,8 @@ test('landing renders for a visitor with signup calls to action', async ({ page 
 	await expect(page.locator('meta[property="og:title"]')).toHaveAttribute('content', 'Khepri');
 	await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', 'https://kheprios.com/assets/brand/og-card.png');
 	await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute('content', 'summary_large_image');
-	// The hero wall: 14 back + 15 front cards.
-	await expect(page.locator('.hero-wall-slot')).toHaveCount(29);
+	// The hero wall: 14 back + 15 front cards, plus the two-card phone pair.
+	await expect(page.locator('.hero-wall-slot')).toHaveCount(31);
 });
 
 test('landing tells a signed-in visitor to open the app', async ({ page, request }) => {
@@ -67,7 +67,7 @@ test('quick tools recompute in the browser', async ({ page }) => {
 	await page.waitForLoadState('networkidle');
 	// BMI: 178 cm / 82 kg → 25.9, then one step taller.
 	await expect(page.getByText('178 cm')).toBeVisible();
-	await page.locator('#bmi-height [data-slot="slider-thumb"]').focus();
+	await page.locator('#bmi-height').focus();
 	await page.keyboard.press('ArrowRight');
 	await expect(page.getByText('179 cm')).toBeVisible();
 	// "Nothing at all" settles the other equipment boxes.

@@ -61,7 +61,7 @@
 							<Button
 								type="button"
 								size="sm"
-								class="bg-signal text-background hover:bg-signal/90"
+							
 								disabled={busy}
 								onclick={() => verdict(m, 'approve')}
 							>

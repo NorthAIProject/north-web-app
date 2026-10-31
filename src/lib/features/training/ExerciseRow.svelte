@@ -74,6 +74,8 @@
 					<button
 						type="button"
 						onclick={() => (editing = !editing)}
+						aria-expanded={editing}
+						aria-label="{i18n.t('workouts.ex.edit.title')}: {prescription(i18n, ex)}"
 						class="text-muted-foreground hover:text-foreground shrink-0 font-mono text-sm underline decoration-dotted underline-offset-4"
 						title={i18n.t('workouts.ex.edit.title')}
 					>
@@ -103,7 +105,7 @@
 			{#if ex.formCues}
 				<p class="text-muted-foreground mt-1 text-sm">{ex.formCues}</p>
 			{/if}
-			<p class="text-muted-foreground/70 mt-1 text-xs">
+			<p class="text-muted-foreground mt-1 text-xs">
 				{exerciseDetails(i18n, ex)}
 				{#if ex.substitute}
 					· {i18n.tf('workouts.ex.substitute', ex.substitute)}

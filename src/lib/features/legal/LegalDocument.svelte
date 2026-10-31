@@ -14,7 +14,7 @@
 
 <article class="mx-auto w-full max-w-2xl px-6 py-16">
 	<header class="mb-10">
-		<h1 class="text-3xl font-medium tracking-tight">{title}</h1>
+		<h1 class="text-3xl font-medium tracking-tight text-balance">{title}</h1>
 		<p class="text-muted-foreground mt-2 font-mono text-xs">
 			Last updated {lastUpdated}
 		</p>

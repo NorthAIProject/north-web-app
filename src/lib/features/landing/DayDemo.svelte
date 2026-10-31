@@ -8,10 +8,7 @@
 	import CoffeeIcon from '@lucide/svelte/icons/coffee';
 	import DropletIcon from '@lucide/svelte/icons/droplet';
 	import DumbbellIcon from '@lucide/svelte/icons/dumbbell';
-	import HeartPulseIcon from '@lucide/svelte/icons/heart-pulse';
-	import LayersIcon from '@lucide/svelte/icons/layers';
 	import MoonIcon from '@lucide/svelte/icons/moon';
-	import PersonStandingIcon from '@lucide/svelte/icons/person-standing';
 	import PillIcon from '@lucide/svelte/icons/pill';
 	import UtensilsIcon from '@lucide/svelte/icons/utensils';
 	import * as Card from '#lib/components/ui/card/index.js';
@@ -40,14 +37,14 @@
 	]);
 
 	const facts = $derived([
-		{ Icon: LayersIcon, title: t('land.day.fact.1.title'), body: t('land.day.fact.1.body') },
-		{ Icon: HeartPulseIcon, title: t('land.day.fact.2.title'), body: t('land.day.fact.2.body') },
-		{ Icon: PersonStandingIcon, title: t('land.day.fact.3.title'), body: t('land.day.fact.3.body') }
+		{ title: t('land.day.fact.1.title'), body: t('land.day.fact.1.body') },
+		{ title: t('land.day.fact.2.title'), body: t('land.day.fact.2.body') },
+		{ title: t('land.day.fact.3.title'), body: t('land.day.fact.3.body') }
 	]);
 </script>
 
 <section id="day" class="border-hairline relative scroll-mt-20 border-t py-24">
-	<SectionHeading eyebrow={t('land.day.eyebrow')} title={t('land.day.title')} body={t('land.day.body')} />
+	<SectionHeading title={t('land.day.title')} body={t('land.day.body')} />
 	<div class="mt-10 grid gap-6 lg:grid-cols-[minmax(0,22rem)_1fr]">
 		<Card.Root class="border-hairline bg-surface overflow-hidden">
 			<Card.Content class="relative space-y-2 py-5">
@@ -55,7 +52,7 @@
 					aria-hidden="true"
 					class="absolute inset-y-4 left-[4.6rem] border-l-2 border-dashed border-[var(--color-day-fat)] opacity-60"
 				></div>
-				<p class="text-day-fat relative mb-1 pl-16 text-[10px] font-medium">{t('land.day.fasting')}</p>
+				<p class="text-day-fat-text relative mb-1 pl-16 text-[11px] font-medium">{t('land.day.fasting')}</p>
 				{#each day as e (e.time)}
 					<div class="relative flex items-center gap-3">
 						<span class="text-muted-foreground w-10 shrink-0 text-right text-[11px] tabular-nums">{e.time}</span>
@@ -101,17 +98,15 @@
 					</div>
 				{/each}
 			</div>
-			<div class="grid gap-3 sm:grid-cols-3">
+			<!-- What the mock-up stands for, as plain terms rather than three icon cards. -->
+			<dl class="divide-hairline border-hairline divide-y border-y">
 				{#each facts as f (f.title)}
-					<div class="border-hairline bg-surface rounded-xl border p-4">
-						<span class="bg-signal/12 text-signal flex size-8 items-center justify-center rounded-md">
-							<f.Icon class="size-4" />
-						</span>
-						<h3 class="mt-3 text-sm font-medium">{f.title}</h3>
-						<p class="text-muted-foreground mt-1 text-xs leading-relaxed">{f.body}</p>
+					<div class="py-3.5 sm:grid sm:grid-cols-[11rem_1fr] sm:gap-6">
+						<dt class="text-sm font-medium">{f.title}</dt>
+						<dd class="text-muted-foreground mt-1 text-sm leading-relaxed sm:mt-0">{f.body}</dd>
 					</div>
 				{/each}
-			</div>
+			</dl>
 		</div>
 	</div>
 </section>

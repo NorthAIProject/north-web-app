@@ -11,7 +11,7 @@
 	import SearchSelect from '#lib/components/khepri/SearchSelect.svelte';
 	import { useI18n } from '#lib/i18n/index.js';
 	import { clearOnSuccess } from './enhance.js';
-	import FieldMessage from './FieldMessage.svelte';
+	import { FieldMessage, describe, describedBy } from '#lib/components/ui/field-message/index.js';
 	import MealVoice from './MealVoice.svelte';
 	import { errorFor, type PlanPage } from './plan-page.js';
 	import { kcal, previewLine, remainingLine, type DayStatus, type MealOption, whole } from './view.js';
@@ -76,8 +76,9 @@
 	>
 		<input type="hidden" name="meal_id" value={option.id} />
 		<div class="flex items-end gap-2">
-			<div class="min-w-0 flex-1">
+			<div class="min-w-0 flex-1" {@attach describe(`option-${option.id}-ingredient`, describedBy(`option-${option.id}-ingredient`, errorFor(page, scope, 'ingredient_id')))}>
 				<SearchSelect
+					id="option-{option.id}-ingredient"
 					name="ingredient_id"
 					bind:value={ingredientId}
 					{items}
@@ -88,6 +89,7 @@
 			</div>
 			<div class="w-24">
 				<Input
+					id="option-{option.id}-grams"
 					name="quantity_grams"
 					type="number"
 					placeholder={i18n.t('nutrition.grams')}
@@ -95,6 +97,7 @@
 					min="1"
 					bind:value={grams}
 					aria-invalid={errorFor(page, scope, 'quantity_grams') ? 'true' : undefined}
+					aria-describedby={describedBy(`option-${option.id}-grams`, errorFor(page, scope, 'quantity_grams'))}
 				/>
 			</div>
 			<Button type="submit" variant="outline">{i18n.t('nutrition.add')}</Button>
@@ -109,8 +112,8 @@
 				{/if}
 			</p>
 		{/if}
-		<FieldMessage message={errorFor(page, scope, 'ingredient_id')} />
-		<FieldMessage message={errorFor(page, scope, 'quantity_grams')} />
+		<FieldMessage id="option-{option.id}-ingredient" error={errorFor(page, scope, 'ingredient_id')} />
+		<FieldMessage id="option-{option.id}-grams" error={errorFor(page, scope, 'quantity_grams')} />
 	</form>
 	<MealVoice mealId={option.id} />
 {/if}

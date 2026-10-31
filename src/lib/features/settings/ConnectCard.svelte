@@ -14,7 +14,7 @@
 	import BrandIcon from './BrandIcon.svelte';
 	import CopyBlock from './CopyBlock.svelte';
 	import FieldDescription from './FieldDescription.svelte';
-	import FieldMessage from './FieldMessage.svelte';
+	import { FieldMessage, describedBy, withInvalidFocus } from '#lib/components/ui/field-message/index.js';
 	import type { FieldErrors } from './form.js';
 	import type { ConnectionSetup } from './types.js';
 
@@ -76,7 +76,7 @@
 									method="post"
 									action="?/create"
 									class="border-hairline space-y-4 border-t pt-5"
-									use:enhance={() => async ({ update }) => update({ reset: false })}
+									use:enhance={withInvalidFocus(() => async ({ update }) => update({ reset: false }))}
 								>
 									<!-- The tab is the choice: picking the client and creating the key are one action. -->
 									<input type="hidden" name="client_kind" value={p.kind} />
@@ -89,11 +89,12 @@
 											required
 											placeholder={i18n.t('conn.name.ph')}
 											aria-invalid={errors.name ? true : undefined}
+											aria-describedby={describedBy(`name-${p.kind}`, errors.name)}
 										/>
-										<FieldMessage message={errors.name} />
+										<FieldMessage id="name-{p.kind}" error={errors.name} />
 										<FieldDescription>{i18n.t('conn.name.desc')}</FieldDescription>
 									</div>
-									<Button type="submit" class="bg-signal text-background hover:bg-signal/90">
+									<Button type="submit">
 										{i18n.tf('conn.connect.create', p.kindLabel ?? '')}
 									</Button>
 								</form>

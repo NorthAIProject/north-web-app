@@ -4,12 +4,23 @@
 	import BarLine from './BarLine.svelte';
 	import type { StatsBar } from './types.js';
 
-	let { title, description = '', bars }: { title: string; description?: string; bars: StatsBar[] } = $props();
+	let {
+		title,
+		description = '',
+		level = 2,
+		bars
+	}: {
+		title: string;
+		description?: string;
+		/** The card title's heading level: 3 inside a section with its own h2. */
+		level?: 2 | 3;
+		bars: StatsBar[];
+	} = $props();
 </script>
 
 <Card class="border-hairline bg-surface">
 	<CardHeader>
-		<CardTitle>{title}</CardTitle>
+		<CardTitle {level}>{title}</CardTitle>
 		{#if description}
 			<CardDescription>{description}</CardDescription>
 		{/if}

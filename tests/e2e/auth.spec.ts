@@ -124,13 +124,16 @@ test('reset password: the emailed link path renders, and a bad token is refused'
 test('locale switcher on the auth card changes the language', async ({ page }) => {
 	await page.goto('/login');
 	await expect(page.getByText('Welcome back')).toBeVisible();
-	// The switcher submits on change once hydrated.
+	// Choosing a language changes nothing until Change is pressed.
 	await page.waitForLoadState('networkidle');
 	await page.locator('#footer-locale').selectOption('pt-PT');
+	await expect(page.getByText('Welcome back')).toBeVisible();
+	await page.getByRole('button', { name: 'Change' }).click();
 	await expect(page.getByText('Bem-vindo de volta')).toBeVisible();
 	await expect(page).toHaveURL(/\/login$/);
 	await page.waitForLoadState('networkidle');
 	await page.locator('#footer-locale').selectOption('en');
+	await page.getByRole('button', { name: 'Mudar' }).click();
 	await expect(page.getByText('Welcome back')).toBeVisible();
 });
 
@@ -165,7 +168,7 @@ test('consent: an unregistered destination is shown, never redirected to', async
 	const res = await page.goto(authorizeURL(clientId, 'https://evil.example/cb'));
 	expect(res?.status()).toBe(400);
 	expect(res?.headers()['x-frame-options']).toBe('DENY');
-	await expect(page.getByText('That request cannot be completed')).toBeVisible();
+	await expect(page.getByRole('heading', { name: 'That request cannot be completed', level: 2 })).toBeVisible();
 	await expect(page).toHaveURL(new RegExp(`${webHost}/oauth/authorize`));
 });
 

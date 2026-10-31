@@ -5,8 +5,6 @@
 	account ignores — a switch that visibly does nothing.
 -->
 <script lang="ts">
-	import CompassIcon from '@lucide/svelte/icons/compass';
-	import MonoLabel from '#lib/components/khepri/MonoLabel.svelte';
 	import LanguageSwitcher from '#lib/components/layout/LanguageSwitcher.svelte';
 	import { discordUrl } from '#lib/brand.js';
 	import { useI18n } from '#lib/i18n/index.js';
@@ -15,24 +13,19 @@
 	let { signedIn = false }: { signedIn?: boolean } = $props();
 	const i18n = useI18n();
 	const t = i18n.t;
+	// Sentence case at 14 px, each at least 24 px tall (44 px on touch).
 	const link =
-		'rounded-md text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-signal';
+		'inline-flex min-h-6 items-center rounded-md text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-signal pointer-coarse:min-h-11';
+	const credit = 'underline underline-offset-2 hover:text-foreground';
 </script>
 
 <footer class="border-t border-hairline">
 	<div class="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-8 lg:pl-28 lg:pr-8">
-		<div class="flex items-center gap-2 text-muted-foreground">
-			<CompassIcon class="size-3.5" />
-			<MonoLabel text={t('land.footer.tagline')} />
-		</div>
-		<div class="flex flex-wrap items-center gap-x-5 gap-y-3">
-			<a href="/privacy" class={link}>
-				<MonoLabel text={t('land.footer.privacy')} />
-			</a>
-			<a href="/terms" class={link}>
-				<MonoLabel text={t('land.footer.terms')} />
-			</a>
-			<a href="https://github.com/NorthAIProject/north-client" class={['flex items-center gap-2', link]}>
+		<p class="text-sm text-muted-foreground">{t('land.footer.tagline')}</p>
+		<div class="flex flex-wrap items-center gap-x-5 gap-y-1">
+			<a href="/privacy" class={link}>{t('land.footer.privacy')}</a>
+			<a href="/terms" class={link}>{t('land.footer.terms')}</a>
+			<a href="https://github.com/NorthAIProject/north-client" class={['gap-2', link]}>
 				<!-- Lucide's github mark; @lucide/svelte no longer ships brand icons. -->
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
@@ -52,7 +45,7 @@
 					/>
 					<path d="M9 18c-4.51 2-5-2-7-2" />
 				</svg>
-				<MonoLabel text={t('land.footer.source')} />
+				{t('land.footer.source')}
 			</a>
 			<a
 				href={discordUrl}
@@ -61,7 +54,7 @@
 				onclick={() => capture('discord_link_clicked', { surface: 'footer' })}
 				class={link}
 			>
-				<MonoLabel text={t('land.footer.discord')} />
+				{t('land.footer.discord')}
 			</a>
 			{#if !signedIn}
 				<LanguageSwitcher />
@@ -69,19 +62,15 @@
 		</div>
 	</div>
 	<div class="mx-auto w-full max-w-6xl px-6 pb-8 lg:pl-28 lg:pr-8">
-		<p class="font-mono text-[10px] leading-relaxed text-muted-foreground/70">
+		<p class="max-w-[90ch] text-xs leading-relaxed text-muted-foreground">
 			3D muscle model built on anatomical data from
-			<a href="https://www.z-anatomy.com/" class="underline hover:text-muted-foreground">Z-Anatomy</a>
+			<a href="https://www.z-anatomy.com/" class={credit}>Z-Anatomy</a>
 			via
-			<a href="https://github.com/hpfrei/body-anatomy-3d-viewer" class="underline hover:text-muted-foreground"
-				>hpfrei/body-anatomy-3d-viewer</a
-			>
-			, licensed
-			<a href="https://creativecommons.org/licenses/by-sa/4.0/" class="underline hover:text-muted-foreground">CC BY-SA 4.0</a>
+			<a href="https://github.com/hpfrei/body-anatomy-3d-viewer" class={credit}>hpfrei/body-anatomy-3d-viewer</a>, licensed
+			<a href="https://creativecommons.org/licenses/by-sa/4.0/" class={credit}>CC BY-SA 4.0</a>
 			(pruned to named muscle groups, regrouped by muscle). Base body mesh by
-			<a href="https://sketchfab.com/ferrumiron6" class="underline hover:text-muted-foreground">ferrumiron6</a>
-			, licensed
-			<a href="https://creativecommons.org/licenses/by/4.0/" class="underline hover:text-muted-foreground">CC BY 4.0</a>
+			<a href="https://sketchfab.com/ferrumiron6" class={credit}>ferrumiron6</a>, licensed
+			<a href="https://creativecommons.org/licenses/by/4.0/" class={credit}>CC BY 4.0</a>
 			(arms folded, drawn as a translucent outer body). The combined asset is CC BY-SA 4.0.
 		</p>
 	</div>

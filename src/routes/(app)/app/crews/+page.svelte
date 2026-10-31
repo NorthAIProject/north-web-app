@@ -5,6 +5,7 @@
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Card from '#lib/components/ui/card/index.js';
 	import { Input } from '#lib/components/ui/input/index.js';
+	import { describedBy, FieldMessage } from '#lib/components/ui/field-message/index.js';
 	import { Label } from '#lib/components/ui/label/index.js';
 	import { crewURL, membersLabel } from '#lib/features/crews/crew.js';
 	import { useI18n } from '#lib/i18n/index.js';
@@ -64,10 +65,9 @@
 						value={form?.values?.name ?? ''}
 						placeholder={i18n.t('crews.name.placeholder')}
 						aria-invalid={errors.name ? 'true' : undefined}
+						aria-describedby={describedBy('name', errors.name)}
 					/>
-					{#if errors.name}
-						<p class="text-[0.8rem] font-medium text-red-500">{errors.name}</p>
-					{/if}
+					<FieldMessage id="name" error={errors.name} />
 				</div>
 				<Button type="submit" disabled={submitting}>{i18n.t('crews.create')}</Button>
 			</form>

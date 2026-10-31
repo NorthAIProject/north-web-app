@@ -195,7 +195,7 @@ export function signed(i18n: Translator, v: number, prec: number): string {
 }
 
 export function deltaClass(v: number): string {
-	if (v > 0) return 'text-emerald-500';
+	if (v > 0) return 'text-success';
 	if (v < 0) return 'text-destructive';
 	return 'text-muted-foreground';
 }

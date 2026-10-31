@@ -119,7 +119,7 @@
 						aria-invalid={errors.password_confirmation ? true : undefined}
 					/>
 				</FormField>
-				<Button type="submit" class="w-full bg-signal text-background hover:bg-signal/90" disabled={submitting}>
+				<Button type="submit" class="w-full" disabled={submitting}>
 					{i18n.t('auth.signup.submit')}
 				</Button>
 				<ConsentNotice />

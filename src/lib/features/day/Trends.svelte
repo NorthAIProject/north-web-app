@@ -5,6 +5,7 @@
 	GET /day/trends itself, once the page is drawn, and stays empty until then.
 -->
 <script lang="ts">
+	import CheckIcon from '@lucide/svelte/icons/check';
 	import { createQuery } from '@tanstack/svelte-query';
 	import { browserApi } from '#lib/api/client.js';
 	import { useI18n } from '#lib/i18n/index.js';
@@ -70,7 +71,14 @@
 							<span class="bg-day-fat/15 h-2 overflow-hidden rounded-full">
 								<span class="bg-day-fat block h-full rounded-full" style:width="{Math.round(f.fraction * 100)}%"></span>
 							</span>
-							<span class={['text-right', f.met && 'text-day-food']}>{f.hours}h</span>
+							<!-- Met is a tick and a word for screen readers, not only a colour. -->
+							<span class={['flex items-center justify-end gap-1 text-right', f.met && 'text-day-food-text']}>
+								{#if f.met}
+									<CheckIcon class="size-3.5 shrink-0" aria-hidden="true" />
+									<span class="sr-only">{i18n.t('day.trend.fast_met')}</span>
+								{/if}
+								{f.hours}h
+							</span>
 						</li>
 					{/each}
 				</ul>

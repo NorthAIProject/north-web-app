@@ -3,6 +3,7 @@
 	import type { HTMLInputAttributes, HTMLInputTypeAttribute } from "svelte/elements";
 	import EyeIcon from "@lucide/svelte/icons/eye";
 	import EyeOffIcon from "@lucide/svelte/icons/eye-off";
+	import { useI18n } from "#lib/i18n/index.js";
 
 	type InputType = Exclude<HTMLInputTypeAttribute, "file">;
 
@@ -24,6 +25,8 @@
 		"data-slot": dataSlot = "input",
 		...restProps
 	}: Props = $props();
+
+	const i18n = useI18n();
 
 	// Matches templUI input (web/shared/ui/input/input.templ).
 	const base =
@@ -57,8 +60,8 @@
 		/>
 		<button
 			type="button"
-			class="absolute top-1/2 right-0 inline-flex size-9 shrink-0 -translate-y-1/2 cursor-pointer items-center justify-center rounded-md opacity-50 transition-all outline-none hover:bg-accent hover:text-accent-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 dark:hover:bg-accent/50"
-			aria-label={revealed ? "Hide password" : "Show password"}
+			class="absolute top-1/2 right-0 inline-flex size-9 shrink-0 -translate-y-1/2 cursor-pointer items-center justify-center rounded-md opacity-50 transition-all outline-none hover:bg-accent hover:text-accent-foreground focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-ring dark:hover:bg-accent/50"
+			aria-label={i18n.t("layout.password.show")}
 			aria-pressed={revealed}
 			onclick={() => (revealed = !revealed)}
 		>

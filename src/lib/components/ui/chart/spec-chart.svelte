@@ -8,14 +8,22 @@
 	<SpecChart {...bar('insights-body-water', 'Water', labels, values)} />
 
 	Bars and lines only: those are the only variants Go's viz builders made.
+
+	The chart is role="img", named by `label` (optional title) plus a sentence
+	per series computed from the data; a visually hidden table before it
+	carries every point, for screen readers that browse tables. With a legend
+	it is a named group instead: the legend's series toggles are buttons, and
+	an img's children are hidden from assistive tech.
 -->
 <script lang="ts">
 	import { curveLinear, curveMonotoneX } from 'd3-shape';
 	import { AreaChart, BarChart, LineChart } from 'layerchart';
+	import { useI18n } from '#lib/i18n/index.js';
 	import { cn } from '#lib/utils.js';
 	import ChartContainer from './chart-container.svelte';
 	import ChartTooltip from './chart-tooltip.svelte';
 	import type { ChartConfig } from './chart-utils.js';
+	import { cellText, chartSummary } from './spec-summary.js';
 	import type { ChartSpec } from './spec-types.js';
 
 	let {
@@ -34,8 +42,12 @@
 		yMin,
 		yMax,
 		beginAtZero = true,
+		label,
 		class: className = ''
 	}: ChartSpec = $props();
+	const i18n = useI18n();
+
+	const summary = $derived(chartSummary(i18n, { data }, label));
 
 	// One row per label, one column per dataset (s0, s1…): LayerChart's shape.
 	const keys = $derived(data.datasets.map((_, i) => `s${i}`));
@@ -98,9 +110,30 @@
 	};
 </script>
 
+{#if data.labels.length > 0 && data.datasets.length > 0}
+	<table class="sr-only">
+		{#if label}<caption>{label}</caption>{/if}
+		<thead>
+			<tr>
+				<td></td>
+				{#each data.datasets as d, j (j)}<th scope="col">{d.label || `${j + 1}`}</th>{/each}
+			</tr>
+		</thead>
+		<tbody>
+			{#each data.labels as rowLabel, i (i)}
+				<tr>
+					<th scope="row">{rowLabel}</th>
+					{#each data.datasets as d, j (j)}<td>{cellText(i18n, d.data[i])}</td>{/each}
+				</tr>
+			{/each}
+		</tbody>
+	</table>
+{/if}
 <ChartContainer
 	{id}
 	{config}
+	role={showLegend ? 'group' : 'img'}
+	aria-label={summary}
 	class={cn(
 		'aspect-auto',
 		// Chart.js's grid and axis colour is --border, at full strength.

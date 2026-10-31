@@ -218,6 +218,7 @@
 				value={cap.text}
 				rows={4}
 				placeholder={i18n.t('capture.ph')}
+				aria-label={i18n.t('capture.heading')}
 				class="text-base"
 				maxlength={MAX_TEXT}
 				autofocus={!embedded}

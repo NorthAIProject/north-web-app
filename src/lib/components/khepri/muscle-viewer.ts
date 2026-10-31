@@ -2,7 +2,7 @@
  * The body figure (NOR-8): a port of north-client
  * web/assets/js/shared/muscle-viewer/viewer.js.
  *
- * The figure is body-map.glb, built by scripts/bodymap from the anatomical
+ * The figure is body-map.glb, built by north-client's scripts/bodymap from the anatomical
  * atlas: the muscles themselves, one mesh per muscle key, inside the body's
  * skin. The skin is drawn as an outline only, clear facing the camera and firm
  * at the silhouette; its shape keys (setShape) widen that edge to a person's
@@ -17,11 +17,15 @@
  * without a figure.
  */
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { GLTFLoader, type GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import { MUSCLE_INFO, type MuscleInfo } from './muscles.js';
 import { readCSSColor } from './css-color.js';
 
-const MODEL_PATH = '/assets/models/body-map.glb';
+// body-map.glb packed with meshopt (EXT_meshopt_compression, ~1.5 MB → 0.57 MB);
+// the suffix is the source file's hash, so the URL is cached as immutable.
+// static/assets/models/README.md has the command.
+const MODEL_PATH = '/assets/models/body-map-83dd70bd.glb';
 const SHELL_REGION = 'shell'; // the skin; every other mesh is a muscle
 const SHELL_EDGE_ALPHA = 0.9;
 const SHELL_EDGE_POWER = 4; // higher is a thinner edge
@@ -246,18 +250,24 @@ export async function createViewer(canvas: HTMLCanvasElement, options: ViewerOpt
 	let lastX = 0;
 	let down = { x: 0, y: 0, at: 0 };
 	let lastDragAt = -Infinity;
+	// Render-loop state (see wake() below), declared before anything can call it.
+	let destroyed = false;
+	let visible = true;
+	let raf = 0;
 
 	const onPointerDown = (e: PointerEvent) => {
 		dragging = true;
 		lastX = e.clientX;
 		down = { x: e.clientX, y: e.clientY, at: performance.now() };
 		canvas.setPointerCapture(e.pointerId);
+		wake();
 	};
 	const onPointerMove = (e: PointerEvent) => {
 		if (!dragging) return;
 		dragOffset += (e.clientX - lastX) * 0.012;
 		lastX = e.clientX;
 		lastDragAt = performance.now();
+		wake();
 	};
 	const onPointerUp = (e: PointerEvent) => {
 		dragging = false;
@@ -303,6 +313,7 @@ export async function createViewer(canvas: HTMLCanvasElement, options: ViewerOpt
 		if (selected && regions[selected]) highlight(regions[selected], false);
 		selected = key;
 		if (selected && regions[selected]) highlight(regions[selected], true);
+		wake();
 	}
 
 	// ---------------------------------------------------------------------
@@ -316,29 +327,32 @@ export async function createViewer(canvas: HTMLCanvasElement, options: ViewerOpt
 		camera.aspect = width / h;
 		camera.updateProjectionMatrix();
 		frame();
+		wake();
 	}
 	const resizeObserver = new ResizeObserver(resize);
 	resizeObserver.observe(canvas);
 	resize();
 
-	let running = true;
-	let raf = 0;
+	// Frames are drawn on demand: wake() asks for one, and tick keeps asking
+	// only while something moves — the idle sway (never under reduced motion),
+	// a drag, or the figure easing to a new facing. A still figure (reduced
+	// motion, a settled turn) costs nothing between changes.
 	const start = performance.now();
 	let yaw = facing;
 
+	function wake() {
+		if (visible && !raf && !destroyed) raf = requestAnimationFrame(tick);
+	}
+
 	const visibility = new IntersectionObserver((entries) => {
-		const visible = entries.some((e) => e.isIntersecting);
-		if (visible && !running) {
-			running = true;
-			raf = requestAnimationFrame(tick);
-		} else if (!visible) {
-			running = false;
-		}
+		visible = entries.some((e) => e.isIntersecting);
+		if (visible) wake();
 	});
 	visibility.observe(canvas);
 
 	function tick(now: number) {
-		if (!running) return;
+		raf = 0;
+		if (!visible || destroyed) return;
 		// A slow sway around the facing, paused for a few seconds after a drag;
 		// none at all for reduced motion.
 		const idle = !reduced && !dragging && now - lastDragAt > 4000;
@@ -347,9 +361,9 @@ export async function createViewer(canvas: HTMLCanvasElement, options: ViewerOpt
 		yaw += (target - yaw) * (reduced ? 1 : 0.08);
 		group.rotation.y = yaw;
 		renderer.render(scene, camera);
-		raf = requestAnimationFrame(tick);
+		if (!reduced || dragging || Math.abs(target - yaw) > 1e-4) wake();
 	}
-	raf = requestAnimationFrame(tick);
+	wake();
 
 	// ---------------------------------------------------------------------
 	// Colour
@@ -381,6 +395,7 @@ export async function createViewer(canvas: HTMLCanvasElement, options: ViewerOpt
 			else front = Math.max(front, value);
 		}
 		facing = back > front ? Math.PI + FRONT_YAW : FRONT_YAW;
+		wake();
 	}
 
 	function setMuscleGroups({
@@ -417,6 +432,7 @@ export async function createViewer(canvas: HTMLCanvasElement, options: ViewerOpt
 				if (mesh.morphTargetInfluences) mesh.morphTargetInfluences[index] = value;
 			}
 		}
+		wake();
 	}
 
 	return {
@@ -429,6 +445,7 @@ export async function createViewer(canvas: HTMLCanvasElement, options: ViewerOpt
 		face(side) {
 			facing = ({ back: Math.PI + FRONT_YAW, side: Math.PI / 2 } as Record<string, number>)[side] ?? FRONT_YAW;
 			dragOffset = 0;
+			wake();
 		},
 		setTheme(isDark) {
 			palette = isDark ? THEME.dark : THEME.light;
@@ -442,7 +459,7 @@ export async function createViewer(canvas: HTMLCanvasElement, options: ViewerOpt
 		},
 		destroy() {
 			cancelAnimationFrame(raf);
-			running = false;
+			destroyed = true;
 			resizeObserver.disconnect();
 			visibility.disconnect();
 			canvas.removeEventListener('pointerdown', onPointerDown);
@@ -466,24 +483,50 @@ export async function createViewer(canvas: HTMLCanvasElement, options: ViewerOpt
 	};
 }
 
+// One download and parse per model per page: the landing's figure, or a
+// training dialog opened twice, is torn down off screen and rebuilt on the way
+// back, and each rebuild clones the parsed scene instead of fetching again.
+// Geometry is shared between clones; a viewer's destroy() releases only its
+// own renderer's copy on the GPU, so a later viewer uploads it again.
+const models = new Map<string, Promise<GLTF>>();
+
+function loadModel(url: string): Promise<GLTF> {
+	let pending = models.get(url);
+	if (!pending) {
+		const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
+		pending = loader.loadAsync(url);
+		pending.catch(() => models.delete(url));
+		models.set(url, pending);
+	}
+	return pending;
+}
+
 /**
  * Loads body-map.glb: the skin becomes the shell, every other mesh a muscle
  * region with its own material, keyed by the mesh's name. The file stands on
  * the origin (soles at y = 0, centred).
  */
 async function loadFigure(colours: Colours, rim: Rim, model?: string) {
-	const gltf = await new GLTFLoader().loadAsync(model || MODEL_PATH);
-	const figure = gltf.scene;
+	const gltf = await loadModel(model || MODEL_PATH);
+	const figure = gltf.scene.clone(true);
 
 	const meshes: THREE.Mesh[] = [];
 	figure.traverse((obj) => {
 		if (obj instanceof THREE.Mesh) meshes.push(obj);
 	});
+	// gltfpack moves each mesh onto an unnamed child of the named node (shell,
+	// quads, …), which GLTFLoader calls mesh_<n>; the key is then the parent's
+	// name. Copied onto the mesh, so a tap resolves by hit.object.name.
+	const isKey = (name?: string) => name === SHELL_REGION || (!!name && name in MUSCLE_INFO);
+	for (const obj of meshes) {
+		if (!isKey(obj.name) && isKey(obj.parent?.name)) obj.name = obj.parent!.name;
+	}
 
 	const regions: Record<string, RegionEntry> = {};
 	let shell: Shell | null = null;
 	for (const obj of meshes) {
-		if (obj.material) (Array.isArray(obj.material) ? obj.material : [obj.material]).forEach((m) => m.dispose());
+		// The file's own materials stay with the cached scene (they hold no GPU
+		// state until drawn, and these meshes never draw them).
 		if (obj.name === SHELL_REGION) {
 			shell = skinLayers(obj, colours, rim);
 			continue;

@@ -18,7 +18,11 @@
 	import { useI18n } from '#lib/i18n/index.js';
 	import StartForm from './StartForm.svelte';
 
-	let { reflection, ontoggle }: { reflection: boolean; ontoggle: () => void } = $props();
+	let {
+		reflection,
+		threadsOpen,
+		ontoggle
+	}: { reflection: boolean; threadsOpen: boolean; ontoggle: () => void } = $props();
 
 	const i18n = useI18n();
 	const status = $derived(mascotChat.status || i18n.t('chat.status.ready'));
@@ -30,10 +34,13 @@
 		<div class="pointer-events-auto flex items-center gap-1">
 			<Button
 				type="button"
+				id="chat-threads-toggle"
 				variant="secondary"
 				size="icon"
 				class="relative size-10 rounded-full shadow-none after:absolute after:-inset-0.5 after:content-[''] lg:hidden"
 				aria-label={i18n.t('chat.threads.aria')}
+				aria-expanded={threadsOpen}
+				aria-controls="chat-threads"
 				onclick={ontoggle}
 			>
 				<PanelLeftIcon class="size-4" />

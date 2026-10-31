@@ -11,7 +11,7 @@
 	import { Progress } from '#lib/components/ui/progress/index.js';
 	import { useI18n } from '#lib/i18n/index.js';
 	import { clearOnSuccess } from './enhance.js';
-	import FieldMessage from './FieldMessage.svelte';
+	import { FieldMessage, describedBy } from '#lib/components/ui/field-message/index.js';
 	import MealBlock from './MealBlock.svelte';
 	import { advanced, errorFor, type PlanPage } from './plan-page.js';
 	import { radioClass } from './radio.js';
@@ -97,7 +97,7 @@
 											<Label for="day-{day.id}-carb-{b.id}">{dayTypeLabel(i18n, b.id)}</Label>
 										</div>
 									{/each}
-									<FieldMessage message={errorFor(page, scope, 'carb_type')} />
+									<FieldMessage id="day-{day.id}-carb" error={errorFor(page, scope, 'carb_type')} />
 								</div>
 								{#each grams as g (g.name)}
 									<div class="space-y-2">
@@ -112,8 +112,9 @@
 											max={whole(g.limit)}
 											step="any"
 											aria-invalid={errorFor(page, scope, g.name) ? 'true' : undefined}
+											aria-describedby={describedBy(`day-${day.id}-${g.id}`, errorFor(page, scope, g.name))}
 										/>
-										<FieldMessage message={errorFor(page, scope, g.name)} />
+										<FieldMessage id="day-{day.id}-{g.id}" error={errorFor(page, scope, g.name)} />
 									</div>
 								{/each}
 								<Dialog.Footer>
@@ -173,15 +174,17 @@
 		<form method="post" action="?/addMeal" class="flex gap-2" use:enhance={clearOnSuccess()}>
 			<input type="hidden" name="day_id" value={day.id} />
 			<Input
+				id="day-{day.id}-meal-name"
 				name="name"
 				placeholder={i18n.t('nutrition.meal.add.placeholder')}
 				aria-label={i18n.t('nutrition.meal.add.placeholder')}
 				required
 				disabled={!page.target}
 				aria-invalid={errorFor(page, mealScope, 'name') ? 'true' : undefined}
+				aria-describedby={describedBy(`day-${day.id}-meal-name`, errorFor(page, mealScope, 'name'))}
 			/>
 			<Button type="submit" variant="outline" disabled={!page.target}>{i18n.t('nutrition.meal.add')}</Button>
 		</form>
-		<FieldMessage message={errorFor(page, mealScope, 'name')} />
+		<FieldMessage id="day-{day.id}-meal-name" error={errorFor(page, mealScope, 'name')} />
 	</Card.Content>
 </Card.Root>

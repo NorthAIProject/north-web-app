@@ -1,5 +1,23 @@
 # body-map.glb
 
+## In this repository: packed, with the hash in the name
+
+The file here is `body-map-<hash>.glb`: north-client's `body-map.glb`, packed
+with meshopt (EXT_meshopt_compression, ~1.5 MB → 0.57 MB) and named for the
+first eight hex digits of the source file's SHA-256, so `_headers` can serve
+it as immutable. The viewer (`src/lib/components/khepri/muscle-viewer.ts`,
+`MODEL_PATH`) decodes it with three's MeshoptDecoder. After a new
+`body-map.glb` comes over from north-client:
+
+    bunx gltfpack@0.18.0 -i body-map.glb -o body-map-$(shasum -a 256 body-map.glb | cut -c1-8).glb -cc -kn -km -vp 16
+
+`-kn -km` keep the named nodes and the per-muscle materials; `-vp 16` keeps
+positions on the 16-bit grid the source already uses. gltfpack puts each mesh
+on an unnamed child of its named node; the viewer takes the key from the
+parent. Delete the old file and update `MODEL_PATH`.
+
+The rest of this file describes the source model.
+
 The body figure every client draws: the web viewer
 (`web/assets/js/shared/muscle-viewer/viewer.js`) loads this file, and iOS loads the
 same meshes as `BodyMap.usdz` (the muscles) and `BodyShell.bin` (the skin). All are written by `task bodymap` (`go run

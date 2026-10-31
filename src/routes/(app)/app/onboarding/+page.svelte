@@ -6,6 +6,7 @@
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Card from '#lib/components/ui/card/index.js';
 	import { Checkbox } from '#lib/components/ui/checkbox/index.js';
+	import { FieldMessage, describedBy, withInvalidFocus } from '#lib/components/ui/field-message/index.js';
 	import { Input } from '#lib/components/ui/input/index.js';
 	import { Label } from '#lib/components/ui/label/index.js';
 	import * as RadioGroup from '#lib/components/ui/radio-group/index.js';
@@ -65,32 +66,33 @@
 				method="post"
 				action="?/complete"
 				class="space-y-8"
-				use:enhance={() => {
+				use:enhance={withInvalidFocus(() => {
 					submitting = true;
 					return async ({ update }) => {
 						await update({ reset: false });
 						submitting = false;
 					};
-				}}
+				})}
 			>
-				<section class="space-y-3">
-					<Label for="focus-{data.choices.focusAreas[0]}">{i18n.t('onboarding.focus.label')}</Label>
-					<p class="text-sm text-muted-foreground">{i18n.t('onboarding.focus.hint')}</p>
-					<div class="grid grid-cols-2 gap-3">
+				<fieldset
+					class="space-y-3"
+					aria-describedby={errors.focus_areas ? 'focus-hint focus_areas-error' : 'focus-hint'}
+				>
+					<legend class="text-sm leading-none font-medium">{i18n.t('onboarding.focus.label')}</legend>
+					<p id="focus-hint" class="text-sm text-muted-foreground">{i18n.t('onboarding.focus.hint')}</p>
+					<div class="grid grid-cols-2 gap-x-3 gap-y-1">
 						{#each data.choices.focusAreas as area (area)}
-							<label class="flex items-center gap-2 text-sm">
+							<label class="flex min-h-6 cursor-pointer items-center gap-2 text-sm pointer-coarse:min-h-11">
 								<Checkbox id="focus-{area}" name="focus_areas" value={area} checked={focusChecked(area)} />
 								{i18n.t(`lifedomain.${area}`)}
 							</label>
 						{/each}
 					</div>
-					{#if errors.focus_areas}
-						<p class="text-sm text-destructive">{errors.focus_areas}</p>
-					{/if}
-				</section>
+					<FieldMessage id="focus_areas" error={errors.focus_areas} />
+				</fieldset>
 
-				<section class="space-y-3">
-					<Label for="style-direct">{i18n.t('onboarding.style.label')}</Label>
+				<fieldset class="space-y-3" aria-describedby={describedBy('coaching_style', errors.coaching_style)}>
+					<legend class="text-sm leading-none font-medium">{i18n.t('onboarding.style.label')}</legend>
 					<RadioGroup.Root name="coaching_style_preset" bind:value={preset} class="space-y-2 gap-0">
 						{#each styles as style (style)}
 							<label
@@ -113,14 +115,15 @@
 									rows={3}
 									placeholder={i18n.t('onboarding.style.placeholder')}
 									value={values?.coaching_style_custom ?? ''}
+									aria-label={i18n.t('onboarding.style.custom.label')}
+									aria-invalid={errors.coaching_style ? true : undefined}
+									aria-describedby={describedBy('coaching_style', errors.coaching_style)}
 								/>
 							</DictateField>
 						</div>
 					{/if}
-					{#if errors.coaching_style}
-						<p class="text-sm text-destructive">{errors.coaching_style}</p>
-					{/if}
-				</section>
+					<FieldMessage id="coaching_style" error={errors.coaching_style} />
+				</fieldset>
 
 				{#if data.choices.firstWeek}
 					<fieldset class="space-y-3">
@@ -147,13 +150,12 @@
 						value={values?.goal_title ?? ''}
 						placeholder={i18n.t('onboarding.goal.placeholder')}
 						aria-invalid={errors.goal_title ? true : undefined}
+						aria-describedby={describedBy('goal_title', errors.goal_title)}
 					/>
-					{#if errors.goal_title}
-						<p class="text-sm text-destructive">{errors.goal_title}</p>
-					{/if}
+					<FieldMessage id="goal_title" error={errors.goal_title} />
 				</section>
 
-				<Button type="submit" class="w-full bg-signal text-background hover:bg-signal/90" disabled={submitting}>
+				<Button type="submit" class="w-full" disabled={submitting}>
 					{i18n.t('onboarding.submit')}
 				</Button>
 			</form>

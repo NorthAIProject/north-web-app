@@ -4,10 +4,10 @@
 	import { SpecChart } from '#lib/components/ui/chart/index.js';
 	import { useI18n } from '#lib/i18n/index.js';
 	import { bar } from '#lib/features/viz/chartjs.js';
+	import StatRow from '../StatRow.svelte';
 	import BarsCard from '../stats/BarsCard.svelte';
 	import RowsCard from '../stats/RowsCard.svelte';
 	import StatsEmpty from '../stats/StatsEmpty.svelte';
-	import StatsTiles from '../stats/StatsTiles.svelte';
 	import type { SleepView } from '../stats/types.js';
 
 	let { view }: { view: SleepView } = $props();
@@ -19,7 +19,6 @@
 	<StatsEmpty message={i18n.t('insights.sleep.empty')} />
 {:else}
 	<div class="space-y-6" data-testid="insights-sleep">
-		<StatsTiles rows={view.tiles} />
 		<div class="grid gap-4 lg:grid-cols-3">
 			<Card class="border-hairline bg-surface lg:col-span-2">
 				<CardHeader>
@@ -38,6 +37,7 @@
 				rows={view.schedule}
 			/>
 		</div>
+		<StatRow items={view.tiles} />
 		<div class="grid gap-4 lg:grid-cols-2">
 			{#if view.stages.length > 0}
 				<BarsCard

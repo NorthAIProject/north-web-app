@@ -46,7 +46,13 @@
 		class="border-hairline bg-surface grid gap-3 rounded-lg border p-4 sm:grid-cols-2 lg:grid-cols-4"
 		data-sveltekit-keepfocus
 	>
-		<Input type="search" name="q" value={f.q} placeholder={i18n.t('exercises.filter.search')} />
+		<Input
+			type="search"
+			name="q"
+			value={f.q}
+			placeholder={i18n.t('exercises.filter.search')}
+			aria-label={i18n.t('exercises.filter.search')}
+		/>
 		<FilterSelect
 			id="muscle"
 			name="muscle"
@@ -69,7 +75,7 @@
 			options={equipmentOptions.map((k) => ({ value: k, label: equipmentLabel(i18n, k) }))}
 		/>
 		<div class="flex gap-2 sm:col-span-2 lg:col-span-4">
-			<Button type="submit" class="bg-signal text-background hover:bg-signal/90">{i18n.t('exercises.filter.submit')}</Button>
+			<Button type="submit">{i18n.t('exercises.filter.submit')}</Button>
 			<Button href="/app/exercises" variant="ghost">{i18n.t('exercises.filter.clear')}</Button>
 		</div>
 	</form>

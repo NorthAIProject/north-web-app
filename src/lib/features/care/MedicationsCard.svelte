@@ -7,6 +7,7 @@
 	import { Badge } from '#lib/components/ui/badge/index.js';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Card from '#lib/components/ui/card/index.js';
+	import { FieldMessage, describedBy } from '#lib/components/ui/field-message/index.js';
 	import { Input } from '#lib/components/ui/input/index.js';
 	import { Label } from '#lib/components/ui/label/index.js';
 	import MonoLabel from '#lib/components/khepri/MonoLabel.svelte';
@@ -37,7 +38,6 @@
 		action="?/dose"
 		fields={slot ? { id: medicationId, status, slot } : { id: medicationId, status }}
 		variant={primary ? 'default' : 'outline'}
-		class={primary ? 'bg-signal text-background hover:bg-signal/90' : ''}
 	>
 		{text}
 	</ActionButton>
@@ -133,6 +133,7 @@
 							required
 							placeholder={i18n.t('care.meds.name.ph')}
 							aria-invalid={errors.name ? 'true' : undefined}
+							aria-describedby={describedBy('med_name', errors.name)}
 						/>
 					</div>
 					<div class="space-y-2">
@@ -143,6 +144,7 @@
 							value={typed(failure, 'dose')}
 							placeholder={i18n.t('care.meds.dose.ph')}
 							aria-invalid={errors.dose ? 'true' : undefined}
+							aria-describedby={describedBy('med_dose', errors.dose)}
 						/>
 					</div>
 					<div class="space-y-2">
@@ -154,16 +156,15 @@
 							value={typed(failure, 'times')}
 							placeholder="08:00, 20:00"
 							aria-invalid={errors.times ? 'true' : undefined}
+							aria-describedby={describedBy('med_times', errors.times)}
 						/>
 						<p class="text-muted-foreground text-sm">{i18n.t('care.meds.times.help')}</p>
 					</div>
 				</div>
 				{#each ['name', 'dose', 'times'] as field (field)}
-					{#if errors[field]}
-						<p class="text-[0.8rem] font-medium text-red-500">{errors[field]}</p>
-					{/if}
+					<FieldMessage id="med_{field}" error={errors[field]} />
 				{/each}
-				<Button type="submit" class="bg-signal text-background hover:bg-signal/90">{i18n.t('care.meds.add')}</Button>
+				<Button type="submit">{i18n.t('care.meds.add')}</Button>
 			</form>
 		{/key}
 	</Card.Content>

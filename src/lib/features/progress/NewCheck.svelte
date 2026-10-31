@@ -16,6 +16,7 @@
 	import * as Alert from '#lib/components/ui/alert/index.js';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Card from '#lib/components/ui/card/index.js';
+	import { withInvalidFocus } from '#lib/components/ui/field-message/index.js';
 	import { Input } from '#lib/components/ui/input/index.js';
 	import { Label } from '#lib/components/ui/label/index.js';
 	import { useI18n } from '#lib/i18n/index.js';
@@ -113,7 +114,7 @@
 			enctype="multipart/form-data"
 			class="space-y-6"
 			data-testid="progress-form"
-			use:enhance={() => {
+			use:enhance={withInvalidFocus(() => {
 				saving = true;
 				return async ({ result, update }) => {
 					saving = false;
@@ -126,7 +127,7 @@
 					}
 					await update();
 				};
-			}}
+			})}
 		>
 			{#key generation}
 				<div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -194,6 +195,7 @@
 							oninput={(e) => (values.measured_on = e.currentTarget.value)}
 							max={today}
 							aria-invalid={fieldErrors.measured_on ? 'true' : undefined}
+							aria-describedby={fieldErrors.measured_on ? 'progress-errors' : undefined}
 						/>
 					</div>
 					{#each measurements as m (m.name)}
@@ -211,6 +213,7 @@
 								min="0"
 								inputmode="decimal"
 								aria-invalid={fieldErrors[m.field] ? 'true' : undefined}
+								aria-describedby={fieldErrors[m.field] ? 'progress-errors' : undefined}
 							/>
 							{#if m.name === 'waist'}
 								<p class="text-muted-foreground text-sm">{i18n.t('progress.m.waist.help')}</p>
@@ -221,12 +224,17 @@
 				<input type="hidden" name="source" value={values.source} />
 				<input type="hidden" name="assist_confidence" value={values.assist_confidence} />
 				<input type="hidden" name="assist_notes" value={values.assist_notes} />
-				{#each formErrors(fieldErrors) as msg, i (i)}
-					<p class="text-[0.8rem] font-medium text-red-500">{tr(msg)}</p>
-				{/each}
+				<!-- One list for every field: each invalid input points at it. -->
+				{#if formErrors(fieldErrors).length > 0}
+					<div id="progress-errors" role="alert" class="space-y-1">
+						{#each formErrors(fieldErrors) as msg, i (i)}
+							<p class="text-[0.8rem] font-medium text-destructive">{tr(msg)}</p>
+						{/each}
+					</div>
+				{/if}
 			</div>
 
-			<Button type="submit" class="bg-signal text-background hover:bg-signal/90" disabled={saving} data-testid="progress-save">
+			<Button type="submit" disabled={saving} data-testid="progress-save">
 				{saving ? i18n.t('progress.saving') : i18n.t('progress.save')}
 			</Button>
 		</form>

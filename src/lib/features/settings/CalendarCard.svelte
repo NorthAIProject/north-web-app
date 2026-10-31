@@ -10,7 +10,7 @@
 	import { Label } from '#lib/components/ui/label/index.js';
 	import { useI18n } from '#lib/i18n/index.js';
 	import FieldDescription from './FieldDescription.svelte';
-	import FieldMessage from './FieldMessage.svelte';
+	import { FieldMessage } from '#lib/components/ui/field-message/index.js';
 	import type { CalendarSettings } from './types.js';
 
 	let { calendar, error = '' }: { calendar: CalendarSettings; error?: string } = $props();
@@ -34,7 +34,7 @@
 							{#if connected.status === 'ok'}
 								<p class="text-muted-foreground mt-1 text-xs">{i18n.t('settings.conn.cal.healthy')}</p>
 							{:else}
-								<p class="mt-1 text-xs text-red-600 dark:text-red-400">{connected.lastError}</p>
+								<p class="mt-1 text-xs text-destructive">{connected.lastError}</p>
 							{/if}
 						</div>
 						<form method="post" action="?/calendarDisconnect" use:enhance>
@@ -44,7 +44,7 @@
 				</div>
 			{:else}
 				<form method="post" action="?/calendar" class="space-y-4" use:enhance={() => async ({ update }) => update({ reset: false })}>
-					<FieldMessage message={error} />
+					<FieldMessage id="calendar" {error} />
 					<div class="space-y-2">
 						<Label for="endpoint">{i18n.t('conn.cal.endpoint')}</Label>
 						<Input id="endpoint" name="endpoint" type="text" placeholder="https://calendar.example.com/mcp" />
@@ -55,7 +55,7 @@
 						<Input id="token" name="token" type="password" placeholder={i18n.t('conn.cal.token.ph')} />
 						<FieldDescription>{i18n.t('conn.cal.token.desc')}</FieldDescription>
 					</div>
-					<Button type="submit" class="bg-signal text-background hover:bg-signal/90">{i18n.t('conn.cal.connect')}</Button>
+					<Button type="submit">{i18n.t('conn.cal.connect')}</Button>
 				</form>
 			{/if}
 		</Card.Content>

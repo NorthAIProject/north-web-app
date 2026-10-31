@@ -24,7 +24,6 @@
 		overview.kinds.map((k) => ({ value: k.code, label: metName(i18n, k.code, k.name) }))
 	);
 	const errMsg = $derived((form as { error?: string } | null)?.error ?? '');
-	const signal = 'bg-signal text-background hover:bg-signal/90';
 </script>
 
 <svelte:head><title>{pageTitle(i18n.t('activity.title'))}</title></svelte:head>
@@ -75,7 +74,7 @@
 					{/if}
 					<form method="post" action="?/stop" use:enhance>
 						<input type="hidden" name="id" value={active.id} />
-						<Button type="submit" class={signal}>{i18n.t('activity.stop')}</Button>
+						<Button type="submit">{i18n.t('activity.stop')}</Button>
 					</form>
 					<form method="post" action="?/cancel" use:enhance>
 						<input type="hidden" name="id" value={active.id} />
@@ -100,7 +99,7 @@
 							{options}
 						/>
 					</div>
-					<Button type="submit" class={signal}>{i18n.t('activity.start')}</Button>
+					<Button type="submit">{i18n.t('activity.start')}</Button>
 				</form>
 			</Card.Content>
 		</Card.Root>

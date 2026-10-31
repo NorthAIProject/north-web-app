@@ -9,6 +9,7 @@
 
 import { applyAction, type SubmitFunction } from '$app/forms';
 import { invalidate } from '$app/navigation';
+import { withInvalidFocus } from '#lib/components/ui/field-message/index.js';
 
 /** Which form a rejected write belongs to, so only that one shows errors. */
 export type CareFormName = 'water' | 'sleep' | 'habit' | 'reminder' | 'medication';
@@ -21,16 +22,19 @@ export type CareFailure = {
 };
 
 export function careSubmit(onSaved?: () => void): SubmitFunction {
-	return () =>
-		async ({ result }) => {
-			if (result.type === 'redirect' || result.type === 'success') {
-				await invalidate('north:care');
-				await applyAction({ type: 'success', status: 200, location: '/app/care' });
-				onSaved?.();
-				return;
+	// A rejection then moves focus to the first field it names.
+	return withInvalidFocus(
+		() =>
+			async ({ result }) => {
+				if (result.type === 'redirect' || result.type === 'success') {
+					await invalidate('north:care');
+					await applyAction({ type: 'success', status: 200, location: '/app/care' });
+					onSaved?.();
+					return;
+				}
+				await applyAction(result);
 			}
-			await applyAction(result);
-		};
+	);
 }
 
 /** The rejection, when it belongs to this form. */

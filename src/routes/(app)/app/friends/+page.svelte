@@ -5,12 +5,12 @@
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Card from '#lib/components/ui/card/index.js';
 	import { CopyButton } from '#lib/components/ui/copybutton/index.js';
+	import { FieldMessage, describedBy, withInvalidFocus } from '#lib/components/ui/field-message/index.js';
 	import { Input } from '#lib/components/ui/input/index.js';
 	import { Label } from '#lib/components/ui/label/index.js';
 	import { Switch } from '#lib/components/ui/switch/index.js';
 	import FacebookCard from '#lib/features/social/FacebookCard.svelte';
 	import FeedCard from '#lib/features/social/FeedCard.svelte';
-	import FieldError from '#lib/features/social/FieldError.svelte';
 	import PersonRow from '#lib/features/social/PersonRow.svelte';
 	import PhoneCard from '#lib/features/social/PhoneCard.svelte';
 	import PostForm from '#lib/features/social/PostForm.svelte';
@@ -37,13 +37,14 @@
 	]);
 
 	let busy = $state('');
-	const submit = (name: string) => () => {
-		busy = name;
-		return async ({ update }: { update: (o?: { reset?: boolean }) => Promise<void> }) => {
-			await update({ reset: false });
-			busy = '';
-		};
-	};
+	const submit = (name: string) =>
+		withInvalidFocus(() => {
+			busy = name;
+			return async ({ update }) => {
+				await update({ reset: false });
+				busy = '';
+			};
+		});
 </script>
 
 <svelte:head><title>{pageTitle(i18n.t('social.title'))}</title></svelte:head>
@@ -65,7 +66,13 @@
 		</Card.Header>
 		<Card.Content>
 			<div class="flex items-center gap-2">
-				<Input id="invite-url" value={o.invite.url} readonly class="font-mono text-sm" />
+				<Input
+					id="invite-url"
+					value={o.invite.url}
+					readonly
+					class="font-mono text-sm"
+					aria-label={i18n.t('social.invite.title')}
+				/>
 				<CopyButton targetId="invite-url" />
 			</div>
 			<div class="mt-3 flex flex-wrap gap-2">
@@ -107,8 +114,9 @@
 						value={handleValue}
 						placeholder={i18n.t('social.handle.placeholder')}
 						aria-invalid={err('handle') ? 'true' : undefined}
+						aria-describedby={describedBy('handle', err('handle'))}
 					/>
-					<FieldError message={err('handle')} />
+					<FieldMessage id="handle" error={err('handle')} />
 				</div>
 				<Button type="submit" disabled={busy === 'handle'}>{i18n.t('social.save')}</Button>
 			</form>
@@ -178,8 +186,9 @@
 						value={f.follow ?? ''}
 						placeholder="@handle"
 						aria-invalid={err('follow') ? 'true' : undefined}
+						aria-describedby={describedBy('follow', err('follow'))}
 					/>
-					<FieldError message={err('follow')} />
+					<FieldMessage id="follow" error={err('follow')} />
 				</div>
 				<Button type="submit" variant="secondary" disabled={busy === 'follow'}
 					>{i18n.t('social.follow.ask')}</Button

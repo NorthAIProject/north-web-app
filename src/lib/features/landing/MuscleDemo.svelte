@@ -95,7 +95,7 @@
 
 <section id="muscle" class="relative border-t border-hairline py-24" bind:this={root}>
 	<Waypoint distance={t('land.waypoint.week3')} />
-	<SectionHeading eyebrow={t('land.muscle.eyebrow')} title={t('land.muscle.title')} body={t('land.muscle.body')} />
+	<SectionHeading title={t('land.muscle.title')} body={t('land.muscle.body')} />
 	<Card.Root class="mt-10 overflow-hidden border-hairline bg-surface p-0">
 		<Card.Content class="grid gap-0 p-0 lg:grid-cols-[1.1fr_1fr]">
 			<!-- One tab state across both columns: display:contents keeps the grid. -->
@@ -108,7 +108,7 @@
 						{#each list as ex (ex.key)}
 							<Tabs.Trigger
 								value={ex.key}
-								class="h-auto rounded-md border border-hairline bg-background/40 px-2 py-2 text-xs data-[state=active]:border-signal/50 data-[state=active]:text-signal"
+								class="h-auto rounded-md border border-hairline bg-background/40 px-2 py-2 text-xs data-[state=active]:border-signal/50 data-[state=active]:text-signal-text"
 							>
 								{ex.name}
 							</Tabs.Trigger>
@@ -135,7 +135,7 @@
 								{@render heatKey(t('land.muscle.role.secondary'), 'bg-ember/55')}
 								{@render heatKey(t('land.muscle.role.stabiliser'), 'bg-ember/25')}
 							</div>
-							<MonoLabel text={t('land.muscle.drag')} />
+							<span class="text-xs text-muted-foreground">{t('land.muscle.drag')}</span>
 						</div>
 					</div>
 				</div>

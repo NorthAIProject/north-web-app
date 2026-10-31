@@ -46,14 +46,18 @@
 				<!-- The name is whatever the client called itself; the line under it is not. -->
 				<Card.Title>{i18n.tf('oauth.asking', req.clientName)}</Card.Title>
 				<Card.Description>
-					{req.isLoopback ? i18n.t('oauth.destination.local') : i18n.tf('oauth.destination', req.redirectHost)}
+					{req.isLoopback
+						? i18n.t('oauth.destination.local')
+						: i18n.tf('oauth.destination', req.redirectHost)}
 				</Card.Description>
 			</Card.Header>
 			<Card.Content>
 				{#if !data.email}
 					<div class="space-y-5">
 						<div>
-							<h2 class="text-sm font-medium">{i18n.t(isLogin ? 'oauth.signin.title' : 'oauth.new.title')}</h2>
+							<h3 class="text-sm font-medium">
+								{i18n.t(isLogin ? 'oauth.signin.title' : 'oauth.new.title')}
+							</h3>
 							{#if !isLogin}
 								<p class="mt-1 text-xs text-muted-foreground">{i18n.t('oauth.new.desc')}</p>
 							{/if}
@@ -66,7 +70,12 @@
 						{#if data.authOptions.google || data.authOptions.passkey}
 							<div class="space-y-2">
 								{#if data.authOptions.google}
-									<Button href={googleHref(data.resume)} variant="outline" class="w-full" data-sveltekit-reload>
+									<Button
+										href={googleHref(data.resume)}
+										variant="outline"
+										class="w-full"
+										data-sveltekit-reload
+									>
 										<GoogleIcon />
 										{i18n.t('oauth.google')}
 									</Button>
@@ -86,7 +95,9 @@
 							</div>
 							<div class="flex items-center gap-3">
 								<span class="h-px flex-1 bg-hairline"></span>
-								<span class="text-xs tracking-wide text-muted-foreground uppercase">{i18n.t('oauth.or')}</span>
+								<span class="text-xs tracking-wide text-muted-foreground uppercase"
+									>{i18n.t('oauth.or')}</span
+								>
 								<span class="h-px flex-1 bg-hairline"></span>
 							</div>
 						{/if}
@@ -104,7 +115,11 @@
 						>
 							<input type="hidden" name="mode" value={isLogin ? 'login' : 'signup'} />
 							{#if !isLogin}
-								<FormField id="display_name" label={i18n.t('oauth.new.name')} error={errors.display_name}>
+								<FormField
+									id="display_name"
+									label={i18n.t('oauth.new.name')}
+									error={errors.display_name}
+								>
 									<Input
 										id="display_name"
 										name="display_name"
@@ -139,29 +154,43 @@
 								/>
 							</FormField>
 							<input type="hidden" id="timezone" name="timezone" value={timezone} />
-							<Button type="submit" class="w-full bg-signal text-background hover:bg-signal/90" disabled={submitting}>
+							<Button
+								type="submit"
+								class="w-full"
+								disabled={submitting}
+							>
 								{i18n.t(isLogin ? 'oauth.signin.submit' : 'oauth.new.submit')}
 							</Button>
 						</form>
 						<p class="text-center text-xs text-muted-foreground">
 							{i18n.t(isLogin ? 'oauth.signin.new' : 'oauth.new.haveone')}
-							<a href="{query}&mode={isLogin ? 'signup' : 'login'}" class="ml-1 underline hover:text-foreground">
+							<a
+								href="{query}&mode={isLogin ? 'signup' : 'login'}"
+								class="ml-1 underline hover:text-foreground"
+							>
 								{i18n.t(isLogin ? 'oauth.new.submit' : 'oauth.signin.submit')}
 							</a>
 						</p>
 					</div>
 				{:else}
-					<div class="mb-6 flex items-center justify-between gap-3 rounded-md border border-hairline bg-surface px-3 py-2">
+					<div
+						class="mb-6 flex items-center justify-between gap-3 rounded-md border border-hairline bg-surface px-3 py-2"
+					>
 						<span class="text-sm">{i18n.tf('oauth.account.signed-in', data.email)}</span>
 						<form method="post" action="/logout" class="shrink-0" data-sveltekit-reload>
 							<input type="hidden" name="next" value={data.resume} />
-							<button type="submit" class="text-xs text-muted-foreground underline hover:text-foreground">
+							<button
+								type="submit"
+								class="text-xs text-muted-foreground underline hover:text-foreground"
+							>
 								{i18n.t('oauth.account.notyou')}
 							</button>
 						</form>
 					</div>
 					<div class="space-y-2">
-						<p class="text-xs tracking-wide text-muted-foreground uppercase">{i18n.t('oauth.can.title')}</p>
+						<p class="text-xs tracking-wide text-muted-foreground uppercase">
+							{i18n.t('oauth.can.title')}
+						</p>
 						<ul class="space-y-1.5 text-sm text-muted-foreground">
 							<li>{i18n.t('oauth.can.read')}</li>
 							{#if req.readOnlyRequested}
@@ -176,7 +205,9 @@
 					     auto-submit would be a one-click grant. -->
 					<form method="post" action="{query}&/decide" class="mt-6 space-y-4">
 						<!-- Hand-rolled checkbox, as in Go: a native input posts read_only=1. -->
-						<label class="flex items-start gap-2.5 rounded-md border border-hairline bg-surface px-3 py-2.5">
+						<label
+							class="flex items-start gap-2.5 rounded-md border border-hairline bg-surface px-3 py-2.5"
+						>
 							<input
 								type="checkbox"
 								name="read_only"
@@ -186,11 +217,18 @@
 							/>
 							<span class="text-sm">
 								<span class="font-medium">{i18n.t('oauth.readonly.label')}</span>
-								<span class="block text-xs text-muted-foreground">{i18n.t('oauth.readonly.hint')}</span>
+								<span class="block text-xs text-muted-foreground"
+									>{i18n.t('oauth.readonly.hint')}</span
+								>
 							</span>
 						</label>
 						<div class="flex gap-3">
-							<Button type="submit" name="decision" value="approve" class="flex-1 bg-signal text-background hover:bg-signal/90">
+							<Button
+								type="submit"
+								name="decision"
+								value="approve"
+								class="flex-1"
+							>
 								{i18n.t('oauth.approve')}
 							</Button>
 							<Button type="submit" name="decision" value="deny" variant="outline" class="flex-1">

@@ -37,13 +37,13 @@
 		<div class="border-hairline bg-surface/60 space-y-4 rounded-lg border p-4">
 			<div class="flex items-baseline justify-between gap-3">
 				<div>
-					<MonoLabel text={view.label} />
+					<p class="text-muted-foreground text-[13px]">{view.label}</p>
 					<p class="mt-1 text-3xl font-medium tabular-nums">{view.headline}</p>
 					{#if view.note}
 						<p class="text-muted-foreground mt-1 text-xs">{view.note}</p>
 					{/if}
 				</div>
-				<a href={view.href} class="text-signal shrink-0 text-xs hover:underline">
+				<a href={view.href} class="text-signal shrink-0 text-xs focus-visible:ring-ring inline-flex min-h-6 items-center rounded-sm outline-none hover:underline focus-visible:ring-2 pointer-coarse:min-h-11">
 					{i18n.t('insights.metric.domainLink')}
 				</a>
 			</div>
@@ -51,7 +51,7 @@
 		</div>
 
 		<div class="border-hairline bg-surface/60 flex items-center justify-between rounded-lg border px-4 py-3">
-			<p class="text-muted-foreground font-mono text-[10px] uppercase tracking-[0.14em]">{i18n.t('insights.metric.trend')}</p>
+			<p class="text-muted-foreground text-[13px]">{i18n.t('insights.metric.trend')}</p>
 			{#if view.trend.hasPrior}
 				<span
 					class={[
@@ -74,7 +74,7 @@
 
 		{#if view.usual}
 			<div class="border-hairline bg-surface/60 space-y-1 rounded-lg border px-4 py-3">
-				<p class="text-muted-foreground font-mono text-[10px] uppercase tracking-[0.14em]">{i18n.t('insights.metric.usual')}</p>
+				<p class="text-muted-foreground text-[13px]">{i18n.t('insights.metric.usual')}</p>
 				<p class={['text-sm', view.usual.state !== 'usual' && 'text-signal']}>{view.usual.text}</p>
 			</div>
 		{/if}

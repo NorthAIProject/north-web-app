@@ -33,13 +33,13 @@
 		<Card.Content>
 			<div class="flex flex-col gap-3">
 				{#if data.thread}
-					<Button href="/app/chat/{data.thread}" class="w-full bg-signal text-background hover:bg-signal/90">
+					<Button href="/app/chat/{data.thread}" class="w-full">
 						{i18n.t('onboarding.done.read')}
 					</Button>
 				{:else}
 					<!-- Go posted to /app/chat; here that route's start action. -->
 					<form method="post" action="/app/chat?/start">
-						<Button type="submit" class="w-full bg-signal text-background hover:bg-signal/90">
+						<Button type="submit" class="w-full">
 							{i18n.t('onboarding.done.talk')}
 						</Button>
 					</form>

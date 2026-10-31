@@ -85,11 +85,11 @@
 </script>
 
 <section class="relative border-t border-hairline py-24">
-	<SectionHeading eyebrow={t('land.goal.eyebrow')} title={t('land.goal.title')} body={t('land.goal.body')} />
+	<SectionHeading title={t('land.goal.title')} body={t('land.goal.body')} />
 	<Card.Root class="mt-10 border-hairline bg-surface">
 		<Card.Content class="grid gap-8 lg:grid-cols-2">
 			<div>
-				<Label for="goal-input" class="font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+				<Label for="goal-input" class="text-sm">
 					{t('land.goal.input')}
 				</Label>
 				<Textarea
@@ -102,7 +102,7 @@
 					}}
 				/>
 				<div class="mt-4 flex flex-wrap items-center gap-3">
-					<Button class="bg-signal text-background hover:bg-signal/90" onclick={run} disabled={running}>
+					<Button onclick={run} disabled={running}>
 						{#if running}
 							<span>{t('land.goal.running')}</span>
 						{:else}
@@ -146,7 +146,7 @@
 				<ol class="mt-3 space-y-2">
 					{#each out.sessions as s, i (i)}
 						<li class="flex items-baseline gap-3 text-sm">
-							<span class="font-mono text-[10px] uppercase tracking-[0.14em] text-signal">{s.day}</span>
+							<span class="font-mono text-[10px] uppercase tracking-[0.14em] text-signal-text">{s.day}</span>
 							<span class="text-foreground/90">{s.work}</span>
 						</li>
 					{/each}

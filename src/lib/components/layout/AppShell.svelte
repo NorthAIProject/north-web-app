@@ -10,8 +10,10 @@
 	import * as Sidebar from '#lib/components/ui/sidebar/index.js';
 	import { useI18n } from '#lib/i18n/index.js';
 	import { buildNav, type NavItem } from '#lib/nav/nav.js';
+	import { cn } from '#lib/utils.js';
 	import CommandPalette from './CommandPalette.svelte';
 	import ShellWidgets from './ShellWidgets.svelte';
+	import SkipLink from './SkipLink.svelte';
 	import CrewsUnreadBadge from '#lib/features/crews/CrewsUnreadBadge.svelte';
 
 	// The shell for every signed-in page (Go: layout.App / layout.AppWide).
@@ -32,50 +34,77 @@
 
 	const i18n = useI18n();
 	const nav = $derived(buildNav(i18n, page.data.navActive ?? page.url.pathname, simpleNav));
+
+	// The lit item is the page you are on, unless one of its sub-pages is: then
+	// it is only the section that holds it.
+	const current = (item: NavItem) =>
+		item.active ? (item.children.some((c) => c.active) ? 'true' : 'page') : undefined;
 </script>
 
 <Sidebar.Provider open={!wide} class={wide ? 'h-dvh overflow-hidden' : 'min-h-dvh'}>
+	<SkipLink />
 	<Sidebar.Root collapsible="icon" id="app-sidebar">
+		<!-- One navigation landmark holds the brand, the links and the account, so nothing in the rail sits outside a landmark. -->
+		<nav aria-label={i18n.t('layout.nav.aria')} class="flex min-h-0 flex-1 flex-col">
 		<Sidebar.Header>
+			<!-- Collapsed to icons, the name stays for screen readers: the mark alone is alt="". -->
 			<BrandLockup
 				href="/app"
 				markSize="size-6"
-				textClass="text-base font-medium tracking-tight group-data-[collapsible=icon]:hidden"
+				textClass="text-base font-medium tracking-tight group-data-[collapsible=icon]:sr-only"
 			/>
 		</Sidebar.Header>
 		<Sidebar.Content>
-			{#each nav as group (group.label)}
-				{#if group.more}
-					<Collapsible.Root open={group.open} data-testid="nav-more">
+			<div class="flex flex-col gap-2">
+				{#each nav as group (group.label)}
+					{#if group.more}
+						<Collapsible.Root open={group.open} data-testid="nav-more">
+							<Sidebar.Group>
+								<!-- A real button: the label primitive renders a div, which no
+								     keyboard can reach. Collapsed to icons the label is
+								     invisible, so it leaves the tab order with it. -->
+								<Collapsible.Trigger>
+									{#snippet child({ props })}
+										<Sidebar.GroupLabel {...props}>
+											{#snippet child({ props: labelProps })}
+												<button
+													type="button"
+													{...labelProps}
+													class={cn(
+														labelProps.class as string,
+														'w-full cursor-pointer text-left group-data-[collapsible=icon]:invisible [&[data-state=open]>svg]:rotate-180'
+													)}
+												>
+													{group.label}
+													<ChevronDownIcon
+														class="ml-auto size-3.5 transition-transform motion-reduce:transition-none"
+													/>
+												</button>
+											{/snippet}
+										</Sidebar.GroupLabel>
+									{/snippet}
+								</Collapsible.Trigger>
+								<Collapsible.Content>
+									<Sidebar.Menu>
+										{#each group.items as item (item.href)}
+											{@render navItem(item)}
+										{/each}
+									</Sidebar.Menu>
+								</Collapsible.Content>
+							</Sidebar.Group>
+						</Collapsible.Root>
+					{:else}
 						<Sidebar.Group>
-							<Collapsible.Trigger class="cursor-pointer">
-								{#snippet child({ props })}
-									<Sidebar.GroupLabel {...props}>
-										{group.label}
-										<ChevronDownIcon class="ml-auto size-3.5" />
-									</Sidebar.GroupLabel>
-								{/snippet}
-							</Collapsible.Trigger>
-							<Collapsible.Content>
-								<Sidebar.Menu>
-									{#each group.items as item (item.href)}
-										{@render navItem(item)}
-									{/each}
-								</Sidebar.Menu>
-							</Collapsible.Content>
+							<Sidebar.GroupLabel>{group.label}</Sidebar.GroupLabel>
+							<Sidebar.Menu>
+								{#each group.items as item (item.href)}
+									{@render navItem(item)}
+								{/each}
+							</Sidebar.Menu>
 						</Sidebar.Group>
-					</Collapsible.Root>
-				{:else}
-					<Sidebar.Group>
-						<Sidebar.GroupLabel>{group.label}</Sidebar.GroupLabel>
-						<Sidebar.Menu>
-							{#each group.items as item (item.href)}
-								{@render navItem(item)}
-							{/each}
-						</Sidebar.Menu>
-					</Sidebar.Group>
-				{/if}
-			{/each}
+					{/if}
+				{/each}
+			</div>
 		</Sidebar.Content>
 		<Sidebar.Footer>
 			<div class="p-1">
@@ -87,11 +116,12 @@
 				<form method="post" action="/logout">
 					<Button type="submit" variant="ghost" size="sm" class="w-full justify-start">
 						<LogOutIcon class="size-4" />
-						<span class="group-data-[collapsible=icon]:hidden">{i18n.t('layout.signout')}</span>
+						<span class="group-data-[collapsible=icon]:sr-only">{i18n.t('layout.signout')}</span>
 					</Button>
 				</form>
 			</div>
 		</Sidebar.Footer>
+		</nav>
 	</Sidebar.Root>
 	<Sidebar.Inset class={wide ? 'min-h-0' : ''}>
 		<header
@@ -109,7 +139,13 @@
 				</ShellWidgets>
 			</div>
 		</header>
-		<main class={wide ? 'min-h-0 flex-1 overflow-hidden' : 'min-h-0 flex-1 overflow-y-auto'}>
+		<!-- The page's one main landmark (SidebarInset is a div); tabindex lets the
+		     skip link move focus here. -->
+		<main
+			id="main"
+			tabindex="-1"
+			class={['min-h-0 flex-1 outline-none', wide ? 'overflow-hidden' : 'overflow-y-auto']}
+		>
 			{@render children()}
 		</main>
 	</Sidebar.Inset>
@@ -117,15 +153,15 @@
 
 {#snippet navItem(item: NavItem)}
 	<Sidebar.MenuItem>
-		<!-- Where you are is one of gold's few jobs: a short rule at the edge
-		     and the icon, over the raised navy the primitive already paints. -->
+		<!-- Where you are is one of gold's few jobs: the icon's tint, over the
+		     raised navy the primitive already paints. No side rule. -->
 		<Sidebar.MenuButton
 			isActive={item.active}
 			tooltipContent={item.label}
-			class="relative data-[active=true]:before:absolute data-[active=true]:before:inset-y-1.5 data-[active=true]:before:left-0 data-[active=true]:before:w-0.5 data-[active=true]:before:rounded-full data-[active=true]:before:bg-sidebar-primary data-[active=true]:[&>svg]:text-sidebar-primary"
+			class="data-[active=true]:[&>svg]:text-sidebar-primary"
 		>
 			{#snippet child({ props })}
-				<a href={item.href} {...props}>
+				<a href={item.href} {...props} aria-current={current(item)}>
 					{#if item.icon}
 						<item.icon class="size-4" />
 					{/if}

@@ -23,7 +23,7 @@
 <section id="iphone" class="border-hairline relative scroll-mt-20 border-t py-24">
 	<div class="grid items-center gap-12 lg:grid-cols-[1fr_20rem]">
 		<div>
-			<SectionHeading eyebrow={t('land.iphone.eyebrow')} title={t('land.iphone.title')} body={t('land.iphone.body')} />
+			<SectionHeading title={t('land.iphone.title')} body={t('land.iphone.body')} />
 			<ul class="mt-8 space-y-4">
 				{#each features as f (f.n)}
 					<li class="flex gap-3">
@@ -68,7 +68,7 @@
 					<span class="text-muted-foreground">− +</span>
 				</div>
 			</div>
-			<div class="bg-signal text-background mt-4 rounded-xl py-2.5 text-center text-sm font-semibold">{t('land.phone.log')}</div>
+			<div class="bg-signal text-signal-foreground mt-4 rounded-xl py-2.5 text-center text-sm font-semibold">{t('land.phone.log')}</div>
 			<p class="text-muted-foreground mt-3 mb-2 text-center text-[11px]">{t('land.phone.rest')}</p>
 		</div>
 	</div>

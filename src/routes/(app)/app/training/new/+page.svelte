@@ -5,6 +5,7 @@
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Card from '#lib/components/ui/card/index.js';
 	import { Checkbox } from '#lib/components/ui/checkbox/index.js';
+	import { FieldMessage, describe, describedBy, withInvalidFocus } from '#lib/components/ui/field-message/index.js';
 	import { Input } from '#lib/components/ui/input/index.js';
 	import { Label } from '#lib/components/ui/label/index.js';
 	import SearchSelect from '#lib/components/khepri/SearchSelect.svelte';
@@ -30,9 +31,7 @@
 <svelte:head><title>{pageTitle(i18n.t('workouts.intake.page'))}</title></svelte:head>
 
 {#snippet fieldMessage(name: string)}
-	{#if errors[name]}
-		<p class="text-destructive text-[0.8rem] font-medium">{errors[name]}</p>
-	{/if}
+	<FieldMessage id={name} error={errors[name]} />
 {/snippet}
 
 <div class="mx-auto w-full max-w-2xl p-6 md:p-8">
@@ -54,13 +53,13 @@
 			<form
 				method="post"
 				class="space-y-5 pt-6"
-				use:enhance={() => {
+				use:enhance={withInvalidFocus(() => {
 					submitting = true;
 					return async ({ update }) => {
 						await update({ reset: false });
 						submitting = false;
 					};
-				}}
+				})}
 			>
 				<div class="space-y-2">
 					<Label for="goal" error={errors.goal}>{i18n.t('workouts.intake.goal')}</Label>
@@ -72,11 +71,12 @@
 							placeholder={i18n.t('workouts.intake.goal.ph')}
 							rows={3}
 							aria-invalid={errors.goal ? true : undefined}
+							aria-describedby={describedBy('goal', errors.goal)}
 						/>
 					</DictateField>
 					{@render fieldMessage('goal')}
 				</div>
-				<div class="space-y-2">
+				<div class="space-y-2" {@attach describe('experience', describedBy('experience', errors.experience))}>
 					<Label for="experience" error={errors.experience}>{i18n.t('workouts.intake.experience')}</Label>
 					<SearchSelect
 						id="experience"
@@ -100,6 +100,7 @@
 							min="1"
 							max="7"
 							aria-invalid={errors.days_per_week ? true : undefined}
+							aria-describedby={describedBy('days_per_week', errors.days_per_week)}
 						/>
 						{@render fieldMessage('days_per_week')}
 					</div>
@@ -115,40 +116,50 @@
 							max="240"
 							step="5"
 							aria-invalid={errors.session_minutes ? true : undefined}
+							aria-describedby={describedBy('session_minutes', errors.session_minutes)}
 						/>
 						{@render fieldMessage('session_minutes')}
 					</div>
 				</div>
-				<div class="space-y-2">
-					<Label error={errors.weekdays}>{i18n.t('workouts.intake.weekdays')}</Label>
-					<p class="text-muted-foreground text-sm">{i18n.t('workouts.intake.weekdays.desc')}</p>
-					<div class="flex flex-wrap gap-x-4 gap-y-2 pt-1">
+				<!-- Each box and its word are one row, so the whole row takes the tap. -->
+				<fieldset class="space-y-2" aria-describedby={errors.weekdays ? 'weekdays-desc weekdays-error' : 'weekdays-desc'}>
+					<legend class={['text-sm leading-none font-medium', errors.weekdays && 'text-destructive']}>
+						{i18n.t('workouts.intake.weekdays')}
+					</legend>
+					<p id="weekdays-desc" class="text-muted-foreground text-sm">{i18n.t('workouts.intake.weekdays.desc')}</p>
+					<div class="flex flex-wrap gap-x-2 gap-y-1 pt-1">
 						{#each WEEKDAYS as wd (wd)}
-							<div class="flex items-center gap-2">
+							<Label
+								for="intake-{wd}"
+								class="flex min-h-6 cursor-pointer items-center gap-2 pr-2 font-normal pointer-coarse:min-h-11"
+							>
 								<Checkbox id="intake-{wd}" name="weekdays" value={wd} checked={hasWeekday(wd)} />
-								<Label for="intake-{wd}" class="font-normal">{weekdayShort(i18n, wd)}</Label>
-							</div>
+								{weekdayShort(i18n, wd)}
+							</Label>
 						{/each}
 					</div>
 					{@render fieldMessage('weekdays')}
-				</div>
-				<div class="space-y-2">
-					<Label>{i18n.t('workouts.intake.equipment')}</Label>
-					<p class="text-muted-foreground text-sm">{i18n.t('workouts.intake.equipment.desc')}</p>
-					<div class="grid gap-3 pt-1 sm:grid-cols-2">
+				</fieldset>
+				<fieldset class="space-y-2" aria-describedby="equipment-desc">
+					<legend class="text-sm leading-none font-medium">{i18n.t('workouts.intake.equipment')}</legend>
+					<p id="equipment-desc" class="text-muted-foreground text-sm">{i18n.t('workouts.intake.equipment.desc')}</p>
+					<div class="grid gap-x-3 gap-y-1 pt-1 sm:grid-cols-2">
 						{#each EQUIPMENT_OPTIONS as option (option.value)}
-							<div class="flex items-center gap-2">
+							<Label
+								for="equipment-{option.value}"
+								class="flex min-h-6 cursor-pointer items-center gap-2 font-normal pointer-coarse:min-h-11"
+							>
 								<Checkbox
 									id="equipment-{option.value}"
 									name="equipment"
 									value={option.value}
 									checked={f.equipment.includes(option.value)}
 								/>
-								<Label for="equipment-{option.value}" class="font-normal">{i18n.t(option.key)}</Label>
-							</div>
+								{i18n.t(option.key)}
+							</Label>
 						{/each}
 					</div>
-				</div>
+				</fieldset>
 				<div class="space-y-2">
 					<Label for="limitations" error={errors.limitations}>{i18n.t('workouts.intake.limitations')}</Label>
 					<DictateField target="limitations">
@@ -159,6 +170,7 @@
 							placeholder={i18n.t('workouts.intake.limitations.ph')}
 							rows={2}
 							aria-invalid={errors.limitations ? true : undefined}
+							aria-describedby={describedBy('limitations', errors.limitations)}
 						/>
 					</DictateField>
 					{@render fieldMessage('limitations')}

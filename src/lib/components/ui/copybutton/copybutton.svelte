@@ -3,6 +3,7 @@
 	import CheckIcon from "@lucide/svelte/icons/check";
 	import { Button, type ButtonProps } from "#lib/components/ui/button/index.js";
 	import { cn } from "#lib/utils.js";
+	import { useI18n } from "#lib/i18n/index.js";
 
 	type Props = Omit<ButtonProps, "value" | "href" | "variant" | "size"> & {
 		/** ID of the element to copy from (inputs/textareas copy `value`, others `textContent`). */
@@ -15,6 +16,7 @@
 
 	let { class: className, targetId, value, oncopied, ...restProps }: Props = $props();
 
+	const i18n = useI18n();
 	let copied = $state(false);
 	let timer: ReturnType<typeof setTimeout> | undefined;
 
@@ -86,7 +88,7 @@
 		size="icon"
 		type="button"
 		class={cn("h-7 w-7 text-muted-foreground hover:text-accent-foreground", className)}
-		aria-label={copied ? "Copied" : "Copy"}
+		aria-label={i18n.t(copied ? "chat.copied" : "chat.copy")}
 		onclick={copy}
 		{...restProps}
 	>

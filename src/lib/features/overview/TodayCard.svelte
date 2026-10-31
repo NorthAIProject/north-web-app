@@ -24,7 +24,7 @@
 	<Card.Content>
 		<div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
 			<div class="min-w-0">
-				<p class="text-muted-foreground font-mono text-[10px] tracking-[0.14em] uppercase">
+				<p class="text-muted-foreground text-[13px]">
 					{i18n.t('dash.today.title')} · {i18n.tf('dash.today.progress', done, items.length)}
 				</p>
 				{#if next}
@@ -37,7 +37,7 @@
 			</div>
 			<div class="shrink-0">
 				{#if next}
-					<Button href={next.href} class="bg-signal text-background hover:bg-signal/90">{next.cta}</Button>
+					<Button href={next.href}>{next.cta}</Button>
 				{:else}
 					<ReflectForm />
 				{/if}
@@ -62,7 +62,7 @@
 						<span
 							class={[
 								'mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full border',
-								item.done ? 'border-signal bg-signal text-background' : 'border-hairline text-muted-foreground'
+								item.done ? 'border-signal bg-signal text-signal-foreground' : 'border-hairline text-muted-foreground'
 							]}
 						>
 							{#if item.done}

@@ -6,6 +6,7 @@
 	import { formatTime } from '#lib/components/khepri/dates.js';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Card from '#lib/components/ui/card/index.js';
+	import { FieldMessage, describedBy, withInvalidFocus } from '#lib/components/ui/field-message/index.js';
 	import { Input } from '#lib/components/ui/input/index.js';
 	import { Label } from '#lib/components/ui/label/index.js';
 	import { prioritySlots, rankValue, volumes } from '#lib/features/weekly/form.js';
@@ -59,13 +60,13 @@
 		method="post"
 		action="/app/weekly"
 		class="space-y-6"
-		use:enhance={() => {
+		use:enhance={withInvalidFocus(() => {
 			submitting = true;
 			return async ({ update }) => {
 				await update({ reset: false });
 				submitting = false;
 			};
-		}}
+		})}
 	>
 		<Card.Root class="border-hairline bg-surface">
 			<Card.Header>
@@ -79,12 +80,12 @@
 						name="priority"
 						value={p}
 						placeholder={i18n.tf('weekly.priority', i + 1)}
+						aria-label={i18n.tf('weekly.priority', i + 1)}
 						aria-invalid={errors.priorities ? 'true' : undefined}
+						aria-describedby={describedBy('priorities', errors.priorities)}
 					/>
 				{/each}
-				{#if errors.priorities}
-					<p class="text-[0.8rem] font-medium text-red-500">{errors.priorities}</p>
-				{/if}
+				<FieldMessage id="priorities" error={errors.priorities} />
 			</Card.Content>
 		</Card.Root>
 		{#if review.goals.length > 0}
@@ -105,14 +106,14 @@
 									class="w-16"
 									min="1"
 									aria-label={i18n.tf('weekly.goals.order', g.title)}
+									aria-invalid={errors.goals ? 'true' : undefined}
+									aria-describedby={describedBy('goal-ranks', errors.goals)}
 								/>
 								<span class="text-sm">{g.title}</span>
 							</li>
 						{/each}
 					</ul>
-					{#if errors.goals}
-						<p class="text-[0.8rem] font-medium text-red-500">{errors.goals}</p>
-					{/if}
+					<FieldMessage id="goal-ranks" error={errors.goals} />
 				</Card.Content>
 			</Card.Root>
 		{/if}
@@ -137,9 +138,7 @@
 						</Label>
 					</div>
 				{/each}
-				{#if errors.volume}
-					<p class="text-[0.8rem] font-medium text-red-500">{errors.volume}</p>
-				{/if}
+				<FieldMessage id="volume" error={errors.volume} />
 			</Card.Content>
 		</Card.Root>
 		<Button type="submit" disabled={submitting}>{i18n.t('weekly.save')}</Button>
