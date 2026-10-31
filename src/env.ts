@@ -24,7 +24,7 @@ export const variables = defineEnvVars({
 	POSTHOG_HOST: {
 		public: true,
 		description: 'PostHog ingestion host the browser reports to.',
-		schema: (value) => (value || 'https://us.i.posthog.com').trim().replace(/\/$/, '')
+		schema: (value) => (value || 'https://eu.i.posthog.com').trim().replace(/\/$/, '')
 	},
 	// /.well-known/apple-app-site-association (north-client internal/auth/aasa.go).
 	// Defaults are the production values from the infra repo's khepri web values.
