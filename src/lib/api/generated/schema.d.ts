@@ -6039,6 +6039,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/ai-consent": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Read the AI data sharing choice and who would receive the data */
+        get: operations["getAIConsent"];
+        /** Allow or decline sending data to third-party AI providers */
+        put: operations["setAIConsent"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/settings/appearance": {
         parameters: {
             query?: never;
@@ -6150,6 +6168,16 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        AIConsent: {
+            /** @description unset, granted or declined. Open string so a shipped client survives a new value. */
+            status: string;
+            /** @description The wording of the question this server asks. */
+            version: number;
+            /** Format: date-time */
+            decided_at?: string;
+            /** @description The companies this deployment can send a consenting person's data to. */
+            recipients: string[];
+        };
         PhoneView: {
             /** @description False when this deployment cannot text codes. */
             configured: boolean;
@@ -20167,6 +20195,58 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TargetWeight"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            422: components["responses"]["ValidationError"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getAIConsent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The choice */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AIConsent"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    setAIConsent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description granted or declined. */
+                    decision: string;
+                };
+            };
+        };
+        responses: {
+            /** @description The choice as saved */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AIConsent"];
                 };
             };
             401: components["responses"]["Unauthorized"];

@@ -4,7 +4,7 @@
 // of legal obligation rather than copy.
 
 /** Bump whenever the substance changes — not for a typo. */
-export const lastUpdated = '29 August 2026';
+export const lastUpdated = '4 November 2026';
 
 // The details a lawyer, not a program, has to supply. Deliberately loud rather
 // than plausible: a placeholder that looks like a real answer gets shipped.

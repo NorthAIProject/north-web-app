@@ -7,6 +7,7 @@
 	import MonoLabel from '#lib/components/khepri/MonoLabel.svelte';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Card from '#lib/components/ui/card/index.js';
+	import AIConsentCard from '#lib/features/settings/AIConsentCard.svelte';
 	import DietsCard from '#lib/features/settings/DietsCard.svelte';
 	import NotificationsCard from '#lib/features/settings/NotificationsCard.svelte';
 	import PreferencesCard from '#lib/features/settings/PreferencesCard.svelte';
@@ -32,8 +33,14 @@
 	const failed = (name: string) => (form?.form === name ? form : undefined);
 	const errorsFor = (name: string): Record<string, string> => failed(name)?.errors ?? {};
 	const profileValues = $derived({ ...data.profile, ...(failed('profile')?.values ?? {}) });
-	const notificationValues = $derived({ ...data.notifications, ...(failed('notifications')?.values ?? {}) });
-	const preferenceValues = $derived({ ...data.preferences, ...(failed('preferences')?.values ?? {}) });
+	const notificationValues = $derived({
+		...data.notifications,
+		...(failed('notifications')?.values ?? {})
+	});
+	const preferenceValues = $derived({
+		...data.preferences,
+		...(failed('preferences')?.values ?? {})
+	});
 	const posthogCapture = () => {
 		const ph = (window as { posthog?: { capture: (e: string, p: object) => void } }).posthog;
 		ph?.capture('discord_link_clicked', { surface: 'settings' });
@@ -46,7 +53,7 @@
 	<header>
 		<MonoLabel text={i18n.t('settings.mono')} />
 		<h1 class="mt-2 text-2xl font-medium tracking-tight">{i18n.t('settings.heading')}</h1>
-		<p class="text-muted-foreground mt-1 text-sm leading-relaxed">{i18n.t('settings.intro')}</p>
+		<p class="mt-1 text-sm leading-relaxed text-muted-foreground">{i18n.t('settings.intro')}</p>
 	</header>
 	<KpiStrip>
 		<KpiCell label={i18n.t('settings.kpi.timezone')} value={summary.timezone} />
@@ -68,6 +75,7 @@
 	<NotificationsCard values={notificationValues} errors={errorsFor('notifications')} />
 	<PreferencesCard values={preferenceValues} errors={errorsFor('preferences')} />
 	<DietsCard diets={data.diets} />
+	<AIConsentCard status={data.aiConsent.status} recipients={data.aiConsent.recipients} />
 
 	<!-- A doorway, not a section: managing agent keys has a page of its own. -->
 	<Card.Root class="border-hairline bg-surface">
@@ -77,9 +85,15 @@
 		</Card.Header>
 		<Card.Content>
 			<div class="flex flex-wrap gap-2">
-				<Button href="/app/settings/connections" variant="outline">{i18n.t('settings.agents.manage')}</Button>
-				<Button href="/app/settings/activity" variant="outline">{i18n.t('settings.agents.activity')}</Button>
-				<Button href="/app/settings/news-ticker" variant="outline">{i18n.t('news.settings.title')}</Button>
+				<Button href="/app/settings/connections" variant="outline"
+					>{i18n.t('settings.agents.manage')}</Button
+				>
+				<Button href="/app/settings/activity" variant="outline"
+					>{i18n.t('settings.agents.activity')}</Button
+				>
+				<Button href="/app/settings/news-ticker" variant="outline"
+					>{i18n.t('news.settings.title')}</Button
+				>
 			</div>
 		</Card.Content>
 	</Card.Root>

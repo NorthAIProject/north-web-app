@@ -10,19 +10,21 @@ import type { Actions, PageServerLoad } from './$types';
 export const load: PageServerLoad = async (event) => {
 	event.depends('north:settings');
 	const api = serverApi(event);
-	const [profile, preferences, notifications, diets, connections] = await Promise.all([
+	const [profile, preferences, notifications, diets, connections, aiConsent] = await Promise.all([
 		api.GET('/settings/profile'),
 		api.GET('/settings/preferences'),
 		api.GET('/settings/notifications'),
 		api.GET('/settings/diets'),
-		api.GET('/settings/connections')
+		api.GET('/settings/connections'),
+		api.GET('/ai-consent')
 	]);
 	return {
 		profile: profile.data!,
 		preferences: preferences.data!,
 		notifications: notifications.data!,
 		diets: diets.data!.diets,
-		connectionCount: connections.data!.connections.length
+		connectionCount: connections.data!.connections.length,
+		aiConsent: aiConsent.data!
 	};
 };
 
@@ -59,9 +61,16 @@ export const actions: Actions = {
 				} as never
 			});
 			if (values.appearance && isAppearance(values.appearance)) {
-				await api.PUT('/settings/appearance', { body: { appearance: values.appearance, surface: 'settings' } });
+				await api.PUT('/settings/appearance', {
+					body: { appearance: values.appearance, surface: 'settings' }
+				});
 			} else if (values.appearance) {
-				return fail(422, { form: 'profile', errors: { appearance: 'Choose system, light or dark.' }, message: '', values });
+				return fail(422, {
+					form: 'profile',
+					errors: { appearance: 'Choose system, light or dark.' },
+					message: '',
+					values
+				});
 			}
 		} catch (err) {
 			return rejected(err, 'profile', values);
@@ -118,10 +127,23 @@ export const actions: Actions = {
 	},
 
 	// Go: updateDiets. Anything that is not an id is dropped, as Go did.
+	// Posted from the settings card and from the first-run question in the app
+	// layout, so it answers in place rather than redirecting here.
+	aiConsent: async (event) => {
+		const form = await event.request.formData();
+		const decision = text(form, 'decision');
+		if (decision !== 'granted' && decision !== 'declined') return fail(422, { form: 'aiConsent' });
+		await serverApi(event).PUT('/ai-consent', { body: { decision } });
+		return { form: 'aiConsent' };
+	},
+
 	diets: async (event) => {
 		const form = await event.request.formData();
 		const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-		const dietIds = form.getAll('diet_ids').map(String).filter((id) => uuid.test(id));
+		const dietIds = form
+			.getAll('diet_ids')
+			.map(String)
+			.filter((id) => uuid.test(id));
 		await serverApi(event).PUT('/settings/diets', { body: { dietIds } });
 		redirect(303, '/app/settings');
 	},
@@ -135,13 +157,24 @@ export const actions: Actions = {
 		let kg: number | null = null;
 		if (raw) {
 			kg = Number(raw.replaceAll(',', '.'));
-			if (!Number.isFinite(kg)) return fail(422, { form: 'targetWeight', errors: {}, message: 'Unprocessable Entity', values: {} });
+			if (!Number.isFinite(kg))
+				return fail(422, {
+					form: 'targetWeight',
+					errors: {},
+					message: 'Unprocessable Entity',
+					values: {}
+				});
 		}
 		try {
 			await serverApi(event).PUT('/settings/target-weight', { body: { targetWeightKg: kg } });
 		} catch (err) {
 			if (isApiError(err) && err.status === 422) {
-				return fail(422, { form: 'targetWeight', errors: err.fields, message: err.message, values: {} });
+				return fail(422, {
+					form: 'targetWeight',
+					errors: err.fields,
+					message: err.message,
+					values: {}
+				});
 			}
 			throw err;
 		}
@@ -153,7 +186,9 @@ export const actions: Actions = {
 	deleteAccount: async (event) => {
 		const form = await event.request.formData();
 		try {
-			await serverApi(event).POST('/account/delete', { body: { confirmEmail: text(form, 'confirm_email') } });
+			await serverApi(event).POST('/account/delete', {
+				body: { confirmEmail: text(form, 'confirm_email') }
+			});
 		} catch (err) {
 			if (isApiError(err) && err.status === 422) {
 				return fail(422, {
