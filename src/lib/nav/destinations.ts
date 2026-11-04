@@ -39,7 +39,6 @@ import TimerIcon from '@lucide/svelte/icons/timer';
 import TrophyIcon from '@lucide/svelte/icons/trophy';
 import UsersIcon from '@lucide/svelte/icons/users';
 import UtensilsIcon from '@lucide/svelte/icons/utensils';
-import VideoIcon from '@lucide/svelte/icons/video';
 import ZapIcon from '@lucide/svelte/icons/zap';
 
 export const groups = ['Today', 'Body', 'Mind', 'Progress', 'System'] as const;
@@ -194,15 +193,6 @@ export const destinations: Destination[] = [
 		group: 'Body',
 		description: 'What each movement trains, on the model.',
 		keywords: ['muscles', 'movement', 'catalog', 'anatomy']
-	},
-	{
-		key: 'nav.form-check',
-		label: 'Form check',
-		href: '/app/form',
-		icon: VideoIcon,
-		group: 'Body',
-		description: 'Upload a clip, get feedback.',
-		keywords: ['video', 'technique', 'review', 'upload']
 	},
 	{
 		key: 'nav.activity-timer',

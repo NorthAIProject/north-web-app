@@ -31,11 +31,27 @@ export const load: LayoutServerLoad = async (event) => {
 
 	event.depends('north:first-week');
 	return {
-		user: { id: user.id, email: user.email, displayName: user.displayName, timezone: user.timezone },
+		user: {
+			id: user.id,
+			email: user.email,
+			displayName: user.displayName,
+			timezone: user.timezone
+		},
 		// Onboarding renders bare (no rail), so it never needs the lookup.
-		simpleNav: user.needsOnboarding ? false : await inFirstWeek(event)
+		simpleNav: user.needsOnboarding ? false : await inFirstWeek(event),
+		aiConsent: await readAIConsent(event)
 	};
 };
+
+/** A failed lookup asks nothing rather than no page; the API still refuses AI calls. */
+async function readAIConsent(event: Parameters<LayoutServerLoad>[0]) {
+	try {
+		const { data } = await serverApi(event).GET('/ai-consent');
+		return data ?? null;
+	} catch {
+		return null;
+	}
+}
 
 /** A running first week shows a smaller rail (Go: firstweek.SimpleNav). */
 async function inFirstWeek(event: Parameters<LayoutServerLoad>[0]): Promise<boolean> {

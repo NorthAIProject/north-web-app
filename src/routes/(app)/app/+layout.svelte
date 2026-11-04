@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import AppShell from '#lib/components/layout/AppShell.svelte';
+	import AIConsentPrompt from '#lib/features/settings/AIConsentPrompt.svelte';
 	import type { LayoutProps } from './$types';
 
 	let { data, children }: LayoutProps = $props();
@@ -17,4 +18,8 @@
 	<AppShell user={data.user} simpleNav={data.simpleNav} {wide}>
 		{@render children()}
 	</AppShell>
+{/if}
+
+{#if data.aiConsent?.status === 'unset'}
+	<AIConsentPrompt recipients={data.aiConsent.recipients} />
 {/if}
