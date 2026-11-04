@@ -92,21 +92,17 @@
 					zone, goals, recent conversations and their summaries, check-ins, journal entries and
 					decisions, workouts, sleep, weight, measurements, nutrition, medications, data you share
 					from Apple Health, what the coach remembers about you, your calendar if you connected it,
-					and files, photos and form-check videos you choose to send.
+					and files and photos you choose to send.
 				</p>
 				<p>
-					Who receives it: the companies below run the models. The app shows which of them are in
-					use before you answer.
+					Who receives it: Anthropic, which runs the Claude models. The app shows this before you
+					answer.
 				</p>
-				<ul>
-					<li>Anthropic (Claude)</li>
-					<li>Google (Gemini)</li>
-				</ul>
 				<p>
-					Each of them is held to protection of your data equal to what this policy describes. They
-					receive it only to provide these features, and Khepri does not sell it or use it for
-					advertising. You may supply your own API key instead, in which case your data goes first
-					to your provider under your own agreement with them.
+					Anthropic is held to protection of your data equal to what this policy describes. It
+					receives your data only to provide these features, and Khepri does not sell it or use it
+					for advertising. You may supply your own API key instead, in which case your data goes
+					first to your provider under your own agreement with them.
 				</p>
 			</li>
 			<li>

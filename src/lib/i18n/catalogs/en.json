@@ -106,7 +106,7 @@
 	"ai.consent.use": "Your data is used to answer you and to run these features. Khepri does not sell it or use it for advertising.",
 	"ai.consent.what": "What is sent",
 	"ai.consent.what.about": "About you: your name, age, time zone, coaching style, and what the coach remembers about you",
-	"ai.consent.what.files": "Only when you choose to send or connect them: files, photos, form-check videos and your calendar",
+	"ai.consent.what.files": "Only when you choose to send or connect them: files, photos and your calendar",
 	"ai.consent.what.health": "Health and fitness: workouts, sleep, weight, measurements, nutrition, medications and data you share from Apple Health",
 	"ai.consent.what.writing": "What you write: coach messages, check-ins, journal entries, goals and decisions",
 	"ai.consent.who": "Who receives it",
