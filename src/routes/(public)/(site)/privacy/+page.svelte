@@ -101,8 +101,6 @@
 				<ul>
 					<li>Anthropic (Claude)</li>
 					<li>Google (Gemini)</li>
-					<li>NVIDIA</li>
-					<li>OpenRouter, which forwards a request to the company behind the model it selects</li>
 				</ul>
 				<p>
 					Each of them is held to protection of your data equal to what this policy describes. They
