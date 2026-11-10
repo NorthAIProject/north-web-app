@@ -409,6 +409,11 @@
   }
 }
 
+/* Selected text takes the signal tint instead of the browser's blue. */
+::selection {
+  background: color-mix(in oklch, var(--north-signal) 30%, transparent);
+}
+
 /* Landing anchor links (#muscle, #pricing, ...) glide and stop below the fixed
    navbar. Scoped to the landing page so app pages keep instant scrolling. */
 html:has([data-landing]) {
