@@ -44,7 +44,10 @@ is limited to beta builds and the login screen.
   workers.dev. The root layout's server load passes it to pages as
   `emblem3dModel`, so no client chunk changes with it.
   The size budget (`scripts/size-budget.mjs`) does not let a route's initial
-  JS grow; only the lazy total may.
+  JS grow; only the lazy total may. One accepted exception: the gate in
+  `AuthShell` (an `{#if}`, a div and a lazy-import attachment) costs about
+  246 B gzip on the nine routes that use it, recorded in `size-budget.json`
+  `notes`. Every other route is unchanged.
 - **iOS.** A non-AR `RealityView` with a virtual camera is drawn transparent
   over SwiftUI. It is compiled for Debug and Beta (`BETA` flag) and excluded
   from Release with `EXCLUDED_SOURCE_FILE_NAMES`.

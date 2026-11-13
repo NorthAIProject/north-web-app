@@ -1,4 +1,7 @@
 {
+	"notes": {
+		"2026-11-13": "AuthShell routes (login, signup, forgot/reset password, invites, oauth, onboarding) +~246 B gzip: the 3D emblem gate (ADR 0005, north-web-app#7). Accepted by the owner for these routes only; every other route stays at its main baseline."
+	},
 	"routes": {
 		"/(app)/app": 258060,
 		"/(app)/app/activity": 209004,
@@ -57,8 +60,8 @@
 		"/(app)/app/nutrition/plans": 203636,
 		"/(app)/app/nutrition/plans/[id]": 231666,
 		"/(app)/app/nutrition/plans/generate": 221955,
-		"/(app)/app/onboarding": 210223,
-		"/(app)/app/onboarding/done": 195693,
+		"/(app)/app/onboarding": 210470,
+		"/(app)/app/onboarding/done": 195939,
 		"/(app)/app/ops/moderation": 192436,
 		"/(app)/app/overview": 272410,
 		"/(app)/app/progress": 204821,
@@ -89,13 +92,13 @@
 		"/(public)/(site)/facebook-data": 103151,
 		"/(public)/(site)/privacy": 105834,
 		"/(public)/(site)/terms": 104623,
-		"/(public)/forgot-password": 111213,
-		"/(public)/i/[code]": 101726,
-		"/(public)/i/c/[code]": 101754,
-		"/(public)/login": 113423,
-		"/(public)/oauth/authorize": 115185,
-		"/(public)/reset-password": 111251,
-		"/(public)/signup": 115015
+		"/(public)/forgot-password": 111459,
+		"/(public)/i/[code]": 101972,
+		"/(public)/i/c/[code]": 102000,
+		"/(public)/login": 113671,
+		"/(public)/oauth/authorize": 115432,
+		"/(public)/reset-password": 111497,
+		"/(public)/signup": 115265
 	},
 	"totalJs": 1492660
 }
