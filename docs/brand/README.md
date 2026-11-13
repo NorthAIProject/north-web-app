@@ -108,6 +108,25 @@ calm and supportive. `components/khepri/Mascot.svelte` (web) and `KhepriMascot`
 (iOS) map states to poses. Motion is gentle hovering and a core glow that
 animates only opacity. Both are static under reduced motion.
 
+**Exception: the 3D mascot (beta builds only).** On the beta web Worker and
+the iOS Debug and Beta builds, onboarding may show the mascot as a real-time
+3D model (`src/lib/mascot3d/mount.ts` on `/app/onboarding`, iOS `Mascot3DView`
+on the Welcome step). Unlike the emblem, the mascot is a character, so it may:
+
+- enter once (about 600 ms: rise 4 % and turn from 10° to rest, no bounce),
+- hover slowly (1.5 % of its height over 6 s),
+- glow its solar core by ±15 % over 6 s (the armour never glows),
+- blink: twice per 7 s cycle, one of them a double blink, about 210 ms each,
+- look toward the pointer or a drag: the head turns at most 12° yaw and 6°
+  pitch, the pupils follow inside the eyes, and both settle back to rest.
+
+Its colours are the brand tokens, never new ones. It never spins, talks,
+waves or leaves those ranges. Reduced motion, Save-Data, iOS Low Power Mode,
+missing WebGL or a model that fails to load keep the flat idle art. Production
+web and the App Store build show the flat mascot; widening this needs a
+verdict on device first. Motion values live in `design/mascot-motion.json`;
+see `docs/architecture/decisions/0006-mascot-3d-experiment.md`.
+
 Only the **idle** pose exists. It was cut from the brand reference image with
 macOS Vision subject lifting and is used as is; nothing was redrawn or
 generated. Every other mood is the idle art moved and lit differently: tilt,
@@ -125,6 +144,7 @@ rig would replace it.
 | View transition | 250–400 ms |
 | Mascot idle | slow (6 s cycle), small amplitude |
 | 3D emblem (beta) | entrance 600 ms once; sun pulse 6 s; light sweep 8 s |
+| 3D mascot (beta) | entrance 600 ms once; hover and core glow 6 s; blink about 210 ms |
 
 The solar core, a sun inside a turning arc (`ui/spinner`), is the one loading
 motif. Everything honours `prefers-reduced-motion` and iOS Reduce Motion.
