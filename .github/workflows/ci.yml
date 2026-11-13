@@ -27,6 +27,8 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.4.2
+      - name: Emblem motion copies match design/
+        run: scripts/brand/emblem-guard.sh
       - run: bun install --frozen-lockfile
       - run: bun run check
       - run: bun run test
