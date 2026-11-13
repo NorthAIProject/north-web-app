@@ -81,6 +81,25 @@ they had when `agent` was violet.
   variants on Ivory or Stone. Don't place the emblem on photographs or gold.
 - **Never** recolour the emblem, stretch it, add glow, or rotate it.
 
+**Exception: the 3D emblem (beta builds only).** On the beta web Worker and
+the iOS Debug and Beta builds, the login screen may show the emblem as a
+real-time 3D model (`src/lib/emblem3d/mount.ts`, iOS `Emblem3DView`). It may:
+
+- enter once (about 600 ms: rise 4 % and turn from 12° to rest, no bounce),
+- tilt toward the pointer or a drag, at most 8° yaw and 5° pitch, and settle
+  back to rest,
+- pulse the sun's glow by ±12 % over 6 s (the wings never glow),
+- let a key light sweep across the gold rules every 8 s (the light moves; the
+  emblem does not).
+
+Its colours are the brand tokens, never new ones. It never spins, never
+leaves the 8°/5° range, and shows only on the login screen. Reduced motion,
+Save-Data, iOS Low Power Mode, missing WebGL or a model that fails to load
+keep the flat SVG. Production web and the App Store build show the flat
+emblem; widening this needs a verdict on device first. Motion values live in
+`design/emblem-motion.json`; see
+`docs/architecture/decisions/0005-emblem-3d-experiment.md`.
+
 ## Mascot
 
 The mascot is a compact navy robotic scarab with gold trim, amber eyes, a
@@ -105,6 +124,7 @@ rig would replace it.
 | Component transition | 180–280 ms |
 | View transition | 250–400 ms |
 | Mascot idle | slow (6 s cycle), small amplitude |
+| 3D emblem (beta) | entrance 600 ms once; sun pulse 6 s; light sweep 8 s |
 
 The solar core, a sun inside a turning arc (`ui/spinner`), is the one loading
 motif. Everything honours `prefers-reduced-motion` and iOS Reduce Motion.

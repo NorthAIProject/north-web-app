@@ -5,6 +5,7 @@
 	import MonoLabel from '#lib/components/khepri/MonoLabel.svelte';
 	import PageTitle from '#lib/features/landing/PageTitle.svelte';
 	import LanguageSwitcher from './LanguageSwitcher.svelte';
+	import { page } from '$app/state';
 
 	// The signed-out pages: one centred card and nothing else to do. The short
 	// signal tick beside the mark is a fragment of the landing bearing.
@@ -27,6 +28,18 @@
 	<div class={['w-full', wide ? 'max-w-lg' : 'max-w-sm']}>
 		<div class="mb-8 flex flex-col items-center text-center">
 			<!-- No gold rule beside the lockup: the emblem already carries the gold. -->
+			<!-- Beta only (ADR 0005): the emblem in 3D above the lockup. app.css paints
+			     the flat emblem first; the renderer is a lazy chunk, so production
+			     (no model URL) loads nothing new. -->
+			{#if page.data.emblem3dModel}
+				<div
+					class="emblem-3d"
+					{@attach (el) => {
+						const stop = import('#lib/emblem3d/mount.js').then((m) => m.mount(el, page.data.emblem3dModel));
+						return () => void stop.then((s) => s());
+					}}
+				></div>
+			{/if}
 			<BrandLockup href="/" markSize="size-7" textClass="text-xl font-medium tracking-tight" />
 			<div class="mt-3">
 				<MonoLabel text={i18n.t('layout.auth.tagline')} />

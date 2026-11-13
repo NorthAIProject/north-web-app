@@ -32,3 +32,6 @@ storybook-static
 /test-results/
 /playwright-report/
 /blob-report/
+
+# Brand build output (scripts/brand/emblem_3d.py)
+/out
