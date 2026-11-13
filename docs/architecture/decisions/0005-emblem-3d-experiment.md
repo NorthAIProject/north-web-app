@@ -45,9 +45,12 @@ is limited to beta builds and the login screen.
   `emblem3dModel`, so no client chunk changes with it.
   The size budget (`scripts/size-budget.mjs`) does not let a route's initial
   JS grow; only the lazy total may. One accepted exception: the gate in
-  `AuthShell` (an `{#if}`, a div and a lazy-import attachment) costs about
-  246 B gzip on the nine routes that use it, recorded in `size-budget.json`
-  `notes`. Every other route is unchanged.
+  `AuthShell` (an `{#if}`, a div and a lazy-import attachment) costs 514 B
+  (about 250 B gzip) on the nine routes that use it, and 24 B (0 to 3 B gzip)
+  on every route, because the shared app entry lists Vite's preload helper
+  for each AuthShell page. Both are recorded in `size-budget.json` `notes`.
+  The budget counts minified bytes, not gzip: gzip sizes differ between Node
+  versions on byte-identical builds.
 - **iOS.** A non-AR `RealityView` with a virtual camera is drawn transparent
   over SwiftUI. It is compiled for Debug and Beta (`BETA` flag) and excluded
   from Release with `EXCLUDED_SOURCE_FILE_NAMES`.
