@@ -11,3 +11,4 @@ bun.lockb
 # Byte-for-byte copies checked by scripts/brand/emblem-guard.sh
 /design/
 /src/lib/emblem3d/*.json
+/src/lib/mascot3d/*.json

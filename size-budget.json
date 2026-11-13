@@ -1,7 +1,8 @@
 {
 	"notes": {
 		"measure": "Minified bytes (scripts/size-budget.mjs), not gzip: gzip sizes differ between Node versions on identical builds.",
-		"2026-11-13": "The 3D emblem gate (ADR 0005, north-web-app#7), owner-approved: +514 B on the nine AuthShell routes and +24 B on every route (the shared app entry lists the preload helper for AuthShell pages). About 250 B and 0-3 B gzip."
+		"2026-11-13": "The 3D emblem gate (ADR 0005, north-web-app#7), owner-approved: +514 B on the nine AuthShell routes and +24 B on every route (the shared app entry lists the preload helper for AuthShell pages). About 250 B and 0-3 B gzip.",
+		"2026-11-13 mascot": "The 3D mascot gate on /app/onboarding (ADR 0006, north-web-app#10): +462 B on that route only (an {#if}, a div and a lazy-import attachment). No other route changes."
 	},
 	"routes": {
 		"/(app)/app": 763607,
@@ -61,7 +62,7 @@
 		"/(app)/app/nutrition/plans": 591799,
 		"/(app)/app/nutrition/plans/[id]": 691677,
 		"/(app)/app/nutrition/plans/generate": 657507,
-		"/(app)/app/onboarding": 607020,
+		"/(app)/app/onboarding": 607482,
 		"/(app)/app/onboarding/done": 572267,
 		"/(app)/app/ops/moderation": 565517,
 		"/(app)/app/overview": 758502,

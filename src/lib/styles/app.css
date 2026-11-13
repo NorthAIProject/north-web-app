@@ -867,3 +867,25 @@ html:has([data-landing]) {
 .emblem-3d + a > img {
   display: none;
 }
+/* Beta only (ADR 0006): the 3D mascot on /app/onboarding. The flat idle art
+   is the first paint and stays until a frame has drawn. */
+.mascot-3d {
+  position: relative;
+  width: 10rem;
+  height: 10rem;
+  background: url('/assets/brand/solar/mascot/khepri-idle-320.webp') center / contain no-repeat;
+}
+.mascot-3d[data-live] {
+  background-image: none;
+}
+.mascot-3d > canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 280ms ease-out;
+}
+.mascot-3d[data-live] > canvas {
+  opacity: 1;
+}

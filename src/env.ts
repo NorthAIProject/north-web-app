@@ -38,6 +38,15 @@ export const variables = defineEnvVars({
 			return /^\/assets\/models\/[\w.-]+\.glb$/.test(url) ? url : '';
 		}
 	},
+	// The 3D mascot experiment (ADR 0006). Set only on the beta Worker, like
+	// EMBLEM_3D_MODEL_URL, and read only by /app/onboarding's server load.
+	MASCOT_3D_MODEL_URL: {
+		description: 'Path of the 3D mascot model (/assets/models/mascot-<hash>.glb). Empty turns the 3D mascot off.',
+		schema: (value) => {
+			const url = (value ?? '').trim();
+			return /^\/assets\/models\/[\w.-]+\.glb$/.test(url) ? url : '';
+		}
+	},
 	// /.well-known/apple-app-site-association (north-client internal/auth/aasa.go).
 	// Defaults are the production values from the infra repo's khepri web values.
 	APPLE_TEAM_ID: {

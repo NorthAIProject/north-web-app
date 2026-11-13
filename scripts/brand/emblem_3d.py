@@ -135,8 +135,10 @@ def srgb_hex(linear):
 # ---------------------------------------------------------------- reading
 
 
-def read_glb(path):
-    """Returns {node name: (points, faces)}. Refuses anything this script does not expect."""
+def read_glb(path, check=None):
+    """Returns {node name: (points, faces)}. Refuses anything this script does not expect.
+
+    `check(parts)` validates the part names (default: they must match PAINT exactly)."""
     data = Path(path).read_bytes()
     if len(data) > MAX_BYTES or len(data) < 28:
         raise SystemExit(f"{path}: unexpected size {len(data)}")
@@ -196,10 +198,14 @@ def read_glb(path):
             points += [tuple(p) for p in new]
             faces += [(base + flat[i], base + flat[i + 1], base + flat[i + 2]) for i in range(0, len(flat), 3)]
         parts[name] = (points, faces)
+    (check or check_paint)(parts)
+    return parts
+
+
+def check_paint(parts):
     unknown, missing = sorted(set(parts) - set(PAINT)), sorted(set(PAINT) - set(parts))
     if unknown or missing:
         raise SystemExit(f"source parts changed: unknown {unknown}, missing {missing}; update PAINT")
-    return parts
 
 
 # ---------------------------------------------------------------- geometry
