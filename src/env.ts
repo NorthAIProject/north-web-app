@@ -26,9 +26,8 @@ export const variables = defineEnvVars({
 		description: 'PostHog ingestion host the browser reports to.',
 		schema: (value) => (value || 'https://eu.i.posthog.com').trim().replace(/\/$/, '')
 	},
-	// The 3D emblem experiment (ADR 0005). Set only on the beta Worker
-	// (wrangler.jsonc env.beta); empty everywhere else, which keeps the flat
-	// emblem and never loads three.js or the model. Same-origin paths only.
+	// The 3D emblem (ADR 0005), set in wrangler.jsonc for production and
+	// beta. Empty keeps the flat emblem and never loads three.js or the model. Same-origin paths only.
 	// Read by the root layout's server load (not imported by client code, so
 	// the public env chunk is unchanged for every route).
 	EMBLEM_3D_MODEL_URL: {
@@ -38,8 +37,8 @@ export const variables = defineEnvVars({
 			return /^\/assets\/models\/[\w.-]+\.glb$/.test(url) ? url : '';
 		}
 	},
-	// The 3D mascot experiment (ADR 0006). Set only on the beta Worker, like
-	// EMBLEM_3D_MODEL_URL, and read only by /app/onboarding's server load.
+	// The 3D mascot (ADR 0006), set like EMBLEM_3D_MODEL_URL and read only
+	// by /app/onboarding's server load.
 	MASCOT_3D_MODEL_URL: {
 		description: 'Path of the 3D mascot model (/assets/models/mascot-<hash>.glb). Empty turns the 3D mascot off.',
 		schema: (value) => {

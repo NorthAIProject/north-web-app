@@ -47,7 +47,7 @@
 	<Card.Root>
 		<Card.Header>
 			<div class="flex justify-center pb-2">
-				<!-- Beta only (ADR 0006): the mascot in 3D. app.css paints the flat
+				<!-- ADR 0006, gated by its model URL: the mascot in 3D. app.css paints the flat
 				     idle art first; the renderer is a lazy chunk. -->
 				{#if data.mascot3dModel}
 					<div

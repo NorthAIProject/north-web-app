@@ -81,8 +81,8 @@ they had when `agent` was violet.
   variants on Ivory or Stone. Don't place the emblem on photographs or gold.
 - **Never** recolour the emblem, stretch it, add glow, or rotate it.
 
-**Exception: the 3D emblem (beta builds only).** On the beta web Worker and
-the iOS Debug and Beta builds, the login screen may show the emblem as a
+**Exception: the 3D emblem (login screen).** On the web and in every iOS
+build, the login screen may show the emblem as a
 real-time 3D model (`src/lib/emblem3d/mount.ts`, iOS `Emblem3DView`). It may:
 
 - enter once (about 600 ms: rise 4 % and turn from 12° to rest, no bounce),
@@ -95,8 +95,8 @@ real-time 3D model (`src/lib/emblem3d/mount.ts`, iOS `Emblem3DView`). It may:
 Its colours are the brand tokens, never new ones. It never spins, never
 leaves the 8°/5° range, and shows only on the login screen. Reduced motion,
 Save-Data, iOS Low Power Mode, missing WebGL or a model that fails to load
-keep the flat SVG. Production web and the App Store build show the flat
-emblem; widening this needs a verdict on device first. Motion values live in
+keep the flat SVG. Promoted to production on 2026-11-13 by the owner,
+before a device check. Motion values live in
 `design/emblem-motion.json`; see
 `docs/architecture/decisions/0005-emblem-3d-experiment.md`.
 
@@ -108,8 +108,8 @@ calm and supportive. `components/khepri/Mascot.svelte` (web) and `KhepriMascot`
 (iOS) map states to poses. Motion is gentle hovering and a core glow that
 animates only opacity. Both are static under reduced motion.
 
-**Exception: the 3D mascot (beta builds only).** On the beta web Worker and
-the iOS Debug and Beta builds, onboarding may show the mascot as a real-time
+**Exception: the 3D mascot (onboarding).** On the web and in every iOS
+build, onboarding may show the mascot as a real-time
 3D model (`src/lib/mascot3d/mount.ts` on `/app/onboarding`, iOS `Mascot3DView`
 on the Welcome step). Unlike the emblem, the mascot is a character, so it may:
 
@@ -122,9 +122,8 @@ on the Welcome step). Unlike the emblem, the mascot is a character, so it may:
 
 Its colours are the brand tokens, never new ones. It never spins, talks,
 waves or leaves those ranges. Reduced motion, Save-Data, iOS Low Power Mode,
-missing WebGL or a model that fails to load keep the flat idle art. Production
-web and the App Store build show the flat mascot; widening this needs a
-verdict on device first. Motion values live in `design/mascot-motion.json`;
+missing WebGL or a model that fails to load keep the flat idle art. Promoted to
+production on 2026-11-13 by the owner, before a device check. Motion values live in `design/mascot-motion.json`;
 see `docs/architecture/decisions/0006-mascot-3d-experiment.md`.
 
 Only the **idle** pose exists. It was cut from the brand reference image with
@@ -143,8 +142,8 @@ rig would replace it.
 | Component transition | 180–280 ms |
 | View transition | 250–400 ms |
 | Mascot idle | slow (6 s cycle), small amplitude |
-| 3D emblem (beta) | entrance 600 ms once; sun pulse 6 s; light sweep 8 s |
-| 3D mascot (beta) | entrance 600 ms once; hover and core glow 6 s; blink about 210 ms |
+| 3D emblem | entrance 600 ms once; sun pulse 6 s; light sweep 8 s |
+| 3D mascot | entrance 600 ms once; hover and core glow 6 s; blink about 210 ms |
 
 The solar core, a sun inside a turning arc (`ui/spinner`), is the one loading
 motif. Everything honours `prefers-reduced-motion` and iOS Reduce Motion.

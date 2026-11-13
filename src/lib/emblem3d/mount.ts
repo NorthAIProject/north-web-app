@@ -1,6 +1,6 @@
 /**
  * Mounts the 3D emblem into an element that already shows the flat emblem
- * (`.emblem-3d` in app.css paints it). Beta only; ADR 0005.
+ * (`.emblem-3d` in app.css paints it). Gated by its model URL; ADR 0005.
  *
  * AuthShell imports this module lazily and only when the root layout's
  * `emblem3dModel` is set, so production pages never load it. The flat emblem

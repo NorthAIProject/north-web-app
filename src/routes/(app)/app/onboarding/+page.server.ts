@@ -12,7 +12,7 @@ export const load: PageServerLoad = async (event) => {
 	if (!data!.needsOnboarding) redirect(303, '/app');
 	return {
 		choices: data!,
-		// The 3D mascot experiment (ADR 0006), beta Worker only. With it on,
+		// The 3D mascot (ADR 0006); empty turns it off. With it on,
 		// the AuthShell emblem stays flat here: one WebGL context per page.
 		mascot3dModel: MASCOT_3D_MODEL_URL || null,
 		...(MASCOT_3D_MODEL_URL ? { emblem3dModel: null } : {})

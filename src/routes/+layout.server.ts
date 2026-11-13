@@ -6,7 +6,7 @@ export const load: LayoutServerLoad = ({ locals }) => {
 	return {
 		locale: locals.locale,
 		appearance: locals.appearance,
-		// The 3D emblem experiment (ADR 0005): set on the beta Worker only.
+		// The 3D emblem (ADR 0005); empty turns it off.
 		emblem3dModel: EMBLEM_3D_MODEL_URL || null,
 		user: user ? { id: user.id, email: user.email, displayName: user.displayName, needsOnboarding: user.needsOnboarding } : null
 	};
