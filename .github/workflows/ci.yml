@@ -69,3 +69,15 @@ jobs:
             echo "$path $code"
             [ "$code" = 200 ] || exit 1
           done
+      # The beta Worker (wrangler.jsonc env.beta, ADR 0005): the same build with
+      # the experiments switched on, on its workers.dev URL. Deployed after
+      # production is known good.
+      - name: Deploy beta
+        run: |
+          out=$(bunx wrangler deploy --env beta --message "${GITHUB_SHA::7}" --tag "${GITHUB_SHA::7}" 2>&1)
+          echo "$out"
+          url=$(echo "$out" | grep -o 'https://[^ ]*workers\.dev' | head -1)
+          [ -n "$url" ] || { echo "::error::no workers.dev URL in the beta deploy output"; exit 1; }
+          code=$(curl -s -o /dev/null -w '%{http_code}' "$url/login")
+          echo "$url/login $code"
+          [ "$code" = 200 ]

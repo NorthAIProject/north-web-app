@@ -31,14 +31,18 @@ is limited to beta builds and the login screen.
   `main`, so the web side merges first.
 - **Web.** `src/lib/emblem3d/scene.ts` is the only module of this feature that
   imports `three`; the muscle viewer keeps its own import, and the pin stays at
-  0.169.0. `Emblem3D.svelte` paints the flat `<img>` first. On the client it
-  checks that `EMBLEM_3D_MODEL_URL` is set, then reduced motion, Save-Data
-  and WebGL, then dynamically imports the scene. The canvas replaces the image
-  only after a frame has drawn. Rendering pauses off-screen and in a hidden
-  tab. A lost context or a failed load returns to the image. There is one
-  canvas per page, and the lights take their colours from the CSS tokens.
-- **Gating.** `EMBLEM_3D_MODEL_URL` is empty in production and set only in
-  `wrangler.jsonc` `env.beta`, the `khepri-web-beta` Worker on workers.dev.
+  0.169.0. `AuthShell` renders a `.emblem-3d` div whose flat emblem is painted
+  by app.css, so it is the first paint. An attachment lazily imports
+  `src/lib/emblem3d/mount.ts`, which checks reduced motion and Save-Data, then
+  dynamically imports the scene. The canvas replaces the flat emblem only after
+  a frame has drawn (`data-live`). Rendering pauses off-screen and in a hidden
+  tab. No WebGL, a failed load or a lost context leaves the flat emblem. There
+  is one canvas per page, and the lights take their colours from the CSS
+  tokens.
+- **Gating.** `EMBLEM_3D_MODEL_URL` is a server variable, empty in production
+  and set only in `wrangler.jsonc` `env.beta`, the `khepri-web-beta` Worker on
+  workers.dev. The root layout's server load passes it to pages as
+  `emblem3dModel`, so no client chunk changes with it.
   The size budget (`scripts/size-budget.mjs`) does not let a route's initial
   JS grow; only the lazy total may.
 - **iOS.** A non-AR `RealityView` with a virtual camera is drawn transparent
@@ -51,5 +55,5 @@ is limited to beta builds and the login screen.
 Production is unchanged until the owner judges the emblem on a device.
 Promoting it means setting the URL in production, removing the iOS exclusion,
 and narrowing the brand exception, each as its own reviewed change. If the
-experiment is dropped, deleting `src/lib/emblem3d/`, the component, the model
-and the beta env removes it completely.
+experiment is dropped, deleting `src/lib/emblem3d/`, the `.emblem-3d` CSS,
+the AuthShell block, the model and the beta env removes it completely.

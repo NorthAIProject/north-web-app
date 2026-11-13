@@ -31,5 +31,26 @@
 		"APPLE_BUNDLE_ID": "com.fernandocorreia.khepri,com.fernandocorreia.khepri.beta",
 		"POSTHOG_HOST": "https://eu.i.posthog.com"
 		// POSTHOG_API_KEY is set per environment (it is public, but differs by project).
+	},
+	"env": {
+		// The beta channel (ADR 0005): the same build as production on its own
+		// workers.dev URL, no custom domain. It exists to try experiments on a
+		// device before production sees them; today that is the 3D emblem.
+		// Vars are not inherited from the top level, so they are repeated here.
+		// No POSTHOG_API_KEY: beta reports nothing.
+		"beta": {
+			"name": "khepri-web-beta",
+			"routes": [],
+			"workers_dev": true,
+			"vars": {
+				"NORTH_API_URL": "https://kheprios.com/api/v1",
+				"GO_ORIGIN": "https://kheprios.com",
+				"APPLE_TEAM_ID": "84X9WYBF36",
+				"APPLE_BUNDLE_ID": "com.fernandocorreia.khepri,com.fernandocorreia.khepri.beta",
+				"POSTHOG_HOST": "https://eu.i.posthog.com",
+				// static/assets/models/README.md says how to cut a new one.
+				"EMBLEM_3D_MODEL_URL": "/assets/models/emblem-47d19e3b.glb"
+			}
+		}
 	}
 }

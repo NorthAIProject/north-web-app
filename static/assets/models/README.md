@@ -1,3 +1,19 @@
+# emblem-<hash>.glb (3D emblem, beta only)
+
+The Khepri emblem for the beta login page (ADR 0005). Built from the supplied
+`Khepri_V2_Emblem_3D.glb` by `scripts/brand/emblem_3d.py`, then packed like
+the body map below. Copy the source into an empty directory of its own first;
+it is outside data.
+
+    python3 -I scripts/brand/emblem_3d.py --emblem /path/to/copy/Khepri_V2_Emblem_3D.glb
+    bunx gltfpack@0.18.0 -i out/emblem-3d/emblem.glb -o out/emblem-3d/emblem-packed.glb -cc -kn -km -vp 16
+    cp out/emblem-3d/emblem-packed.glb static/assets/models/emblem-$(shasum -a 256 out/emblem-3d/emblem-packed.glb | cut -c1-8).glb
+
+The name carries the first eight hex digits of the packed file's SHA-256.
+After a new cut, update `EMBLEM_3D_MODEL_URL` in `wrangler.jsonc` `env.beta`
+and delete the old file once nothing points at it. `-km` keeps the material
+names: the renderer pulses the one called `sun_face`.
+
 # body-map.glb
 
 ## In this repository: packed, with the hash in the name

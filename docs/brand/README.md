@@ -83,7 +83,7 @@ they had when `agent` was violet.
 
 **Exception: the 3D emblem (beta builds only).** On the beta web Worker and
 the iOS Debug and Beta builds, the login screen may show the emblem as a
-real-time 3D model (`Emblem3D.svelte`, iOS `Emblem3DView`). It may:
+real-time 3D model (`src/lib/emblem3d/mount.ts`, iOS `Emblem3DView`). It may:
 
 - enter once (about 600 ms: rise 4 % and turn from 12° to rest, no bounce),
 - tilt toward the pointer or a drag, at most 8° yaw and 5° pitch, and settle
