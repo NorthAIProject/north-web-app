@@ -1,3 +1,19 @@
+# mascot-<hash>.glb (3D mascot, beta only)
+
+The Khepri mascot for the beta onboarding page (ADR 0006). Built from the
+supplied `Khepri_V2_Mascot_Mobile.glb` by `scripts/brand/mascot_3d.py`, then
+packed like the emblem. Copy the source into an empty directory of its own
+first; it is outside data.
+
+    python3 -I scripts/brand/mascot_3d.py --mascot /path/to/copy/Khepri_V2_Mascot_Mobile.glb
+    bunx gltfpack@0.18.0 -i out/mascot-3d/mascot.glb -o out/mascot-3d/mascot-packed.glb -cc -kn -km -vp 16
+    cp out/mascot-3d/mascot-packed.glb static/assets/models/mascot-$(shasum -a 256 out/mascot-3d/mascot-packed.glb | cut -c1-8).glb
+
+`-kn` keeps the joint nodes the renderer moves (`Mascot_body`, `_core`,
+`_head`, `_eyes`, `_pupils`). After a new cut, update `MASCOT_3D_MODEL_URL`
+in `wrangler.jsonc` `env.beta`, copy `out/mascot-3d/Mascot.usdz` to north-ios,
+and delete the old file once nothing points at it.
+
 # emblem-<hash>.glb (3D emblem, beta only)
 
 The Khepri emblem for the beta login page (ADR 0005). Built from the supplied

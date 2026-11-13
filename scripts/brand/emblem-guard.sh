@@ -1,7 +1,7 @@
 #!/bin/sh
-# Fails when a copy of the emblem motion data drifts from design/.
-# The canonical files are design/emblem-motion.json and its fixtures; the web
-# copy lives in src/lib/emblem3d/. north-ios runs the same check against this
+# Fails when a copy of the 3D motion data drifts from design/.
+# The canonical files are design/{emblem,mascot}-motion.json and their
+# fixtures; the web copies live in src/lib/emblem3d/ and src/lib/mascot3d/. north-ios runs the same check against this
 # repository's main branch (its scripts/emblem-guard.sh).
 set -eu
 cd "$(dirname "$0")/../.."
@@ -13,4 +13,5 @@ check() {
 	fi
 }
 check design/emblem-motion.json src/lib/emblem3d/emblem-motion.json
+check design/mascot-motion.json src/lib/mascot3d/mascot-motion.json
 exit $fail

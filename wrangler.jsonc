@@ -35,7 +35,7 @@
 	"env": {
 		// The beta channel (ADR 0005): the same build as production on its own
 		// workers.dev URL, no custom domain. It exists to try experiments on a
-		// device before production sees them; today that is the 3D emblem.
+		// device before production sees them; today the 3D emblem and mascot.
 		// Vars are not inherited from the top level, so they are repeated here.
 		// No POSTHOG_API_KEY: beta reports nothing.
 		"beta": {
@@ -49,7 +49,9 @@
 				"APPLE_BUNDLE_ID": "com.fernandocorreia.khepri,com.fernandocorreia.khepri.beta",
 				"POSTHOG_HOST": "https://eu.i.posthog.com",
 				// static/assets/models/README.md says how to cut a new one.
-				"EMBLEM_3D_MODEL_URL": "/assets/models/emblem-47d19e3b.glb"
+				"EMBLEM_3D_MODEL_URL": "/assets/models/emblem-47d19e3b.glb",
+				// The 3D mascot on /app/onboarding (ADR 0006).
+				"MASCOT_3D_MODEL_URL": "/assets/models/mascot-03301e1f.glb"
 			}
 		}
 	}

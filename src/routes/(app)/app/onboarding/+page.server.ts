@@ -1,4 +1,5 @@
 import { redirect } from '@sveltejs/kit';
+import { MASCOT_3D_MODEL_URL } from '$app/env/private';
 import { serverApi } from '#lib/server/api.js';
 import { formFailure } from '#lib/server/form.js';
 import type { Actions, PageServerLoad } from './$types';
@@ -9,7 +10,13 @@ export const load: PageServerLoad = async (event) => {
 	if (event.locals.session?.user?.needsOnboarding === false) redirect(303, '/app');
 	const { data } = await serverApi(event).GET('/onboarding');
 	if (!data!.needsOnboarding) redirect(303, '/app');
-	return { choices: data! };
+	return {
+		choices: data!,
+		// The 3D mascot experiment (ADR 0006), beta Worker only. With it on,
+		// the AuthShell emblem stays flat here: one WebGL context per page.
+		mascot3dModel: MASCOT_3D_MODEL_URL || null,
+		...(MASCOT_3D_MODEL_URL ? { emblem3dModel: null } : {})
+	};
 };
 
 export const actions: Actions = {

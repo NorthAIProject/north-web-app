@@ -47,7 +47,19 @@
 	<Card.Root>
 		<Card.Header>
 			<div class="flex justify-center pb-2">
-				<Mascot size="md" state="listening" />
+				<!-- Beta only (ADR 0006): the mascot in 3D. app.css paints the flat
+				     idle art first; the renderer is a lazy chunk. -->
+				{#if data.mascot3dModel}
+					<div
+						class="mascot-3d"
+						{@attach (el) => {
+							const stop = import('#lib/mascot3d/mount.js').then((m) => m.mount(el, data.mascot3dModel!));
+							return () => void stop.then((s) => s());
+						}}
+					></div>
+				{:else}
+					<Mascot size="md" state="listening" />
+				{/if}
 			</div>
 			<Card.Title>{i18n.t('onboarding.title')}</Card.Title>
 			<Card.Description>{i18n.t('onboarding.desc')}</Card.Description>
