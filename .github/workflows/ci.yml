@@ -33,6 +33,8 @@ jobs:
       - run: bun run check
       - run: bun run test
       - run: bun run build
+      - name: Route size budget (size-budget.json)
+        run: node scripts/size-budget.mjs
 
   deploy:
     needs: check
