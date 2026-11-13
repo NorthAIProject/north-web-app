@@ -28,7 +28,7 @@
 	<div class={['w-full', wide ? 'max-w-lg' : 'max-w-sm']}>
 		<div class="mb-8 flex flex-col items-center text-center">
 			<!-- No gold rule beside the lockup: the emblem already carries the gold. -->
-			<!-- Beta only (ADR 0005): the emblem in 3D above the lockup. app.css paints
+			<!-- ADR 0005, gated by its model URL: the emblem in 3D above the lockup. app.css paints
 			     the flat emblem first; the renderer is a lazy chunk, so production
 			     (no model URL) loads nothing new. -->
 			{#if page.data.emblem3dModel}

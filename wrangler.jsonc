@@ -29,8 +29,12 @@
 		// Same values as the Go deployment (apps/khepri/web in the infra repo).
 		"APPLE_TEAM_ID": "84X9WYBF36",
 		"APPLE_BUNDLE_ID": "com.fernandocorreia.khepri,com.fernandocorreia.khepri.beta",
-		"POSTHOG_HOST": "https://eu.i.posthog.com"
+		"POSTHOG_HOST": "https://eu.i.posthog.com",
 		// POSTHOG_API_KEY is set per environment (it is public, but differs by project).
+		// The 3D emblem (login) and mascot (onboarding), ADRs 0005 and 0006.
+		// Promoted to production 2026-11-13; empty turns either off.
+		"EMBLEM_3D_MODEL_URL": "/assets/models/emblem-47d19e3b.glb",
+		"MASCOT_3D_MODEL_URL": "/assets/models/mascot-03301e1f.glb"
 	},
 	"env": {
 		// The beta channel (ADR 0005): the same build as production on its own

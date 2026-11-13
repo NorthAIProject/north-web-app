@@ -867,7 +867,7 @@ html:has([data-landing]) {
 .emblem-3d + a > img {
   display: none;
 }
-/* Beta only (ADR 0006): the 3D mascot on /app/onboarding. The flat idle art
+/* ADR 0006: the 3D mascot on /app/onboarding. The flat idle art
    is the first paint and stays until a frame has drawn. */
 .mascot-3d {
   position: relative;

@@ -1,6 +1,6 @@
 # ADR 0005: 3D emblem as a beta-only experiment
 
-- Status: accepted (experiment)
+- Status: accepted; promoted to production 2026-11-13
 - Date: 2026-11-13
 - Tracking: north-web-app#7
 
@@ -63,3 +63,11 @@ Promoting it means setting the URL in production, removing the iOS exclusion,
 and narrowing the brand exception, each as its own reviewed change. If the
 experiment is dropped, deleting `src/lib/emblem3d/`, the `.emblem-3d` CSS,
 the AuthShell block, the model and the beta env removes it completely.
+
+## Promotion (2026-11-13)
+
+The owner promoted this to production before the planned device check.
+`wrangler.jsonc` sets the model URL in the top-level vars, so kheprios.com
+serves the 3D version; the iOS Release configuration no longer excludes the
+files (north-ios). Emptying the URL turns the web version off again without
+a code change.
