@@ -111,7 +111,7 @@
 			<Alert.Description>
 				<ul class="mt-1 space-y-1">
 					{#each approval.calls as call, i (i)}
-						<li class="font-mono text-xs">{call.summary}</li>
+						<li class="text-sm whitespace-pre-line first-line:text-foreground first-line:font-medium">{call.summary}</li>
 					{/each}
 				</ul>
 			</Alert.Description>
