@@ -35,7 +35,7 @@ names: the renderer pulses the one called `sun_face`.
 ## In this repository: packed, with the hash in the name
 
 The file here is `body-map-<hash>.glb`: north-client's `body-map.glb`, packed
-with meshopt (EXT_meshopt_compression, ~1.5 MB → 0.57 MB) and named for the
+with meshopt (EXT_meshopt_compression, ~1.8 MB → 0.70 MB) and named for the
 first eight hex digits of the source file's SHA-256, so `_headers` can serve
 it as immutable. The viewer (`src/lib/components/khepri/muscle-viewer.ts`,
 `MODEL_PATH`) decodes it with three's MeshoptDecoder. After a new
@@ -44,7 +44,8 @@ it as immutable. The viewer (`src/lib/components/khepri/muscle-viewer.ts`,
     bunx gltfpack@0.18.0 -i body-map.glb -o body-map-$(shasum -a 256 body-map.glb | cut -c1-8).glb -cc -kn -km -vp 16
 
 `-kn -km` keep the named nodes and the per-muscle materials; `-vp 16` keeps
-positions on the 16-bit grid the source already uses. gltfpack puts each mesh
+positions on the 16-bit grid the source already uses; the shell's shape keys,
+`core` among them, come through with their names. gltfpack puts each mesh
 on an unnamed child of its named node; the viewer takes the key from the
 parent. Delete the old file and update `MODEL_PATH`.
 
