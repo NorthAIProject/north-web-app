@@ -388,7 +388,10 @@ export interface paths {
             };
             cookie?: never;
         };
-        /** One conversation with its messages and any pending approval */
+        /**
+         * One conversation with its messages and any pending approval
+         * @description Messages are the newest page, oldest first. When older ones exist the answer carries nextBefore; pass it back as before for the page before this one. pendingApproval and awaitingResume always describe the end of the thread, whichever page is asked for.
+         */
         get: operations["getConversation"];
         put?: never;
         post?: never;
@@ -513,7 +516,7 @@ export interface paths {
         put?: never;
         /**
          * Stream the rest of a reply after an approval was answered
-         * @description Same events as replyInConversation. Spends no message quota.
+         * @description Same events as replyInConversation. Spends no message quota. Answers 409 when no reply is owed or one is already being written. After an approved standing task it streams the confirmation already stored, without asking a model.
          */
         post: operations["resumeConversation"];
         delete?: never;
@@ -5926,6 +5929,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/soreness/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Sore regions over the last days, newest first */
+        get: operations["getSorenessHistory"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/soreness/{region}": {
         parameters: {
             query?: never;
@@ -7645,6 +7665,36 @@ export interface components {
         SorenessToday: {
             entries: components["schemas"]["SorenessEntry"][];
             regions: string[];
+            /**
+             * @description For each soreness region, the regions of the body figure (GET
+             *     /body/map ids) it covers, so a client can paint soreness on the
+             *     figure and turn a tap on a muscle into a region. Knees and feet
+             *     cover none. Not required: older servers do not send it.
+             */
+            figure?: {
+                [key: string]: string[];
+            };
+        };
+        SorenessDayEntry: {
+            /**
+             * Format: date
+             * @description The calendar day in the user's timezone.
+             */
+            date: string;
+            region: string;
+            /** @description 1 stiff, 2 sore, 3 painful. */
+            severity: number;
+            note?: string;
+        };
+        SorenessHistory: {
+            days: number;
+            /**
+             * Format: date
+             * @description The last day covered, the user's today. The first is days-1 before it.
+             */
+            to: string;
+            /** @description Newest first. A day with nothing sore has none. */
+            entries: components["schemas"]["SorenessDayEntry"][];
         };
         TrackerInput: {
             name: string;
@@ -8560,6 +8610,11 @@ export interface components {
             conversation: components["schemas"]["ConversationSummary"];
             summary?: string;
             messages: components["schemas"]["ChatMessage"][];
+            /**
+             * Format: uuid
+             * @description Set when older messages exist. Pass it as before for the page before this one.
+             */
+            nextBefore?: string;
             pendingApproval?: components["schemas"]["Approval"];
             /** @description An approval was answered and the reply is owed; call resumeConversation. */
             awaitingResume: boolean;
@@ -8892,6 +8947,8 @@ export interface components {
             days: components["schemas"]["DaySummary"][];
             /** @enum {string} */
             source: "ai" | "edited";
+            /** @description Where the plan came from: ai, edited or imported. Open-ended; treat an unknown value as edited. source stays within ai and edited for older clients, so an imported plan reports source edited. */
+            origin?: string;
             /** Format: date-time */
             createdAt: string;
             /** @description The plan being followed; the list puts it first. */
@@ -8968,6 +9025,8 @@ export interface components {
             problems: string[];
             /** @enum {string} */
             source: "ai" | "edited";
+            /** @description Where the plan came from: ai, edited or imported. Open-ended; treat an unknown value as edited. source stays within ai and edited for older clients, so an imported plan reports source edited. */
+            origin?: string;
             /** Format: date-time */
             createdAt: string;
             /**
@@ -11221,7 +11280,10 @@ export interface operations {
     };
     getConversation: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description The nextBefore of a later page. Omit it for the newest page. */
+                before?: string;
+            };
             header?: never;
             path: {
                 id: components["parameters"]["ConversationID"];
@@ -11382,6 +11444,7 @@ export interface operations {
             200: components["responses"]["ReplyStream"];
             401: components["responses"]["Unauthorized"];
             404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
         };
     };
     decideToolCalls: {
@@ -19988,6 +20051,32 @@ export interface operations {
                 };
             };
             401: components["responses"]["Unauthorized"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getSorenessHistory: {
+        parameters: {
+            query?: {
+                /** @description How many days back to look, today included, 1 to 90. Defaults to 14. */
+                days?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SorenessHistory"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            422: components["responses"]["ValidationError"];
             500: components["responses"]["InternalError"];
         };
     };

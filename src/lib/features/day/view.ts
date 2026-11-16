@@ -8,6 +8,7 @@ import type { components } from '#lib/api/generated/schema.js';
 import type { Translator } from '#lib/i18n/index.js';
 import { formatTime } from '#lib/components/khepri/dates.js';
 import { REGIONS } from '#lib/components/khepri/bodymap.js';
+import { soreHeat, soreStrip, zoneByRegion, type SoreFigure } from './soreness.js';
 import type { BodyMap, BodyShape } from '#lib/components/khepri/types.js';
 
 type Schemas = components['schemas'];
@@ -89,6 +90,8 @@ export type BodyCard = {
 	lastWaist: string;
 	lastCheckOn: string;
 	shape: BodyShape | null;
+	/** Null when the server does not say how soreness maps onto the figure. */
+	sore: SoreFigure | null;
 };
 
 export type RailHour = { label: string; topPx: number };
@@ -154,6 +157,9 @@ export type BodyExtras = {
 	map: Schemas['BodyMap'] | null;
 	morph: Schemas['BodyMorph'] | null;
 	progress: Schemas['ProgressChecks'] | null;
+	/** GET /soreness, read only for its zone → figure map. */
+	soreness?: Schemas['SorenessToday'] | null;
+	sorenessHistory?: Schemas['SorenessHistory'] | null;
 };
 
 // ---------------------------------------------------------------------------
@@ -628,8 +634,17 @@ function bodyCard(i18n: Translator, b: Schemas['DayBody'], extras: BodyExtras): 
 		progressDue: false,
 		lastWaist: '',
 		lastCheckOn: '',
-		shape: null
+		shape: null,
+		sore: null
 	};
+	const figure = extras.soreness?.figure;
+	if (figure) {
+		out.sore = {
+			heat: soreHeat(out.soreness, figure),
+			zoneOf: zoneByRegion(figure),
+			strip: extras.sorenessHistory ? soreStrip(extras.sorenessHistory) : []
+		};
+	}
 	if (b.targetWeightKg != null) out.target = b.targetWeightKg.toFixed(1);
 	if (b.toGoalKg != null) {
 		out.hasGoal = true;

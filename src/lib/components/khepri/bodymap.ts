@@ -62,6 +62,12 @@ export const STABILIZER_HEAT = 0.25;
 /** Every region's colour, 0 to 1, keyed by region. */
 export function heatOf(p: MuscleViewerProps): Record<string, number> {
 	const out: Record<string, number> = {};
+	if (p.soreness) {
+		for (const [region, value] of Object.entries(p.soreness)) {
+			if (value > 0 && regionSet.has(region)) out[region] = value;
+		}
+		return out;
+	}
 	if (p.map) {
 		for (const r of p.map.regions) {
 			if (r.intensity > 0) out[r.region] = r.intensity;
@@ -117,16 +123,22 @@ export function detailsOf(i18n: Translator, p: MuscleViewerProps): Record<string
  * One muscle of the flat figure, coloured the way the 3D one is: untrained
  * grey-blue, else a mix from muted ochre toward ember (colourFor in the viewer).
  */
-export function regionStyle(h: Record<string, number>, region: string): string {
+export function regionStyle(h: Record<string, number>, region: string, sore = false): string {
 	const stroke = '; stroke: var(--north-surface); stroke-width: 0.8';
 	const v = h[region];
 	if (v === undefined || v <= 0) return 'fill: var(--north-body-idle)' + stroke;
 	const t = 0.15 + 0.85 * Math.min(v, 1);
-	return `fill: color-mix(in oklch, var(--north-ember) ${(t * 100).toFixed(0)}%, var(--north-heat-low))` + stroke;
+	const [high, low] = sore ? ['--north-sore-high', '--north-sore-low'] : ['--north-ember', '--north-heat-low'];
+	return `fill: color-mix(in oklch, var(${high}) ${(t * 100).toFixed(0)}%, var(${low}))` + stroke;
 }
 
 /** The figure in words, for screen readers: the hottest regions. */
-export function summaryOf(i18n: Translator, map: BodyMap | null | undefined): string {
+export function summaryOf(i18n: Translator, map: BodyMap | null | undefined, soreness?: Record<string, number> | null): string {
+	if (soreness) {
+		const sore = REGIONS.filter((r) => soreness[r] > 0).sort((a, b) => soreness[b] - soreness[a]);
+		if (sore.length === 0) return i18n.t('bodymap.sore.none');
+		return i18n.tf('bodymap.sore.summary', sore.map((r) => i18n.t('muscle.' + r)).join(', '));
+	}
 	if (!map) return i18n.t('bodymap.figure');
 	const hot = hottest(map.regions);
 	if (hot.length === 0) return i18n.t('bodymap.empty');
