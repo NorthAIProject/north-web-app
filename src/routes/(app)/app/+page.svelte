@@ -21,7 +21,7 @@
 	const i18n = useI18n();
 	const timeZone = $derived(data.user.timezone || 'UTC');
 	const view = $derived(
-		buildDayView(i18n, data.day, data.rules, { map: data.map, morph: data.morph, progress: data.progress }, timeZone)
+		buildDayView(i18n, data.day, data.rules, { map: data.map, morph: data.morph, progress: data.progress, soreness: data.soreness, sorenessHistory: data.sorenessHistory }, timeZone)
 	);
 </script>
 

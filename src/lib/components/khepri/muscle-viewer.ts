@@ -3,14 +3,18 @@
  * web/assets/js/shared/muscle-viewer/viewer.js.
  *
  * The figure is body-map.glb, built by north-client's scripts/bodymap from the anatomical
- * atlas: the muscles themselves, one mesh per muscle key, inside the body's
- * skin. The skin is drawn as an outline only, clear facing the camera and firm
- * at the silhouette; its shape keys (setShape) widen that edge to a person's
- * measurements. Colouring a muscle is setting one colour — no geometry is
- * reloaded — and a tap resolves to a key by the mesh's name.
+ * atlas: the muscles themselves, one mesh per muscle key, lying on a solid
+ * body. That body is the skin's own geometry with its "core" shape key on,
+ * which sinks it to just under each muscle and leaves it at the surface where
+ * there is none (head, hands, feet, the tendon between muscles), so nothing
+ * shows through the figure. The skin is drawn once more as an outline, clear
+ * facing the camera and firm at the silhouette; its other shape keys
+ * (setShape) widen that edge to a person's measurements. Colouring a muscle
+ * is setting one colour — no geometry is reloaded — and a tap resolves to a
+ * key by the mesh's name.
  *
- * Untrained muscle is a cool grey-blue; trained muscle ramps from a pale amber
- * to ember.
+ * Untrained muscle is a cool grey-blue on a paler body of the same family;
+ * trained muscle ramps from a pale amber to ember.
  *
  * This module imports three.js statically. MuscleViewer.svelte imports *this
  * module* lazily inside an effect, so three never loads during SSR or on a page
@@ -22,11 +26,12 @@ import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.j
 import { MUSCLE_INFO, type MuscleInfo } from './muscles.js';
 import { readCSSColor } from './css-color.js';
 
-// body-map.glb packed with meshopt (EXT_meshopt_compression, ~1.5 MB → 0.57 MB);
+// body-map.glb packed with meshopt (EXT_meshopt_compression, ~1.8 MB → 0.70 MB);
 // the suffix is the source file's hash, so the URL is cached as immutable.
 // static/assets/models/README.md has the command.
-const MODEL_PATH = '/assets/models/body-map-83dd70bd.glb';
+const MODEL_PATH = '/assets/models/body-map-e9000025.glb';
 const SHELL_REGION = 'shell'; // the skin; every other mesh is a muscle
+const CORE_KEY = 'core'; // the shell's shape key that sinks it to the body under the muscles
 const SHELL_EDGE_ALPHA = 0.9;
 const SHELL_EDGE_POWER = 4; // higher is a thinner edge
 
@@ -35,8 +40,11 @@ const SHELL_EDGE_POWER = 4; // higher is a thinner edge
 const FALLBACK = {
 	idle: 0x7d8ca1,
 	shell: 0xc9d3df,
+	base: 0xb9c0cb,
 	heatLow: 0xf0d6a0,
-	ember: 0xe8973c
+	ember: 0xe8973c,
+	soreLow: 0xb08584,
+	sore: 0xc8323a
 };
 
 const THEME = {
@@ -48,7 +56,7 @@ const THEME = {
 // front, the figure faces away by default, so a back day is not hidden.
 const BACK_REGIONS = new Set(['traps', 'lats', 'erectors', 'glutes', 'hamstrings', 'calves', 'triceps', 'neck']);
 
-const FRONT_YAW = 0.45; // front three-quarter, radians
+const FRONT_YAW = 0; // straight on, radians
 const SWAY = 0.35; // idle sway either side of the facing, radians
 const SWAY_PERIOD = 8; // seconds
 
@@ -62,6 +70,8 @@ export type ViewerOptions = {
 
 export type MuscleViewerHandle = {
 	setHeat(next?: Record<string, number>): void;
+	/** Which ramp heat is drawn in: training's ember, or reported soreness's red. */
+	setRamp(ramp: Ramp): void;
 	setMuscleGroups(groups?: { primary?: string[]; secondary?: string[]; stabilizers?: string[] }): void;
 	setShape(shape?: Partial<Record<string, number>>): void;
 	setLoads(loads?: { key: string; share: number }[]): void;
@@ -71,12 +81,23 @@ export type MuscleViewerHandle = {
 	destroy(): void;
 };
 
-type Colours = { idle: THREE.Color; shell: THREE.Color; heatLow: THREE.Color; ember: THREE.Color };
+export type Ramp = 'training' | 'soreness';
+
+type Colours = {
+	idle: THREE.Color;
+	shell: THREE.Color;
+	base: THREE.Color;
+	heatLow: THREE.Color;
+	ember: THREE.Color;
+	soreLow: THREE.Color;
+	sore: THREE.Color;
+};
 type Rim = { color: { value: THREE.Color }; strength: { value: number } };
 type RegionEntry = { mesh: THREE.Mesh; material: THREE.MeshStandardMaterial };
 type Shell = {
 	geometry: THREE.BufferGeometry;
 	ghost: THREE.MeshStandardMaterial;
+	core: THREE.MeshStandardMaterial;
 	meshes: THREE.Mesh[];
 	targets: Record<string, number>;
 };
@@ -134,8 +155,11 @@ function readColours(): Colours {
 	return {
 		idle: readCSSColor(THREE, '--north-body-idle', FALLBACK.idle),
 		shell: readCSSColor(THREE, '--north-body-shell', FALLBACK.shell),
+		base: readCSSColor(THREE, '--north-body-base', FALLBACK.base),
 		heatLow: readCSSColor(THREE, '--north-heat-low', FALLBACK.heatLow),
-		ember: readCSSColor(THREE, '--north-ember', FALLBACK.ember)
+		ember: readCSSColor(THREE, '--north-ember', FALLBACK.ember),
+		soreLow: readCSSColor(THREE, '--north-sore-low', FALLBACK.soreLow),
+		sore: readCSSColor(THREE, '--north-sore-high', FALLBACK.sore)
 	};
 }
 
@@ -369,17 +393,26 @@ export async function createViewer(canvas: HTMLCanvasElement, options: ViewerOpt
 	// Colour
 	// ---------------------------------------------------------------------
 	let heat: Record<string, number> = {};
+	let ramp: Ramp = 'training';
 	const scratch = new THREE.Color();
+	const soreHigh = new THREE.Color();
 
 	function colourFor(intensity: number): THREE.Color {
 		if (!(intensity > 0)) return colours.idle;
 		// Even a light touch reads as warm: start a little way up the ramp.
 		const t = 0.15 + 0.85 * Math.min(1, intensity);
+		// Soreness blends in sRGB, as iOS and the flat figure do: in linear
+		// light a fifth of the way to red already reads red, and stiff and
+		// painful look the same.
+		if (ramp === 'soreness') {
+			return scratch.copy(colours.soreLow).convertLinearToSRGB().lerp(soreHigh.copy(colours.sore).convertLinearToSRGB(), t).convertSRGBToLinear();
+		}
 		return scratch.copy(colours.heatLow).lerp(colours.ember, t);
 	}
 
 	function paintSkin() {
 		shell.ghost.color.copy(colours.shell);
+		shell.core.color.copy(colours.base);
 	}
 
 	function setHeat(next: Record<string, number> = {}) {
@@ -427,6 +460,7 @@ export async function createViewer(canvas: HTMLCanvasElement, options: ViewerOpt
 	// overall}, each 0..1, from the server). Unknown keys stay at 0.
 	function setShape(shape: Partial<Record<string, number>> = {}) {
 		for (const [name, index] of Object.entries(shell.targets)) {
+			if (name === CORE_KEY) continue;
 			const value = Math.min(1, Math.max(0, Number(shape[name]) || 0));
 			for (const mesh of shell.meshes) {
 				if (mesh.morphTargetInfluences) mesh.morphTargetInfluences[index] = value;
@@ -437,6 +471,10 @@ export async function createViewer(canvas: HTMLCanvasElement, options: ViewerOpt
 
 	return {
 		setHeat,
+		setRamp(next) {
+			ramp = next;
+			setHeat(heat);
+		},
 		setMuscleGroups,
 		setShape,
 		setLoads,
@@ -472,6 +510,7 @@ export async function createViewer(canvas: HTMLCanvasElement, options: ViewerOpt
 			}
 			shell.geometry.dispose();
 			shell.ghost.dispose();
+			shell.core.dispose();
 			shadowGeometry.dispose();
 			shadowMaterial.dispose();
 			shadowTexture.dispose();
@@ -562,5 +601,21 @@ function skinLayers(obj: THREE.Mesh, colours: Colours, rim: Rim): Shell {
 	addRim(ghost, rim, SHELL_EDGE_ALPHA, SHELL_EDGE_POWER);
 	obj.material = ghost;
 	obj.renderOrder = 1;
-	return { geometry: obj.geometry, ghost, meshes: [obj], targets: obj.morphTargetDictionary || {} };
+	const targets = obj.morphTargetDictionary || {};
+
+	// The body under the muscles: the same geometry with the core key on, so
+	// it lies just below each muscle and at the surface where there is none
+	// (head, hands, feet, the tendon between muscles). Opaque, and never a
+	// tap target. The measurement keys do not move it: the muscles stay put.
+	const core = new THREE.MeshStandardMaterial({ color: colours.base, roughness: 0.7, metalness: 0 });
+	addRim(core, rim);
+	const body = new THREE.Mesh(obj.geometry, core);
+	body.name = CORE_KEY;
+	// gltfpack leaves the grid-to-metres transform on the mesh itself.
+	body.position.copy(obj.position);
+	body.quaternion.copy(obj.quaternion);
+	body.scale.copy(obj.scale);
+	if (body.morphTargetInfluences && CORE_KEY in targets) body.morphTargetInfluences[targets[CORE_KEY]] = 1;
+	obj.parent?.add(body);
+	return { geometry: obj.geometry, ghost, core, meshes: [obj], targets };
 }

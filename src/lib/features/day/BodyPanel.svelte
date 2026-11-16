@@ -1,9 +1,11 @@
 <!--
 	The body figure, coloured by what the last week of logged sets trained,
 	with the latest weight, BMI and blood pressure beneath it (web/day
-	body.templ). Soreness stays a row of chips: the figure means training.
-	The dialog's forms keep the dialog open and only the chips change, as
-	Go's #body-chips swap did, so the canvas never reloads.
+	body.templ). A switch turns the same figure to the day's reported
+	soreness, where a tap on a muscle opens the dialog on that zone; knees
+	and feet have no muscle to tap and stay chips. The dialog's forms keep
+	the dialog open and only the figure and chips change, so the canvas
+	never reloads.
 -->
 <script lang="ts">
 	import { enhance } from '$app/forms';
@@ -15,6 +17,7 @@
 	import { useI18n } from '#lib/i18n/index.js';
 	import { cn } from '#lib/utils.js';
 	import { quickSubmit } from './forms.js';
+	import { stripClass } from './soreness.js';
 	import { bmiClass, bodyCaption, bodyMapOrEmpty, sorenessClass, type DayView } from './view.js';
 
 	let { data }: { data: DayView } = $props();
@@ -23,12 +26,61 @@
 	const caption = $derived(bodyCaption(i18n, b.map));
 	let region = $state('');
 	let open = $state(false);
+	let mode = $state<'training' | 'soreness'>('training');
+	const sore = $derived(mode === 'soreness' ? b.sore : null);
+	const soreDays = $derived(b.sore?.strip.filter((d) => d.severity > 0).length ?? 0);
+
+	// A tap in soreness mode: the dialog, already on the tapped muscle's zone.
+	function pick(key: string) {
+		const zone = b.sore?.zoneOf[key];
+		if (!zone) return;
+		region = zone;
+		open = true;
+	}
 </script>
 
 <Dialog.Root bind:open>
 	<section class="border-hairline bg-surface relative overflow-hidden rounded-2xl border p-4" aria-label={i18n.t('day.body')} data-testid="body-panel">
-		<MuscleViewer id="day-body-viewer" map={bodyMapOrEmpty(b.map)} shape={b.shape} hideLegend />
-		{#if caption}
+		{#if b.sore}
+			<div class="bg-muted mb-3 grid grid-cols-2 gap-1 rounded-lg p-1" role="group" aria-label={i18n.t('day.body.mode')} data-testid="body-mode">
+				{#each ['training', 'soreness'] as const as m (m)}
+					<button
+						type="button"
+						class={cn(
+							'rounded-md px-2 py-1 text-xs font-medium transition-colors',
+							mode === m ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
+						)}
+						aria-pressed={mode === m}
+						onclick={() => (mode = m)}>{i18n.t(`day.body.mode.${m}`)}</button
+					>
+				{/each}
+			</div>
+		{/if}
+		<MuscleViewer
+			id="day-body-viewer"
+			map={bodyMapOrEmpty(b.map)}
+			shape={b.shape}
+			soreness={sore?.heat}
+			onpick={sore ? pick : undefined}
+			ratio="portrait"
+			hideLegend
+		/>
+		{#if sore}
+			<p class="text-muted-foreground mt-2 text-center text-xs" data-testid="soreness-caption">{i18n.t('day.soreness.caption')}</p>
+			{#if sore.strip.length > 0}
+				<div
+					class="mt-2 flex gap-0.5"
+					role="img"
+					aria-label={i18n.tf('day.soreness.strip', soreDays, sore.strip.length)}
+					data-testid="soreness-strip"
+				>
+					{#each sore.strip as d (d.date)}
+						<span class={cn('h-2 flex-1 rounded-[2px]', stripClass(d.severity))} data-date={d.date}></span>
+					{/each}
+				</div>
+				<p class="text-muted-foreground mt-1 text-center text-[10px]">{i18n.tf('day.soreness.strip', soreDays, sore.strip.length)}</p>
+			{/if}
+		{:else if caption}
 			<p class="text-muted-foreground mt-2 text-center text-xs" data-testid="body-caption">{caption}</p>
 		{/if}
 		<div id="body-chips" data-testid="body-chips">

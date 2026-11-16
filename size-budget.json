@@ -1,19 +1,13 @@
 {
-	"notes": {
-		"measure": "Minified bytes (scripts/size-budget.mjs), not gzip: gzip sizes differ between Node versions on identical builds.",
-		"2026-11-13": "The 3D emblem gate (ADR 0005, north-web-app#7), owner-approved: +514 B on the nine AuthShell routes and +24 B on every route (the shared app entry lists the preload helper for AuthShell pages). About 250 B and 0-3 B gzip.",
-		"2026-11-13 mascot": "The 3D mascot gate on /app/onboarding (ADR 0006, north-web-app#10), owner-approved: +462 B on that route only (an {#if}, a div and a lazy-import attachment). No other route changes.",
-		"2026-11-15 approval card": "Readable approval summary (north-web-app#13, north-client#167): +60 B on /app/chat/[id], the card's new class names (whitespace-pre-line, first-line emphasis). No other route changes."
-	},
 	"routes": {
-		"/(app)/app": 763607,
+		"/(app)/app": 767541,
 		"/(app)/app/activity": 622439,
 		"/(app)/app/awards": 569977,
 		"/(app)/app/calculator": 625002,
 		"/(app)/app/capture": 591891,
 		"/(app)/app/care": 1076124,
 		"/(app)/app/chat": 569659,
-		"/(app)/app/chat/[id]": 768756,
+		"/(app)/app/chat/[id]": 769823,
 		"/(app)/app/check-ins": 656190,
 		"/(app)/app/crews": 570503,
 		"/(app)/app/crews/[crewID]": 676255,
@@ -23,7 +17,7 @@
 		"/(app)/app/decisions": 590097,
 		"/(app)/app/decisions/[id]": 588558,
 		"/(app)/app/exercises": 627775,
-		"/(app)/app/exercises/[slug]": 614596,
+		"/(app)/app/exercises/[slug]": 615663,
 		"/(app)/app/first-week": 559167,
 		"/(app)/app/first-week/review": 565620,
 		"/(app)/app/fitness": 1013856,
@@ -66,7 +60,7 @@
 		"/(app)/app/onboarding": 607482,
 		"/(app)/app/onboarding/done": 572267,
 		"/(app)/app/ops/moderation": 565517,
-		"/(app)/app/overview": 758502,
+		"/(app)/app/overview": 759847,
 		"/(app)/app/progress": 598042,
 		"/(app)/app/recap": 996006,
 		"/(app)/app/reports": 570648,
@@ -78,7 +72,7 @@
 		"/(app)/app/settings/vault": 565836,
 		"/(app)/app/today/lighter": 558870,
 		"/(app)/app/training": 559175,
-		"/(app)/app/training/[id]": 728827,
+		"/(app)/app/training/[id]": 729894,
 		"/(app)/app/training/[id]/activate": 559175,
 		"/(app)/app/training/[id]/days/[day]/exercises": 559175,
 		"/(app)/app/training/import": 629003,
@@ -91,7 +85,7 @@
 		"/(app)/app/u/[handle]/workouts/[sessionID]": 567782,
 		"/(app)/app/weekly": 676667,
 		"/(app)/app/workouts/[id]": 559175,
-		"/(public)/(site)": 581652,
+		"/(public)/(site)": 581995,
 		"/(public)/(site)/facebook-data": 296122,
 		"/(public)/(site)/privacy": 302768,
 		"/(public)/(site)/terms": 299638,
@@ -103,5 +97,5 @@
 		"/(public)/reset-password": 315363,
 		"/(public)/signup": 323437
 	},
-	"totalJs": 4769549
+	"totalJs": 4782795
 }

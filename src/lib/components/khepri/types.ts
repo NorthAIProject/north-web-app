@@ -50,6 +50,15 @@ export type MuscleViewerProps = {
 	hideLegend?: boolean;
 	/** Shapes the skin to a person's measurements (their own body only). */
 	shape?: BodyShape | null;
+	/**
+	 * Reported soreness per region, 0..1. When set the figure shows this in
+	 * the soreness ramp instead of training heat.
+	 */
+	soreness?: Record<string, number> | null;
+	/** A tap on a region goes here instead of opening the callout. */
+	onpick?: (region: string) => void;
+	/** The frame's shape; square unless a card has room for a taller figure. */
+	ratio?: 'square' | 'portrait';
 };
 
 /** What a tap on a region shows, already in the reader's language. */

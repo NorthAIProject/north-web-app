@@ -15,7 +15,7 @@
 	import { useI18n } from '#lib/i18n/index.js';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import AspectRatio from '#lib/components/ui/aspectratio/aspectratio.svelte';
-	import { detailsOf, heatOf, regionStyle, summaryOf } from './bodymap.js';
+	import { REGIONS, detailsOf, heatOf, regionStyle, summaryOf } from './bodymap.js';
 	import { figureBack, figureFront } from './muscle-figure-data.js';
 	import type { MuscleViewerHandle } from './muscle-viewer.js';
 	import type { MuscleDetail, MuscleViewerProps } from './types.js';
@@ -27,7 +27,8 @@
 	const heat = $derived(heatOf(props));
 	const details = $derived(detailsOf(i18n, props));
 	const inspect = $derived(Boolean(props.map));
-	const summary = $derived(summaryOf(i18n, props.map));
+	const summary = $derived(summaryOf(i18n, props.map, props.soreness));
+	const sore = $derived(Boolean(props.soreness));
 
 	let root: HTMLDivElement | undefined = $state();
 	let canvas: HTMLCanvasElement | undefined = $state();
@@ -60,6 +61,7 @@
 				return;
 			}
 			viewer = created;
+			viewer.setRamp(sore ? 'soreness' : 'training');
 			viewer.setHeat(heat);
 			if (props.shape) viewer.setShape(props.shape);
 			// Any appearance change (the switcher, or the OS flipping while the
@@ -82,6 +84,11 @@
 		const detail = key ? details[key] : undefined;
 		if (!key || !detail) {
 			clear();
+			return;
+		}
+		if (props.onpick) {
+			clear();
+			props.onpick(key);
 			return;
 		}
 		selected = inspect ? { key, ...detail } : { key, name: detail.name };
@@ -126,7 +133,9 @@
 	$effect(() => {
 		const h = heat;
 		const shape = props.shape;
+		const ramp = sore ? 'soreness' : 'training';
 		if (!viewer) return;
+		viewer.setRamp(ramp);
 		viewer.setHeat(h);
 		if (shape) viewer.setShape(shape);
 	});
@@ -134,7 +143,7 @@
 
 <div id={props.id || undefined} bind:this={root}>
 	<div class="relative">
-		<AspectRatio ratio="square" class="rounded-lg border border-hairline bg-background/60">
+		<AspectRatio ratio={props.ratio ?? 'square'} class="rounded-lg border border-hairline bg-background/60">
 			<!-- svelte-ignore a11y_no_interactive_element_to_noninteractive_role -->
 			<canvas
 				bind:this={canvas}
@@ -157,7 +166,7 @@
 							<path
 								d={r.d}
 								fill-rule="evenodd"
-								style={regionStyle(heat, r.region)}
+								style={regionStyle(heat, r.region, sore)}
 								data-muscle={r.region}
 								class="cursor-pointer"
 								onclick={() => select(r.region)}
@@ -173,6 +182,21 @@
 				<span class="font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">{i18n.t('bodymap.loading')}</span>
 			</div>
 		</AspectRatio>
+		{#if inspect || props.onpick}
+			<!-- The canvas cannot take focus muscle by muscle: the same taps as
+			     buttons, shown only while one of them has the keyboard. -->
+			<ul
+				class="sr-only focus-within:not-sr-only focus-within:mt-2 focus-within:flex focus-within:flex-wrap focus-within:gap-1"
+				aria-label={i18n.t('bodymap.regions')}
+				data-testid="muscle-list"
+			>
+				{#each REGIONS as region (region)}
+					<li>
+						<Button variant="outline" size="sm" onclick={() => select(region)}>{details[region]?.name ?? region}</Button>
+					</li>
+				{/each}
+			</ul>
+		{/if}
 		{#if selected}
 			<div
 				transition:fade={{ duration: 150 }}

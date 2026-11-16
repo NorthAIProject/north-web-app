@@ -21,16 +21,18 @@ export const load: PageServerLoad = async (event) => {
 		}
 	};
 
-	const [day, rules, map, current, progress, firstWeek] = await Promise.all([
+	const [day, rules, map, current, progress, firstWeek, soreness, sorenessHistory] = await Promise.all([
 		api.GET('/day', { params: { query: { date } } }).then((r) => r.data!),
 		optional(api.GET('/day/rules')),
 		optional(api.GET('/body/map', { params: { query: { days: 7 } } })),
 		optional(api.GET('/body/current')),
 		optional(api.GET('/progress/checks')),
-		optional(api.GET('/first-week'))
+		optional(api.GET('/first-week')),
+		optional(api.GET('/soreness')),
+		optional(api.GET('/soreness/history', { params: { query: { days: 14 } } }))
 	]);
 
-	return { day, rules, map, morph: current?.morph ?? null, progress, firstWeek };
+	return { day, rules, map, morph: current?.morph ?? null, progress, firstWeek, soreness, sorenessHistory };
 };
 
 const str = (form: FormData, key: string) => String(form.get(key) ?? '').trim();
