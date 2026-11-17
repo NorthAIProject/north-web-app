@@ -33,7 +33,9 @@
 		return () => (alive = false);
 	});
 
-	const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+	const sleep = (ms: number) => new Promise((r) => {
+			setTimeout(r, ms);
+		});
 
 	function reset() {
 		running = false;

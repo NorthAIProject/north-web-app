@@ -33,7 +33,7 @@ export function mount(el: HTMLElement, modelUrl: string): () => void {
 	}
 	const onLeave = () => mascot?.clearPointer();
 
-	(async () => {
+	void (async () => {
 		try {
 			const { createMascot } = await import('./scene.js');
 			if (!alive) return;

@@ -57,6 +57,12 @@
 		"promise/no-promise-in-callback": "error",
 		"import/no-named-as-default": "error",
 		"import/namespace": "error",
+		"typescript/no-floating-promises": "error",
+		"typescript/no-misused-promises": "error",
+		"typescript/await-thenable": "error",
+		"no-promise-executor-return": "error",
+		// A then() that ends a chain has nobody to return to.
+		"promise/always-return": ["error", { "ignoreLastCallback": true }],
 
 		// BACKLOG. Rules of this profile that the existing code still breaks
 		// (count as of 2026-11-17, with --type-aware). They report as warnings so
@@ -81,7 +87,6 @@
 		"vitest/expect-expect": "warn", // 11
 		"no-console": ["warn", { "allow": ["warn", "error"] }], // 11
 		"typescript/require-await": "warn", // 10
-		"promise/always-return": "warn", // 8
 		"no-shadow": "warn", // 7
 		"typescript/switch-exhaustiveness-check": "warn", // 6
 		"no-underscore-dangle": "warn", // 4
@@ -90,16 +95,12 @@
 		"oxc/no-map-spread": "warn", // 3
 		"vitest/valid-expect": "warn", // 3
 		"typescript/no-redundant-type-constituents": "warn", // 3
-		"no-promise-executor-return": "warn", // 2
 		"typescript/no-unnecessary-type-conversion": "warn", // 2
-		"typescript/no-floating-promises": "warn", // 2
 		"typescript/no-misused-spread": "warn", // 2
 		"unicorn/no-array-reverse": "warn", // 1
 		"import/no-unassigned-import": "warn", // 1
 		"unicorn/no-empty-file": "warn", // 1
 		"typescript/triple-slash-reference": "warn", // 1
-		"typescript/await-thenable": "warn", // 1
-		"typescript/no-misused-promises": "warn", // 1
 		"typescript/require-array-sort-compare": "warn" // 1
 	}
 }

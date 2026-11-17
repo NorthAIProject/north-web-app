@@ -94,7 +94,7 @@ export async function toWav(blob: Blob): Promise<Blob> {
 	const bytes = await blob.arrayBuffer();
 	const audio = await new Promise<AudioBuffer>((resolve, reject) => {
 		const decoded = ctx.decodeAudioData(bytes, resolve, reject);
-		if (decoded && typeof decoded.then === 'function') decoded.then(resolve, reject);
+		if (typeof decoded?.then === 'function') decoded.then(resolve, reject);
 	});
 	void ctx.close();
 	if (!Offline) return encodeWav(audio);

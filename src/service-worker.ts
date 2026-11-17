@@ -30,7 +30,7 @@ const OFFLINE_URL = '/offline.html';
 function offlineText(): string {
 	const langs = sw.navigator.languages || [sw.navigator.language];
 	for (const raw of langs) {
-		const l = String(raw || '').toLowerCase();
+		const l = (raw || '').toLowerCase();
 		if (l === 'en' || l.startsWith('en-')) break;
 		if (l === 'es' || l.startsWith('es-')) return 'Estás sin conexión.';
 		if (l === 'pt' || l === 'pt-br') return 'Você está sem conexão.';
@@ -72,7 +72,7 @@ sw.addEventListener('activate', (event) => {
 	event.waitUntil(
 		(async () => {
 			const names = await caches.keys();
-			await Promise.all(names.map((name) => (name === CACHE ? undefined : caches.delete(name))));
+			await Promise.all(names.filter((name) => name !== CACHE).map((name) => caches.delete(name)));
 			await sw.clients.claim();
 		})()
 	);
