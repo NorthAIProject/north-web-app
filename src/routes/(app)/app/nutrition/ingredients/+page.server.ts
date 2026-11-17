@@ -3,6 +3,7 @@ import { isApiError } from '#lib/api/errors.js';
 import { isUuid, parseNumber, serverI18n } from '#lib/features/nutrition/server.js';
 import { serverApi } from '#lib/server/api.js';
 import type { Actions, PageServerLoad } from './$types';
+import { formText } from '#lib/forms.js';
 
 // Go: internal/meals/handler_ingredients.go — GET /app/nutrition/ingredients,
 // POST /app/nutrition/ingredients (?/create) and
@@ -19,7 +20,7 @@ export const load: PageServerLoad = async (event) => {
 export const actions: Actions = {
 	create: async (event) => {
 		const form = await event.request.formData();
-		const value = (name: string) => String(form.get(name) ?? '');
+		const value = (name: string) => formText(form, name);
 		const values = {
 			name: value('name'),
 			brand: value('brand'),
@@ -55,7 +56,7 @@ export const actions: Actions = {
 	},
 
 	delete: async (event) => {
-		const id = String((await event.request.formData()).get('id') ?? '');
+		const id = formText(await event.request.formData(), 'id');
 		if (!isUuid(id)) error(404, (await serverI18n(event)).t('nutrition.err.notfound'));
 		try {
 			await serverApi(event).DELETE('/nutrition/ingredients/{ingredientID}', { params: { path: { ingredientID: id } } });

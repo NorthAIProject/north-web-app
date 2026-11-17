@@ -66,5 +66,5 @@ export function valueText(i18n: Translator, metric: string, v: number): string {
 
 /** The first letter of a name (Go: leaderboard initials). */
 export function initial(name: string): string {
-	return [...name][0] ?? '?';
+	return Array.from(name)[0] ?? '?';
 }

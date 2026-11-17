@@ -10,6 +10,7 @@ import {
 	type CaptureState
 } from '#lib/features/capture/capture.js';
 import type { Actions, PageServerLoad } from './$types';
+import { formText } from '#lib/forms.js';
 
 // Go: GET /app/capture (internal/capture/handler.go show) — the empty box, or
 // one prefilled from the PWA share target. GET /app/capture/panel is the same
@@ -27,8 +28,8 @@ export const actions: Actions = {
 	// Go: POST /app/capture/parse (metered by the API's quick-capture quota).
 	parse: async (event) => {
 		const form = await event.request.formData();
-		const text = String(form.get('text') ?? '').trim();
-		const returnTo = embedReturnTo(String(form.get('return_to') ?? ''));
+		const text = formText(form, 'text').trim();
+		const returnTo = embedReturnTo(formText(form, 'return_to'));
 		try {
 			const { data } = await serverApi(event).POST('/capture/parse', { body: { text } });
 			const draft = { items: data?.items ?? [], unparsed: data?.unparsed ?? [] };
@@ -47,8 +48,8 @@ export const actions: Actions = {
 	// Go: POST /app/capture/commit
 	commit: async (event) => {
 		const form = await event.request.formData();
-		const text = String(form.get('text') ?? '').trim();
-		const returnTo = embedReturnTo(String(form.get('return_to') ?? ''));
+		const text = formText(form, 'text').trim();
+		const returnTo = embedReturnTo(formText(form, 'return_to'));
 		let receipt;
 		try {
 			const items = itemsFromForm(form);

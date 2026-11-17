@@ -36,15 +36,14 @@
 	let { initial, onSaved }: { initial: CaptureState; onSaved?: () => void } = $props();
 	const i18n = useI18n();
 
-	// svelte-ignore state_referenced_locally
-	let cap = $state<CaptureState>(initial);
-	$effect(() => {
-		cap = initial;
-	});
+	// Follows the server's state, and holds what an action returned until it changes.
+	let cap = $derived<CaptureState>(initial);
 
 	const embedded = $derived(cap.returnTo !== '');
 	const textId = 'capture-text';
 
+	// The checkboxes bind into this array, which a $derived value would not track.
+	// eslint-disable-next-line svelte/prefer-writable-derived
 	let included = $state<boolean[]>([]);
 	$effect(() => {
 		included = (cap.draft?.items ?? []).map((it) => writable(it));
@@ -211,7 +210,6 @@
 	{:else}
 		<form method="post" action="/app/capture?/parse" class="space-y-3" use:enhance={submit} data-testid="capture-composer">
 			{#if embedded}<input type="hidden" name="return_to" value={cap.returnTo} />{/if}
-			<!-- svelte-ignore a11y_autofocus -->
 			<Textarea
 				id={textId}
 				name="text"

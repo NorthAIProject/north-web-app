@@ -12,15 +12,12 @@ export const GET: RequestHandler = async (event) => {
 	const { url, locals, cookies } = event;
 	if (locals.session?.user) redirect(303, '/app');
 
-	let start;
-	try {
-		({ data: start } = await serverApi(event).POST('/auth/google/start', {
-			body: { redirectUri: googleRedirectUri(url) }
-		}));
-	} catch (err) {
-		if (isApiError(err) && err.status === 404) error(404, 'Not found');
-		redirect(303, '/login?google=unavailable');
-	}
+	const { data: start } = await serverApi(event)
+		.POST('/auth/google/start', { body: { redirectUri: googleRedirectUri(url) } })
+		.catch((err: unknown) => {
+			if (isApiError(err) && err.status === 404) error(404, 'Not found');
+			redirect(303, '/login?google=unavailable');
+		});
 
 	const next = safeNext(url.searchParams.get('next'), '');
 	writeGoogleState(cookies, url, start!.state, next);

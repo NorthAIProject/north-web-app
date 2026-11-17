@@ -100,7 +100,6 @@
 	});
 </script>
 
-<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
 <div
 	bind:this={ref}
 	id={`${id}-container`}
@@ -189,7 +188,6 @@
 					class="bg-popover rounded-lg border text-popover-foreground text-sm shadow-lg z-50 outline-none p-1 max-h-[200px] overflow-y-auto min-w-(--bits-popover-anchor-width) w-(--bits-popover-anchor-width)"
 				>
 					{#each visible as suggestion, i (suggestion)}
-						<!-- svelte-ignore a11y_click_events_have_key_events -->
 						<div
 							role="option"
 							tabindex="-1"

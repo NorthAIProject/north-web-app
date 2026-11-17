@@ -4,6 +4,7 @@ import { error, fail, redirect, type RequestEvent } from '@sveltejs/kit';
 import { isApiError } from '#lib/api/errors.js';
 import { serverApi } from '#lib/server/api.js';
 import { crewURL, mutedUntil, type Tab } from './crew.js';
+import { formText } from '#lib/forms.js';
 
 type Event = Pick<RequestEvent, 'fetch' | 'locals'> & { depends: (...deps: `${string}:${string}`[]) => void };
 
@@ -62,11 +63,11 @@ export function spaceActions(crewIDOf: (event: RequestEvent) => string) {
 		notify: async (event: RequestEvent) => {
 			const crewID = crewIDOf(event);
 			const form = await event.request.formData();
-			const until = mutedUntil(String(form.get('mute') ?? ''));
+			const until = mutedUntil(formText(form, 'mute'));
 			try {
 				await serverApi(event).PUT('/crews/{crewID}/notifications', {
 					params: { path: { crewID } },
-					body: { notify: String(form.get('notify') ?? ''), ...(until ? { mutedUntil: until } : {}) }
+					body: { notify: formText(form, 'notify'), ...(until ? { mutedUntil: until } : {}) }
 				});
 			} catch (err) {
 				if (isApiError(err) && err.status === 422) return fail(422, { notifyError: err.message });

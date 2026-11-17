@@ -3,6 +3,7 @@ import { isApiError } from '#lib/api/errors.js';
 import { activeGoalsForFiling, filingFrom } from '#lib/features/inbox/inbox.js';
 import { serverApi } from '#lib/server/api.js';
 import type { Actions, PageServerLoad } from './$types';
+import { formText } from '#lib/forms.js';
 
 // The inbox (Go inbox.Handler): what is waiting to be filed, and the active
 // goals a note can be filed under.
@@ -18,7 +19,7 @@ export const load: PageServerLoad = async (event) => {
 // the inbox; a refused capture keeps its text and shows the message.
 export const actions: Actions = {
 	add: async (event) => {
-		const text = String((await event.request.formData()).get('text') ?? '');
+		const text = formText(await event.request.formData(), 'text');
 		try {
 			await serverApi(event).POST('/inbox', { body: { text, source: 'web' } });
 		} catch (err) {
@@ -31,12 +32,12 @@ export const actions: Actions = {
 	},
 	file: async (event) => {
 		const form = await event.request.formData();
-		const itemID = String(form.get('item') ?? '');
+		const itemID = formText(form, 'item');
 		await serverApi(event).POST('/inbox/{itemID}/file', { params: { path: { itemID } }, body: filingFrom(form) });
 		redirect(303, '/app/inbox');
 	},
 	dismiss: async (event) => {
-		const itemID = String((await event.request.formData()).get('item') ?? '');
+		const itemID = formText(await event.request.formData(), 'item');
 		await serverApi(event).POST('/inbox/{itemID}/dismiss', { params: { path: { itemID } } });
 		redirect(303, '/app/inbox');
 	}

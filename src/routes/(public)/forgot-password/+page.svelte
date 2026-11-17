@@ -48,7 +48,6 @@
 					}}
 				>
 					<FormField id="email" label={i18n.t('auth.field.email')} error={failure?.errors?.email}>
-						<!-- svelte-ignore a11y_autofocus -->
 						<Input
 							id="email"
 							name="email"

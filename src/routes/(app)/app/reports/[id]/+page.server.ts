@@ -4,6 +4,7 @@ import { serverApi } from '#lib/server/api.js';
 import { regenerate } from '#lib/features/reports/generate.server.js';
 import { parseHelpful } from '#lib/features/reports/reports.js';
 import type { Actions, PageServerLoad } from './$types';
+import { formText } from '#lib/forms.js';
 
 // Go: internal/reports/handler.go (GET /app/reports/{id}, POST archive,
 // regenerate and helpful).
@@ -27,7 +28,7 @@ export const actions: Actions = {
 	},
 	regenerate: (event) => regenerate(event, event.params.id),
 	helpful: async (event) => {
-		const helpful = parseHelpful(String((await event.request.formData()).get('answer') ?? ''));
+		const helpful = parseHelpful(formText(await event.request.formData(), 'answer'));
 		if (helpful === undefined) error(404, 'Not found.');
 		await serverApi(event).PUT('/reports/{reportID}/helpful', {
 			params: { path: { reportID: event.params.id } },

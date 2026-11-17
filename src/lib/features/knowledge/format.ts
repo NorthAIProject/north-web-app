@@ -66,6 +66,7 @@ export function filterCount(docs: KnowledgeDocument[], filter: LibraryFilter): n
 		case 'files':
 			// Go: countFiles counts uploads only, though the tab also shows vault files.
 			return docs.filter((d) => d.kind === 'upload').length;
+		case 'waiting':
 		default:
 			return docs.filter(isWaiting).length;
 	}
@@ -119,13 +120,14 @@ export function searchCountLabel(i18n: Translator, n: number, hasMore: boolean):
 	return i18n.tf('knowledge.search.count.many', n);
 }
 
+// Number, not parseInt: Go's Atoi refuses "5abc" rather than reading 5.
+const int = (v: string | null) => {
+	const n = Number(v ?? '');
+	return v && Number.isInteger(n) ? n : 0;
+};
+
 /** A passage's line range off a document URL; anything unreadable is no highlight. */
 export function highlightRange(url: URL): { from: number; to: number } {
-	// Number, not parseInt: Go's Atoi refuses "5abc" rather than reading 5.
-	const int = (v: string | null) => {
-		const n = Number(v ?? '');
-		return v && Number.isInteger(n) ? n : 0;
-	};
 	const from = int(url.searchParams.get('from'));
 	let to = int(url.searchParams.get('to'));
 	if (from < 1) return { from: 0, to: 0 };

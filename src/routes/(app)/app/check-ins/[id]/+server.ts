@@ -1,4 +1,4 @@
-import { error, json } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 import { isApiError } from '#lib/api/errors.js';
 import { formErrors, formFromData, requestFrom } from '#lib/features/checkins/checkins.js';
 import { serverApi } from '#lib/server/api.js';
@@ -23,10 +23,10 @@ export const PATCH: RequestHandler = async (event) => {
 			params: { path: { checkInID: event.params.id } },
 			body: requestFrom(form)
 		});
-		return json({ saved: data });
+		return Response.json({ saved: data });
 	} catch (err) {
 		if (isApiError(err) && err.status === 422) {
-			return json({ errors: formErrors(err.fields), values: form }, { status: 422 });
+			return Response.json({ errors: formErrors(err.fields), values: form }, { status: 422 });
 		}
 		apiFailure(err);
 	}

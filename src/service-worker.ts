@@ -30,7 +30,7 @@ const OFFLINE_URL = '/offline.html';
 function offlineText(): string {
 	const langs = sw.navigator.languages || [sw.navigator.language];
 	for (const raw of langs) {
-		const l = String(raw || '').toLowerCase();
+		const l = (raw || '').toLowerCase();
 		if (l === 'en' || l.startsWith('en-')) break;
 		if (l === 'es' || l.startsWith('es-')) return 'Estás sin conexión.';
 		if (l === 'pt' || l === 'pt-br') return 'Você está sem conexão.';
@@ -72,7 +72,7 @@ sw.addEventListener('activate', (event) => {
 	event.waitUntil(
 		(async () => {
 			const names = await caches.keys();
-			await Promise.all(names.map((name) => (name === CACHE ? undefined : caches.delete(name))));
+			await Promise.all(names.filter((name) => name !== CACHE).map((name) => caches.delete(name)));
 			await sw.clients.claim();
 		})()
 	);
@@ -105,7 +105,7 @@ sw.addEventListener('fetch', (event) => {
 				} catch {
 					const cached = await caches.match(OFFLINE_URL);
 					return (
-						cached ||
+						cached ??
 						new Response(offlineText(), {
 							status: 503,
 							headers: { 'Content-Type': 'text/plain; charset=utf-8' }
@@ -137,7 +137,7 @@ sw.addEventListener('fetch', (event) => {
 
 				// Falling back to the network result when there is nothing cached, and
 				// to a plain failure when both are unavailable.
-				return cached || (await network) || Response.error();
+				return cached ?? (await network) ?? Response.error();
 			})()
 		);
 	}
@@ -148,6 +148,15 @@ sw.addEventListener('fetch', (event) => {
 
 type PushPayload = { title?: string; body?: string; href?: string };
 
+const isObject = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null;
+const textOf = (value: unknown) => (typeof value === 'string' ? value : undefined);
+
+// The payload's text fields; a payload that is not an object has none.
+function pushPayload(parsed: unknown): PushPayload {
+	if (!isObject(parsed)) return {};
+	return { title: textOf(parsed.title), body: textOf(parsed.body), href: textOf(parsed.href) };
+}
+
 // A nudge arriving. The payload is the JSON internal/push encrypted for this
 // browser: a title, a body, and the /open link that attributes the tap. A push
 // with no readable payload still shows something — a silent push is how a
@@ -156,7 +165,7 @@ type PushPayload = { title?: string; body?: string; href?: string };
 sw.addEventListener('push', (event) => {
 	let data: PushPayload;
 	try {
-		data = event.data ? event.data.json() : {};
+		data = event.data ? pushPayload(event.data.json()) : {};
 	} catch {
 		data = { title: 'Khepri', body: event.data ? event.data.text() : '' };
 	}
@@ -186,8 +195,8 @@ sw.addEventListener('push', (event) => {
 // page the nudge was about (a chat thread for a coach reply or a briefing).
 // Anything that is not a same-origin path falls back to /app, so a malformed
 // payload cannot send somebody off-site.
-function notificationTarget(action: string, data: { href?: string } | null | undefined, origin: string): string {
-	const href = action === 'capture' ? '/app/capture' : (data && data.href) || '/app';
+function notificationTarget(action: string, data: unknown, origin: string): string {
+	const href = action === 'capture' ? '/app/capture' : (isObject(data) && textOf(data.href)) || '/app';
 	let url: URL;
 	try {
 		url = new URL(href, origin);
@@ -209,7 +218,7 @@ async function openNotificationTarget(clients: Clients, target: string) {
 	const windows = await clients.matchAll({ type: 'window', includeUncontrolled: true });
 	for (const client of windows) {
 		if (!('focus' in client) || !('navigate' in client)) continue;
-		const win = client as WindowClient;
+		const win = client;
 		try {
 			const focused = await win.focus();
 			await (focused || win).navigate(target);

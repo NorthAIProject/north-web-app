@@ -15,6 +15,7 @@ import {
 import type { Overage, Plan } from '#lib/features/nutrition/view.js';
 import { serverApi } from '#lib/server/api.js';
 import type { Actions, PageServerLoad } from './$types';
+import { formText } from '#lib/forms.js';
 
 // Go: internal/meals/handler_plans.go — GET /app/nutrition/plans/{id} and
 // every POST that changes a plan. In Go each form posts to its own URL
@@ -89,7 +90,7 @@ function change(action: string, scope: (form: FormData) => string, run: Change) 
 	};
 }
 
-const field = (form: FormData, name: string) => String(form.get(name) ?? '');
+const field = (form: FormData, name: string) => formText(form, name);
 const confirmed = (form: FormData) => field(form, 'confirm_overage') !== '';
 
 /** A form naming no valid id: a 404, as Go's uuid.Parse of a bad path. */
@@ -213,10 +214,14 @@ export const actions: Actions = {
 		await api.POST('/nutrition/meals/{mealID}/ingredients/batch', {
 			params: { path: { mealID } },
 			body: {
-				portions: form.getAll('line').map((n) => ({
-					ingredientId: uuidOr(form.get(`ingredient_id_${n}`)),
-					quantityGrams: parseNumber(form.get(`quantity_grams_${n}`))
-				})),
+				// A "line" that is a file names no row; it posts as a blank portion.
+				portions: form.getAll('line').map((line) => {
+					const n = typeof line === 'string' ? line : '';
+					return {
+						ingredientId: uuidOr(form.get(`ingredient_id_${n}`)),
+						quantityGrams: parseNumber(form.get(`quantity_grams_${n}`))
+					};
+				}),
 				confirmOverage: confirmed(form)
 			}
 		});

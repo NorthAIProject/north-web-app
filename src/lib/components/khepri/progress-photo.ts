@@ -23,7 +23,9 @@ export async function shrinkPhoto(file: File): Promise<File> {
 	if (!ctx) throw new Error('no 2d context');
 	ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
 	bitmap.close();
-	const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/jpeg', QUALITY));
+	const blob = await new Promise<Blob | null>((resolve) => {
+		canvas.toBlob(resolve, 'image/jpeg', QUALITY);
+	});
 	if (!blob) throw new Error('toBlob failed');
 	const name = file.name.replace(/\.[^.]+$/, '') + '.jpg';
 	return new File([blob], name, { type: 'image/jpeg' });

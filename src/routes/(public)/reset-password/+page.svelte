@@ -53,7 +53,6 @@
 						error={errors.password}
 						hint={i18n.t('auth.password.hint')}
 					>
-						<!-- svelte-ignore a11y_autofocus -->
 						<Input
 							id="password"
 							name="password"

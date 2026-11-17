@@ -41,7 +41,7 @@ export function isRegion(key: string): key is Region {
 
 /** The region a muscle key shows on, or null for a key the figure does not know. */
 export function regionOf(muscle: string): Region | null {
-	if (regionSet.has(muscle)) return muscle as Region;
+	if (isRegion(muscle)) return muscle;
 	return FOLD[muscle] ?? null;
 }
 

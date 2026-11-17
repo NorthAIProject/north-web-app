@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-const invalidate = vi.fn(async () => {});
+const invalidate = vi.fn<() => Promise<void>>(() => Promise.resolve());
 vi.mock('$app/navigation', () => ({ invalidate }));
 vi.mock('#lib/components/khepri/mascot.svelte.js', () => ({
 	mascot: new Proxy({}, { get: () => () => {} })
@@ -21,12 +21,12 @@ describe('ChatStream announcement', () => {
 	it('announces the finished reply once, as plain words', async () => {
 		vi.stubGlobal(
 			'fetch',
-			vi.fn(async () =>
-				sse([
+			vi.fn<() => Promise<Response>>(() =>
+				Promise.resolve(sse([
 					['token', { text: '**Good** ' }],
 					['token', { text: 'question.' }],
 					['done', { messageId: 'm1' }]
-				])
+				]))
 			)
 		);
 		const chat = new ChatStream(() => 'c1');
@@ -40,12 +40,12 @@ describe('ChatStream announcement', () => {
 	it('says nothing politely when the stream fails (the bubble alerts instead)', async () => {
 		vi.stubGlobal(
 			'fetch',
-			vi.fn(async () =>
-				sse([
+			vi.fn<() => Promise<Response>>(() =>
+				Promise.resolve(sse([
 					['token', { text: 'Half a' }],
 					['error', { message: 'The coach is busy.' }],
 					['done', {}]
-				])
+				]))
 			)
 		);
 		const chat = new ChatStream(() => 'c1');

@@ -260,9 +260,10 @@ export function paceLabel(seconds: number): string {
 	return `${Math.trunc(s / 60)}:${String(s % 60).padStart(2, '0')} /km`;
 }
 
+const pad = (n: number) => String(n).padStart(2, '0');
+
 export function clockLabel(seconds: number): string {
 	const s = Math.trunc(seconds + 0.5);
-	const pad = (n: number) => String(n).padStart(2, '0');
 	if (s >= 3600)
 		return `${Math.trunc(s / 3600)}:${pad(Math.trunc((s % 3600) / 60))}:${pad(s % 60)}`;
 	return `${Math.trunc(s / 60)}:${pad(s % 60)}`;

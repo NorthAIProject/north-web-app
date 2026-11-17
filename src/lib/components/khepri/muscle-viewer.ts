@@ -93,6 +93,9 @@ type Colours = {
 	sore: THREE.Color;
 };
 type Rim = { color: { value: THREE.Color }; strength: { value: number } };
+/** instanceof narrows to Mesh<any, any, any>; this keeps the default (typed) parameters. */
+const isMesh = (obj: THREE.Object3D): obj is THREE.Mesh => obj instanceof THREE.Mesh;
+
 type RegionEntry = { mesh: THREE.Mesh; material: THREE.MeshStandardMaterial };
 type Shell = {
 	geometry: THREE.BufferGeometry;
@@ -145,7 +148,7 @@ function createStudioEnvironment(): THREE.Scene {
 function hasWebGL(): boolean {
 	try {
 		const probe = document.createElement('canvas');
-		return Boolean(window.WebGLRenderingContext && (probe.getContext('webgl2') || probe.getContext('webgl')));
+		return Boolean(window.WebGLRenderingContext && (probe.getContext('webgl2') ?? probe.getContext('webgl')));
 	} catch {
 		return false;
 	}
@@ -190,6 +193,12 @@ function addRim(material: THREE.Material, rim: Rim, rimAlpha = 0, rimPower = 2.5
 	material.customProgramCacheKey = () => 'north-body-rim';
 }
 
+// The selected muscle glows in its own colour, so a tap is seen to land.
+function highlight(region: RegionEntry, on: boolean) {
+	if (on) region.material.emissive.copy(region.material.color).multiplyScalar(0.45);
+	else region.material.emissive.setScalar(0);
+}
+
 export async function createViewer(canvas: HTMLCanvasElement, options: ViewerOptions = {}): Promise<MuscleViewerHandle> {
 	if (!hasWebGL()) throw new Error('WebGL unavailable');
 
@@ -210,9 +219,9 @@ export async function createViewer(canvas: HTMLCanvasElement, options: ViewerOpt
 	const studio = createStudioEnvironment();
 	const envTexture = pmrem.fromScene(studio, 0.03).texture;
 	studio.traverse((obj) => {
-		if (obj instanceof THREE.Mesh) {
+		if (isMesh(obj)) {
 			obj.geometry.dispose();
-			(obj.material as THREE.Material).dispose();
+			for (const material of [obj.material].flat()) material.dispose();
 		}
 	});
 	pmrem.dispose();
@@ -319,23 +328,17 @@ export async function createViewer(canvas: HTMLCanvasElement, options: ViewerOpt
 		pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
 		raycaster.setFromCamera(pointer, camera);
 		const hit = raycaster.intersectObjects(meshes, false)[0];
-		const key = hit ? hit.object.name : null;
-		select(key);
-		options.onMuscleClick?.(key, key ? (MUSCLE_INFO[key] ?? null) : null, {
+		const muscle = hit ? hit.object.name : null;
+		select(muscle);
+		options.onMuscleClick?.(muscle, muscle ? (MUSCLE_INFO[muscle] ?? null) : null, {
 			x: (e.clientX - rect.left) / rect.width,
 			y: (e.clientY - rect.top) / rect.height
 		});
 	}
 
-	// The selected muscle glows in its own colour, so a tap is seen to land.
-	function highlight(region: RegionEntry, on: boolean) {
-		if (on) region.material.emissive.copy(region.material.color).multiplyScalar(0.45);
-		else region.material.emissive.setScalar(0);
-	}
-
-	function select(key: string | null) {
+	function select(muscle: string | null) {
 		if (selected && regions[selected]) highlight(regions[selected], false);
-		selected = key;
+		selected = muscle;
 		if (selected && regions[selected]) highlight(regions[selected], true);
 		wake();
 	}
@@ -545,18 +548,19 @@ function loadModel(url: string): Promise<GLTF> {
  * region with its own material, keyed by the mesh's name. The file stands on
  * the origin (soles at y = 0, centred).
  */
+const isKey = (name?: string) => name === SHELL_REGION || (!!name && name in MUSCLE_INFO);
+
 async function loadFigure(colours: Colours, rim: Rim, model?: string) {
 	const gltf = await loadModel(model || MODEL_PATH);
 	const figure = gltf.scene.clone(true);
 
 	const meshes: THREE.Mesh[] = [];
 	figure.traverse((obj) => {
-		if (obj instanceof THREE.Mesh) meshes.push(obj);
+		if (isMesh(obj)) meshes.push(obj);
 	});
 	// gltfpack moves each mesh onto an unnamed child of the named node (shell,
 	// quads, …), which GLTFLoader calls mesh_<n>; the key is then the parent's
 	// name. Copied onto the mesh, so a tap resolves by hit.object.name.
-	const isKey = (name?: string) => name === SHELL_REGION || (!!name && name in MUSCLE_INFO);
 	for (const obj of meshes) {
 		if (!isKey(obj.name) && isKey(obj.parent?.name)) obj.name = obj.parent!.name;
 	}
@@ -601,7 +605,7 @@ function skinLayers(obj: THREE.Mesh, colours: Colours, rim: Rim): Shell {
 	addRim(ghost, rim, SHELL_EDGE_ALPHA, SHELL_EDGE_POWER);
 	obj.material = ghost;
 	obj.renderOrder = 1;
-	const targets = obj.morphTargetDictionary || {};
+	const targets = obj.morphTargetDictionary ?? {};
 
 	// The body under the muscles: the same geometry with the core key on, so
 	// it lies just below each muscle and at the surface where there is none

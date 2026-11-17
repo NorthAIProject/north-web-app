@@ -21,6 +21,7 @@
 	let checking = false;
 	// The ids already shown on this page, so a check that races the "seen"
 	// posts never opens the same celebration twice (Go: data-shown).
+	// eslint-disable-next-line svelte/prefer-svelte-reactivity -- bookkeeping, never rendered
 	const shown = new Set<string>();
 
 	async function check() {

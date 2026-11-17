@@ -26,7 +26,7 @@ export const GET: RequestHandler = async ({ locals, fetch }) => {
 		return new Response(message + '\n', { status: 429, headers });
 	}
 	if (!upstream.ok || !upstream.body) {
-		error(upstream.ok ? 502 : upstream.status, { message: 'The export could not be started.' });
+		error(upstream.ok ? 502 : upstream.status, 'The export could not be started.');
 	}
 
 	return new Response(upstream.body, {

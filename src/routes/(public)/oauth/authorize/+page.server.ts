@@ -11,6 +11,7 @@ import {
 import { writeSession } from '#lib/server/session.js';
 import { fetchAuthOptions } from '#lib/features/auth/options.js';
 import type { Actions, PageServerLoad, RequestEvent } from './$types';
+import { formText } from '#lib/forms.js';
 
 // GET /oauth/authorize (Go: mcpauth.BrowserHandler.authorize and
 // renderExisting). An agent's browser redirect lands here with the OAuth
@@ -26,9 +27,8 @@ export const load: PageServerLoad = async (event) => {
 	const requestId = url.searchParams.get('request_id');
 	if (!requestId) {
 		const q = (name: string) => url.searchParams.get(name) ?? '';
-		let begun;
-		try {
-			({ data: begun } = await api.POST('/auth/oauth/authorize', {
+		const { data: begun } = await api
+			.POST('/auth/oauth/authorize', {
 				body: {
 					clientId: q('client_id'),
 					redirectUri: q('redirect_uri'),
@@ -40,12 +40,12 @@ export const load: PageServerLoad = async (event) => {
 					resource: q('resource'),
 					signedIn: Boolean(locals.session?.user)
 				}
-			}));
-		} catch (err) {
-			// Fatal: the destination is unvalidated, so show the reason, never redirect.
-			if (isApiError(err) && err.status < 500) error(400, err.message);
-			throw err;
-		}
+			})
+			.catch((err: unknown) => {
+				// Fatal: the destination is unvalidated, so show the reason, never redirect.
+				if (isApiError(err) && err.status < 500) error(400, err.message);
+				throw err;
+			});
 		// The client's own registered callback, validated by north-client.
 		if (begun?.redirect) redirect(303, begun.redirect, { external: true });
 		writeOAuthVerifier(cookies, url, begun!.verifier!);
@@ -89,8 +89,8 @@ export const actions: Actions = {
 		const mode = form.get('mode') === 'login' ? 'login' : 'signup';
 		const values = {
 			mode,
-			email: String(form.get('email') ?? ''),
-			display_name: String(form.get('display_name') ?? '')
+			email: formText(form, 'email'),
+			display_name: formText(form, 'display_name')
 		};
 		try {
 			const { data } = await serverApi(event).POST('/auth/oauth/requests/{requestID}/account', {
@@ -99,9 +99,9 @@ export const actions: Actions = {
 					verifier: readOAuthVerifier(cookies),
 					mode,
 					email: values.email,
-					password: String(form.get('password') ?? ''),
+					password: formText(form, 'password'),
 					displayName: values.display_name,
-					timezone: String(form.get('timezone') ?? '')
+					timezone: formText(form, 'timezone')
 				}
 			});
 			writeSession(cookies, url, data!.token, data!.expiresAt);

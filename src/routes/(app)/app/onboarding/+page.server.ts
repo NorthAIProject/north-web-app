@@ -3,6 +3,7 @@ import { MASCOT_3D_MODEL_URL } from '$app/env/private';
 import { serverApi } from '#lib/server/api.js';
 import { formFailure } from '#lib/server/form.js';
 import type { Actions, PageServerLoad } from './$types';
+import { formText } from '#lib/forms.js';
 
 // GET /app/onboarding (Go: onboarding.Handler.show). The /app layout already
 // keeps an un-onboarded account here; a finished one has nothing to fill in.
@@ -27,10 +28,10 @@ export const actions: Actions = {
 		const form = await event.request.formData();
 		const values = {
 			focus_areas: form.getAll('focus_areas').map(String),
-			coaching_style_preset: String(form.get('coaching_style_preset') ?? 'direct'),
-			coaching_style_custom: String(form.get('coaching_style_custom') ?? ''),
-			goal_title: String(form.get('goal_title') ?? ''),
-			first_week_template: String(form.get('first_week_template') ?? '')
+			coaching_style_preset: formText(form, 'coaching_style_preset', 'direct'),
+			coaching_style_custom: formText(form, 'coaching_style_custom'),
+			goal_title: formText(form, 'goal_title'),
+			first_week_template: formText(form, 'first_week_template')
 		};
 		let thread: string | undefined;
 		try {

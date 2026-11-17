@@ -27,7 +27,7 @@ function withDefaults(base: Obj, defaults: Obj): Obj {
 	const out: Obj = { ...base };
 	for (const [key, value] of Object.entries(defaults)) {
 		if (out[key] === undefined) out[key] = value;
-		else if (isObj(out[key]) && isObj(value)) out[key] = withDefaults(out[key] as Obj, value);
+		else if (isObj(out[key]) && isObj(value)) out[key] = withDefaults(out[key], value);
 	}
 	return out;
 }
@@ -52,7 +52,7 @@ export function prepareOption(option: EChartsOption, description?: string): ECha
 	if (isObj(out.toolbox) && Object.keys(out.toolbox).length === 0) delete out.toolbox;
 	// Only a chart that asked for a tooltip gets one: adding the key would
 	// switch tooltips on where the builder left them out.
-	if (Array.isArray(out.tooltip)) out.tooltip = out.tooltip.map((t) => (isObj(t) ? withDefaults(t, tooltipDefaults) : t));
+	if (Array.isArray(out.tooltip)) out.tooltip = out.tooltip.map((t: unknown) => (isObj(t) ? withDefaults(t, tooltipDefaults) : t));
 	else if (isObj(out.tooltip)) out.tooltip = withDefaults(out.tooltip, tooltipDefaults);
 	if (description) {
 		const aria = isObj(out.aria) ? out.aria : {};
@@ -64,8 +64,14 @@ export function prepareOption(option: EChartsOption, description?: string): ECha
 const MAX_POINTS = 31;
 
 function categories(axis: unknown): string[] {
-	const first = Array.isArray(axis) ? axis[0] : axis;
+	const first: unknown = Array.isArray(axis) ? axis[0] : axis;
 	return isObj(first) && Array.isArray(first.data) ? first.data.map(String) : [];
+}
+
+/** "Name: " for a named point; a name that is not text or a number is left out. */
+function pointName(point: unknown): string {
+	if (!isObj(point)) return '';
+	return typeof point.name === 'string' || typeof point.name === 'number' ? `${point.name}: ` : '';
 }
 
 function pointValue(point: unknown): unknown {
@@ -80,7 +86,13 @@ function pointValue(point: unknown): unknown {
  */
 export function describeOption(option: EChartsOption, locale: string): string {
 	const number = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 });
-	const fmt = (v: unknown) => (typeof v === 'number' ? number.format(v) : v == null ? '' : String(v));
+	// A point that is an object has no text form; it reads as nothing rather than "[object Object]".
+	const fmt = (v: unknown): string => {
+		if (typeof v === 'number') return number.format(v);
+		if (typeof v === 'string') return v;
+		if (Array.isArray(v)) return v.join(',');
+		return typeof v === 'boolean' || typeof v === 'bigint' ? String(v) : '';
+	};
 	const x = categories(option.xAxis);
 	const series = (Array.isArray(option.series) ? option.series : option.series ? [option.series] : []).filter(isObj);
 	const parts: string[] = [];
@@ -90,7 +102,7 @@ export function describeOption(option: EChartsOption, locale: string): string {
 		let items: string[];
 		if (s.type === 'pie' || s.type === 'gauge') {
 			const unit = isObj(s.detail) && typeof s.detail.formatter === 'string' && s.detail.formatter.includes('%') ? '%' : '';
-			items = data.map((d) => `${isObj(d) && d.name != null ? `${d.name}: ` : ''}${fmt(pointValue(d))}${unit}`);
+			items = data.map((d) => `${pointName(d)}${fmt(pointValue(d))}${unit}`);
 			parts.push(items.slice(0, MAX_POINTS).join('; ') + (items.length > MAX_POINTS ? '…' : ''));
 			continue;
 		}

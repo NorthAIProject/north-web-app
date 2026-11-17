@@ -40,7 +40,7 @@ export type MedalSet = {
 	glyphs: Record<string, string[]>;
 };
 
-export const medalSet: MedalSet = raw as MedalSet;
+export const medalSet: MedalSet = raw;
 
 const fontStacks: Record<string, string> = {
 	rounded: "ui-rounded,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif"

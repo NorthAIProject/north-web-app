@@ -63,6 +63,8 @@ function reducedMotion(): boolean {
 
 type Instance = { id: string; apply(name: string): void };
 
+// A registry that nothing renders from, so it stays a plain Set.
+// eslint-disable-next-line svelte/prefer-svelte-reactivity
 const instances = new Set<Instance>();
 let sustained = 'idle';
 let lastGesture: string | null = null;
@@ -94,6 +96,7 @@ export type ChatStatusKey = 'ready' | 'listening' | 'thinking' | 'writing' | 'sn
 export type ChatCopy = { ready: string; listening: string; thinking: string; writing: string; snag: string };
 
 /** The chat header's phase and status line, reactive. */
+// oxlint-disable-next-line typescript/no-unnecessary-type-assertion -- without it $state infers phase as string
 export const mascotChat = $state({ phase: 'idle' as ChatPhase, status: '' });
 
 let statusKey: ChatStatusKey = 'ready';

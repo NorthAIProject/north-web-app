@@ -25,7 +25,7 @@ describe('onCheckInSaved', () => {
 	});
 
 	it('refreshes on a save and on every poll while visible', () => {
-		const refresh = vi.fn();
+		const refresh = vi.fn<() => void>();
 		const stop = onCheckInSaved(refresh, 1000);
 		announceCheckInSaved();
 		expect(refresh).toHaveBeenCalledTimes(1);
@@ -38,7 +38,7 @@ describe('onCheckInSaved', () => {
 	});
 
 	it('skips polls while hidden and catches up once on return', () => {
-		const refresh = vi.fn();
+		const refresh = vi.fn<() => void>();
 		const stop = onCheckInSaved(refresh, 1000);
 		doc.setHidden(true);
 		vi.advanceTimersByTime(5000);
@@ -49,7 +49,7 @@ describe('onCheckInSaved', () => {
 	});
 
 	it('does not refresh on return when no poll was missed', () => {
-		const refresh = vi.fn();
+		const refresh = vi.fn<() => void>();
 		const stop = onCheckInSaved(refresh, 1000);
 		vi.advanceTimersByTime(300);
 		doc.setHidden(true);

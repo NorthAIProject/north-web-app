@@ -37,15 +37,13 @@ export default defineConfig(
 		plugins: { '@typescript-eslint': ts.plugin },
 		linterOptions: { reportUnusedDisableDirectives: 'off' },
 		rules: {
-			// BACKLOG. Recommended Svelte rules the existing tree still breaks
-			// (count as of 2026-11-17). They report as warnings so CI stays
-			// green while every other recommended rule is enforced. To retire
-			// one: fix its hits, then delete the line. Never add a rule here.
-			'svelte/no-navigation-without-resolve': 'warn', // 112
-			'svelte/no-useless-mustaches': 'warn', // 9
-			'svelte/no-unused-svelte-ignore': 'warn', // 8
-			'svelte/prefer-svelte-reactivity': 'warn', // 4
-			'svelte/prefer-writable-derived': 'warn' // 4
+			// No paths.base is configured, so plain hrefs and goto() targets are
+			// already resolved; wrapping all of them in resolve() would change nothing.
+			'svelte/no-navigation-without-resolve': 'off',
+			// {' '} and {' · '} are how this tree keeps whitespace that Svelte trims
+			// at the edge of an element or a block; the plain text the rule asks for
+			// would lose the space.
+			'svelte/no-useless-mustaches': 'off'
 		}
 	},
 	...oxlint.buildFromOxlintConfigFile('./.oxlintrc.json')

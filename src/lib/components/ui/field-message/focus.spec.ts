@@ -90,7 +90,7 @@ describe('withInvalidFocus', () => {
 	const input = { formElement: form } as Parameters<ReturnType<typeof withInvalidFocus>>[0];
 
 	async function run(type: 'failure' | 'success', inner?: Parameters<typeof withInvalidFocus>[0]) {
-		const update = vi.fn(async () => {});
+		const update = vi.fn<() => Promise<void>>(() => Promise.resolve());
 		const after = await withInvalidFocus(inner)(input);
 		if (typeof after !== 'function') throw new Error('expected a callback');
 		await after({ result: { type }, update } as unknown as Parameters<typeof after>[0]);
@@ -109,7 +109,7 @@ describe('withInvalidFocus', () => {
 	});
 
 	it('runs the inner callback instead of the default update', async () => {
-		const innerAfter = vi.fn(async () => {});
+		const innerAfter = vi.fn<() => Promise<void>>(() => Promise.resolve());
 		const update = await run('failure', () => innerAfter);
 		expect(innerAfter).toHaveBeenCalledOnce();
 		expect(update).not.toHaveBeenCalled();

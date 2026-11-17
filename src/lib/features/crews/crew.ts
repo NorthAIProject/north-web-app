@@ -99,11 +99,12 @@ export function percent(done: number, target: number): number {
 	return Math.min(100, Math.floor((done * 100) / target));
 }
 
+const first = (s: string) => Array.from(s)[0] ?? '';
+
 /** initials: what an avatar without a photo shows. */
 export function initials(name: string | undefined): string {
 	const fields = (name ?? '').trim().split(/\s+/).filter(Boolean);
 	if (fields.length === 0) return '?';
-	const first = (s: string) => Array.from(s)[0] ?? '';
 	if (fields.length === 1) return first(fields[0]).toUpperCase();
 	return (first(fields[0]) + first(fields[fields.length - 1])).toUpperCase();
 }

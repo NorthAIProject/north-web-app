@@ -86,15 +86,15 @@ export async function toWav(blob: Blob): Promise<Blob> {
 		OfflineAudioContext?: typeof OfflineAudioContext;
 		webkitOfflineAudioContext?: typeof OfflineAudioContext;
 	};
-	const Ctx = w.AudioContext || w.webkitAudioContext;
-	const Offline = w.OfflineAudioContext || w.webkitOfflineAudioContext;
+	const Ctx = w.AudioContext ?? w.webkitAudioContext;
+	const Offline = w.OfflineAudioContext ?? w.webkitOfflineAudioContext;
 	if (!Ctx) throw new Error('no audio context');
 
 	const ctx = new Ctx();
 	const bytes = await blob.arrayBuffer();
 	const audio = await new Promise<AudioBuffer>((resolve, reject) => {
 		const decoded = ctx.decodeAudioData(bytes, resolve, reject);
-		if (decoded && typeof decoded.then === 'function') decoded.then(resolve, reject);
+		if (typeof decoded?.then === 'function') decoded.then(resolve, reject);
 	});
 	void ctx.close();
 	if (!Offline) return encodeWav(audio);

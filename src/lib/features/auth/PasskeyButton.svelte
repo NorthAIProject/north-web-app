@@ -30,10 +30,10 @@
 	// What the page holds at the click. Like passkey.js, read #email and
 	// #display_name off the DOM first: that catches text typed or autofilled
 	// before hydration, which the page's bound state never saw.
+	const value = (id: string) =>
+		(document.getElementById(id) as HTMLInputElement | null)?.value.trim() || undefined;
 	function current() {
 		const given = fields();
-		const value = (id: string) =>
-			(document.getElementById(id) as HTMLInputElement | null)?.value.trim() || undefined;
 		return {
 			email: value('email') ?? given.email,
 			displayName: value('display_name') ?? given.displayName,

@@ -1,5 +1,7 @@
 // The weekly review form (north-client web/weekly + internal/weekly/handler.go).
 
+import { entryText } from '#lib/forms.js';
+
 /** week.MaxPriorities */
 export const MAX_PRIORITIES = 3;
 
@@ -36,7 +38,7 @@ export function goalOrder(form: FormData): string[] {
 		if (!key.startsWith('rank_')) continue;
 		const id = key.slice('rank_'.length);
 		if (!uuidPattern.test(id)) continue;
-		const raw = String(value).trim();
+		const raw = entryText(value).trim();
 		let rank = /^[+-]?\d+$/.test(raw) ? Number(raw) : Number.NaN;
 		if (!Number.isFinite(rank) || rank < 1) rank = 1 << 30;
 		list.push({ id, rank });

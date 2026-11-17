@@ -2,6 +2,7 @@ import { fail, redirect, type RequestEvent } from '@sveltejs/kit';
 import { isApiError } from '#lib/api/errors.js';
 import { serverApi } from '#lib/server/api.js';
 import type { Actions, PageServerLoad } from './$types';
+import { formText } from '#lib/forms.js';
 
 // Go: internal/documents/handler.go index, createNote, upload, reindex,
 // retryEmbeddings. Every write lands back on /app/knowledge, as Go's 303s did.
@@ -33,8 +34,8 @@ async function post(event: RequestEvent, path: '/knowledge/reindex' | '/knowledg
 export const actions: Actions = {
 	note: async (event) => {
 		const form = await event.request.formData();
-		const title = String(form.get('title') ?? '').trim();
-		const body = String(form.get('body') ?? '').trim();
+		const title = formText(form, 'title').trim();
+		const body = formText(form, 'body').trim();
 		try {
 			await serverApi(event).POST('/knowledge/notes', { body: { title, body } });
 		} catch (err) {

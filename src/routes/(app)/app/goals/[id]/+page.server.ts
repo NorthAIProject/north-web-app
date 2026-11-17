@@ -9,6 +9,7 @@ import {
 	milestoneRequest
 } from '#lib/features/goals/goals.js';
 import type { Actions, PageServerLoad } from './$types';
+import { formText } from '#lib/forms.js';
 
 // Go: internal/goals/handler.go — GET /app/goals/{id} and every form on it
 // (edit, status, progress note, milestones add/edit/status/delete, delete).
@@ -53,7 +54,7 @@ export const actions: Actions = {
 	},
 
 	status: async (event) => {
-		const status = String((await event.request.formData()).get('status') ?? '');
+		const status = formText(await event.request.formData(), 'status');
 		try {
 			await serverApi(event).PUT('/goals/{goalID}/status', { ...goalPath(event), body: { status } });
 		} catch (err) {
@@ -64,8 +65,8 @@ export const actions: Actions = {
 
 	note: async (event) => {
 		const data = await event.request.formData();
-		const note = String(data.get('note') ?? '');
-		const raw = String(data.get('progress') ?? '').trim();
+		const note = formText(data, 'note');
+		const raw = formText(data, 'progress').trim();
 		const progress = /^[+-]?\d+$/.test(raw) ? Number(raw) : undefined;
 		try {
 			await serverApi(event).POST('/goals/{goalID}/updates', { ...goalPath(event), body: { note, progress } });
@@ -94,7 +95,7 @@ export const actions: Actions = {
 
 	editMilestone: async (event) => {
 		const data = await event.request.formData();
-		const mid = String(data.get('milestone_id') ?? '');
+		const mid = formText(data, 'milestone_id');
 		const m = milestoneFrom(data);
 		try {
 			await serverApi(event).PUT('/goals/{goalID}/milestones/{milestoneID}', {
@@ -112,8 +113,8 @@ export const actions: Actions = {
 
 	milestoneStatus: async (event) => {
 		const data = await event.request.formData();
-		const mid = String(data.get('milestone_id') ?? '');
-		const status = String(data.get('status') ?? '');
+		const mid = formText(data, 'milestone_id');
+		const status = formText(data, 'status');
 		try {
 			await serverApi(event).PUT('/goals/{goalID}/milestones/{milestoneID}/status', {
 				...milestonePath(event, mid),
@@ -126,7 +127,7 @@ export const actions: Actions = {
 	},
 
 	deleteMilestone: async (event) => {
-		const mid = String((await event.request.formData()).get('milestone_id') ?? '');
+		const mid = formText(await event.request.formData(), 'milestone_id');
 		try {
 			await serverApi(event).DELETE('/goals/{goalID}/milestones/{milestoneID}', milestonePath(event, mid));
 		} catch (err) {

@@ -2,6 +2,7 @@ import { fail, redirect } from '@sveltejs/kit';
 import { isApiError } from '#lib/api/errors.js';
 import { serverApi } from '#lib/server/api.js';
 import type { Actions, PageServerLoad } from './$types';
+import { formText } from '#lib/forms.js';
 
 // Go: crews.Handler.index / create (GET, POST /app/crews).
 export const load: PageServerLoad = async (event) => {
@@ -12,7 +13,7 @@ export const load: PageServerLoad = async (event) => {
 
 export const actions: Actions = {
 	default: async (event) => {
-		const name = String((await event.request.formData()).get('name') ?? '');
+		const name = formText(await event.request.formData(), 'name');
 		let id: string;
 		try {
 			const { data } = await serverApi(event).POST('/crews', { body: { name } });

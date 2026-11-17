@@ -22,9 +22,9 @@ describe('clientAddress', () => {
 describe('createApi', () => {
 	it('sends the browser address as X-Real-IP', async () => {
 		let seen: Headers | undefined;
-		const fetch = (async (input: Request) => {
+		const fetch = ((input: Request) => {
 			seen = input.headers;
-			return new Response('{}', { headers: { 'content-type': 'application/json' } });
+			return Promise.resolve(new Response('{}', { headers: { 'content-type': 'application/json' } }));
 		}) as typeof globalThis.fetch;
 		await createApi({ fetch, baseUrl: 'http://api.test', clientAddress: '176.223.17.241' }).GET(
 			'/me'

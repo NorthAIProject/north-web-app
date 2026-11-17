@@ -1,4 +1,4 @@
-import { error, json } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 import { APPLE_BUNDLE_ID, APPLE_TEAM_ID } from '$app/env/private';
 import { appSiteAssociation } from '#lib/features/pwa/aasa.js';
 import type { RequestHandler } from './$types';
@@ -8,5 +8,5 @@ import type { RequestHandler } from './$types';
 export const GET: RequestHandler = () => {
 	const body = appSiteAssociation(APPLE_TEAM_ID, APPLE_BUNDLE_ID);
 	if (!body) error(404, 'Not found');
-	return json(body);
+	return Response.json(body);
 };

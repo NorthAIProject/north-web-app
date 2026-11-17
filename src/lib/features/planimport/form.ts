@@ -8,6 +8,7 @@
 // the API re-validates every value and recomputes every number.
 
 import type { components } from '#lib/api/generated/schema.js';
+import { formText } from '#lib/forms.js';
 
 export type MealDraft = components['schemas']['MealImportDraft'];
 export type MealDay = components['schemas']['MealImportDay'];
@@ -61,7 +62,7 @@ const floatPattern = /^[+-]?(\d+\.?\d*|\.\d+)([eE][+-]?\d+)?$/;
 export function mealFromForm(form: FormData): { draft: MealDraft; action: ReviewAction } | undefined {
 	let d: MealDraft;
 	try {
-		const raw = String(form.get('draft') ?? '');
+		const raw = formText(form, 'draft');
 		if (!raw) return undefined;
 		d = JSON.parse(raw) as MealDraft;
 		if (!d || typeof d !== 'object') return undefined;
@@ -69,7 +70,7 @@ export function mealFromForm(form: FormData): { draft: MealDraft; action: Review
 		return undefined;
 	}
 	normalize(d);
-	const value = (name: string) => String(form.get(name) ?? '');
+	const value = (name: string) => formText(form, name);
 
 	d.name = value('name');
 	d.planType = value('plan_type');
@@ -94,7 +95,7 @@ export function mealFromForm(form: FormData): { draft: MealDraft; action: Review
 /** foodsFromForm: one option's food lines, posted under prefix. */
 function foodsFromForm(form: FormData, prefix: string, foods: FoodDraft[]) {
 	foods.forEach((f, k) => {
-		const key = (field: string) => String(form.get(`${prefix}.f${k}.${field}`) ?? '');
+		const key = (field: string) => formText(form, `${prefix}.f${k}.${field}`);
 		delete f.grams;
 		const g = key('grams').trim();
 		if (floatPattern.test(g) && Number(g) > 0) f.grams = Number(g);

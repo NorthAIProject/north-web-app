@@ -3,6 +3,7 @@ import { isApiError } from '#lib/api/errors.js';
 import { serverApi } from '#lib/server/api.js';
 import { goalOrder, MAX_PRIORITIES, type Volume } from '#lib/features/weekly/form.js';
 import type { Actions, PageServerLoad } from './$types';
+import { formText } from '#lib/forms.js';
 
 // Go: internal/weekly/handler.go (GET/POST /app/weekly).
 export const load: PageServerLoad = async (event) => {
@@ -15,7 +16,7 @@ export const actions: Actions = {
 	default: async (event) => {
 		const form = await event.request.formData();
 		const priorities = form.getAll('priority').map(String).slice(0, MAX_PRIORITIES);
-		const volume = String(form.get('volume') ?? '') as Volume;
+		const volume = formText(form, 'volume') as Volume;
 		const order = goalOrder(form);
 		try {
 			await serverApi(event).PUT('/weekly/focus', {

@@ -2,6 +2,7 @@ import { error, redirect } from '@sveltejs/kit';
 import { isApiError } from '#lib/api/errors.js';
 import { serverApi } from '#lib/server/api.js';
 import type { Actions, PageServerLoad } from './$types';
+import { formText } from '#lib/forms.js';
 
 // Go: internal/moderation/handler.go (GET /app/ops/moderation, POST
 // .../{kind}/{subjectID}/{action}, POST .../users/{userID}/suspend). The queue is
@@ -26,9 +27,9 @@ function done(err: unknown): never {
 export const actions: Actions = {
 	decide: async (event) => {
 		const form = await event.request.formData();
-		const kind = String(form.get('kind') ?? '');
-		const subjectID = String(form.get('subject') ?? '');
-		const action = String(form.get('action') ?? '');
+		const kind = formText(form, 'kind');
+		const subjectID = formText(form, 'subject');
+		const action = formText(form, 'action');
 		try {
 			await serverApi(event).POST('/ops/moderation/{kind}/{subjectID}/{action}', {
 				params: { path: { kind, subjectID, action } }
@@ -40,8 +41,8 @@ export const actions: Actions = {
 	},
 	suspend: async (event) => {
 		const form = await event.request.formData();
-		const userID = String(form.get('user') ?? '');
-		const hours = Number.parseInt(String(form.get('hours') ?? '0'), 10);
+		const userID = formText(form, 'user');
+		const hours = Number.parseInt(formText(form, 'hours', '0'), 10);
 		try {
 			await serverApi(event).POST('/ops/moderation/users/{userID}/suspend', {
 				params: { path: { userID } },

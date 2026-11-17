@@ -51,7 +51,7 @@ export function createApi({ fetch, baseUrl, token, locale, clientAddress }: ApiO
  * new badges (Go: htmx:after:request on any non-GET). Pages need do nothing.
  */
 const announceWrites: Middleware = {
-	async onResponse({ request, response }) {
+	onResponse({ request, response }) {
 		if (response.ok && request.method !== 'GET' && request.method !== 'HEAD') announceWrite();
 		return undefined;
 	}

@@ -61,6 +61,7 @@
 
 	// The kind donut is built from the feed already on the page (Go buildKindDonut).
 	const donut = $derived.by(() => {
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity -- a local tally inside the derivation
 		const counts = new Map<string, number>();
 		for (const e of s.timeline) counts.set(e.label, (counts.get(e.label) ?? 0) + 1);
 		return donutOption([...counts].map(([l, value]) => ({ label: l, value })));

@@ -2,6 +2,7 @@
 
 import type { components } from '#lib/api/generated/schema.js';
 import type { Translator } from '#lib/i18n/index.js';
+import { formText } from '#lib/forms.js';
 
 export type Inbox = components['schemas']['Inbox'];
 export type InboxItem = components['schemas']['InboxItem'];
@@ -26,6 +27,7 @@ export function suggestionLabel(i18n: Translator, s: Suggestion): string {
 			return i18n.tf('inbox.suggest.goal', s.goalTitle ?? '');
 		case 'knowledge':
 			return s.title ? i18n.tf('inbox.suggest.knowledge_titled', s.title) : i18n.t('inbox.dest.knowledge');
+		case 'journal':
 		default:
 			return i18n.t('inbox.dest.journal');
 	}
@@ -33,9 +35,9 @@ export function suggestionLabel(i18n: Translator, s: Suggestion): string {
 
 /** The filing a form posted: destination, and the goal and title when given. */
 export function filingFrom(form: FormData): { destination: Destination; goalId?: string; title?: string } {
-	const raw = String(form.get('destination') ?? '');
+	const raw = formText(form, 'destination');
 	const destination: Destination = raw === 'goal_note' || raw === 'knowledge' ? raw : 'journal';
-	const goalId = String(form.get('goal_id') ?? '').trim();
-	const title = String(form.get('title') ?? '').trim();
+	const goalId = formText(form, 'goal_id').trim();
+	const title = formText(form, 'title').trim();
 	return { destination, ...(goalId ? { goalId } : {}), ...(title ? { title } : {}) };
 }

@@ -3,6 +3,7 @@ import { isApiError } from '#lib/api/errors.js';
 import { serverApi } from '#lib/server/api.js';
 import { clipDraft } from '#lib/features/coach/copy.js';
 import type { Actions, PageServerLoad } from './$types';
+import { formText } from '#lib/forms.js';
 
 // GET /app/chat/{id} (Go coach.Handler.show): the conversation, the thread
 // list beside it, the coach strip, and any approval or owed resume. Wide: the
@@ -48,8 +49,8 @@ export const actions: Actions = {
 	// page swaps the control in place with JavaScript (Go: hx-post).
 	helpful: async (event) => {
 		const form = await event.request.formData();
-		const messageID = String(form.get('messageId') ?? '');
-		const helpful = parseHelpful(String(form.get('answer') ?? ''));
+		const messageID = formText(form, 'messageId');
+		const helpful = parseHelpful(formText(form, 'answer'));
 		if (helpful === undefined) error(404, 'Not found.');
 		const { data } = await serverApi(event).PUT('/conversations/{id}/messages/{messageID}/helpful', {
 			params: { path: { id: event.params.id, messageID } },
@@ -62,8 +63,8 @@ export const actions: Actions = {
 	// this request (minutes for a new plan) and finish even if it is dropped.
 	decide: async (event) => {
 		const form = await event.request.formData();
-		const messageID = String(form.get('messageId') ?? '');
-		const decision = String(form.get('decision') ?? '');
+		const messageID = formText(form, 'messageId');
+		const decision = formText(form, 'decision');
 		if (decision !== 'approve' && decision !== 'decline') error(404, 'Not found.');
 		try {
 			await serverApi(event).POST('/conversations/{id}/tools/{messageID}', {

@@ -11,11 +11,7 @@
 	let { messageId, helpful: initial }: { messageId: string; helpful?: boolean | null } = $props();
 
 	const i18n = useI18n();
-	// svelte-ignore state_referenced_locally
-	let helpful = $state<boolean | null | undefined>(initial);
-	$effect(() => {
-		helpful = initial;
-	});
+	let helpful = $derived<boolean | null | undefined>(initial);
 </script>
 
 {#snippet answer(value: 'helpful' | 'unhelpful' | 'clear', label: string)}

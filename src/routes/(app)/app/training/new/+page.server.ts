@@ -3,6 +3,7 @@ import { isApiError } from '#lib/api/errors.js';
 import { serverApi } from '#lib/server/api.js';
 import type { TrainingIntake } from '#lib/features/training/types.js';
 import type { Actions, PageServerLoad } from './$types';
+import { entryText, formText } from '#lib/forms.js';
 
 // Go: internal/workouts/handler.go showIntake / submitIntake.
 
@@ -30,7 +31,7 @@ export const load: PageServerLoad = async (event) => {
 
 /** Go: atoiOr(…, 0). */
 function int(v: FormDataEntryValue | null): number {
-	const n = Number.parseInt(String(v ?? '').trim(), 10);
+	const n = Number.parseInt(entryText(v).trim(), 10);
 	return Number.isNaN(n) ? 0 : n;
 }
 
@@ -38,12 +39,12 @@ export const actions: Actions = {
 	default: async (event) => {
 		const form = await event.request.formData();
 		const values: TrainingIntake = {
-			goal: String(form.get('goal') ?? '').trim(),
-			experience: String(form.get('experience') ?? '').trim(),
+			goal: formText(form, 'goal').trim(),
+			experience: formText(form, 'experience').trim(),
 			daysPerWeek: int(form.get('days_per_week')),
 			sessionMinutes: int(form.get('session_minutes')),
 			equipment: form.getAll('equipment').map(String),
-			limitations: String(form.get('limitations') ?? '').trim(),
+			limitations: formText(form, 'limitations').trim(),
 			weekdays: form.getAll('weekdays').map(String)
 		};
 		// Ticked days are the count: asking for both and refusing a mismatch
@@ -65,6 +66,7 @@ export const actions: Actions = {
 				err.kind === 'unavailable' || err.status === 429
 					? 'The coach is busy right now. Your answers were saved — try again in a moment.'
 					: 'Khepri could not build a plan that fits those constraints. Try widening them slightly, or try again.';
+			// oxlint-disable-next-line typescript/no-unnecessary-type-assertion -- keeps the action's errors one type for the page
 			return fail(503, { values, errors: {} as Record<string, string>, error });
 		}
 		redirect(303, `/app/training/${planID}`);

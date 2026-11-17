@@ -4,15 +4,16 @@ import { crewCookie, setLinkCookie } from '#lib/features/social/invite-cookies.s
 import { serverApi } from '#lib/server/api.js';
 import type { PageServerLoad } from './$types';
 
+const notFound = (err: unknown): never => {
+	if (isApiError(err) && err.status === 404) error(404, 'Not found.');
+	throw err;
+};
+
 // Go: GET /i/c/{code} (crews Handler.joinLink). A signed-in visitor joins at
 // once and lands in the crew; a signed-out one carries the code in a cookie to
 // wherever they sign up, and /app joins them.
 export const load: PageServerLoad = async (event) => {
 	const api = serverApi(event);
-	const notFound = (err: unknown): never => {
-		if (isApiError(err) && err.status === 404) error(404, 'Not found.');
-		throw err;
-	};
 	const { data: crew } = await api
 		.GET('/crews/join/{code}', { params: { path: { code: event.params.code } } })
 		.catch(notFound);

@@ -14,6 +14,7 @@ export function statusLabel(i18n: Translator, r: ReportSummary, timeZone: string
 			return i18n.t('reports.label.pending');
 		case 'failed':
 			return i18n.t('reports.label.failed');
+		case 'ready':
 		default:
 			if (r.generatedAt) {
 				return i18n.tf('reports.label.readyon', formatTime(i18n.locale, r.generatedAt, '2 Jan', timeZone));

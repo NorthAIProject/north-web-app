@@ -13,6 +13,17 @@ function nullableSeries(values: number[]): (number | null)[] {
 	return values.map((v) => (v <= 0 ? null : v));
 }
 
+const line = (label: string, data: (number | null)[], colour: string) => ({
+	label,
+	data,
+	tension: 0.35,
+	borderWidth: 2,
+	pointRadius: 3,
+	borderColor: colour,
+	backgroundColor: `color-mix(in oklch, ${colour} 12%, transparent)`,
+	fill: false
+});
+
 /**
  * viz.MoodEnergyLine: two lines (mood and energy, 1–5), with dots, a legend and gaps
  * for days without a check-in. Go passed a raw Chart.js config whose defaults
@@ -25,16 +36,6 @@ export function moodEnergyLine(
 	energy: number[],
 	names: { mood: string; energy: string } = { mood: 'Mood', energy: 'Energy' }
 ): ChartSpec {
-	const line = (label: string, data: (number | null)[], colour: string) => ({
-		label,
-		data,
-		tension: 0.35,
-		borderWidth: 2,
-		pointRadius: 3,
-		borderColor: colour,
-		backgroundColor: `color-mix(in oklch, ${colour} 12%, transparent)`,
-		fill: false
-	});
 	return {
 		id,
 		variant: 'line',

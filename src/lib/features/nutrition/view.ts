@@ -34,7 +34,7 @@ function evenHalves(format: string, args: unknown[]): unknown[] {
 		const index = m[1] ?? m[3];
 		const at = index ? Number(index) - 1 : next;
 		next = at + 1;
-		if (m[4] === 'f' && m[2].endsWith('.0') && typeof out[at] === 'number') out[at] = goRound(out[at] as number);
+		if (m[4] === 'f' && m[2].endsWith('.0') && typeof out[at] === 'number') out[at] = goRound(out[at]);
 	}
 	return out;
 }

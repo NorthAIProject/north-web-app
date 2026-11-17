@@ -1,6 +1,7 @@
 // What the crew space does from the browser, through the same-origin /api
 // proxy. Each is one of the htmx calls the Go page made (web/crews/*.templ).
 import { browserApi } from '#lib/api/client.js';
+import { isJsonObject } from '#lib/json.js';
 import type { CrewChannel, CrewLiveEvent, CrewMessage, CrewMessagePage, CrewSpace } from './crew.js';
 
 const api = () => browserApi();
@@ -36,7 +37,7 @@ export async function getMessage(crewID: string, messageID: string): Promise<Cre
 		});
 		return data!;
 	} catch (err) {
-		if ((err as { status?: number }).status === 404) return null;
+		if (isJsonObject(err) && err.status === 404) return null;
 		throw err;
 	}
 }
@@ -124,6 +125,10 @@ export type LiveHandlers = {
 	reconnected: () => void;
 };
 
+/** A frame with the two fields every live event has; anything else is not one of ours. */
+const isLiveEvent = (frame: unknown): frame is CrewLiveEvent =>
+	isJsonObject(frame) && typeof frame.type === 'string' && typeof frame.crewId === 'string';
+
 const liveTypes = ['message', 'update', 'channels', 'removed', 'resync'];
 
 /**
@@ -133,18 +138,19 @@ const liveTypes = ['message', 'update', 'channels', 'removed', 'resync'];
 export function connectLive(crewID: string, on: LiveHandlers): () => void {
 	const source = new EventSource(`/api/crews/${crewID}/live`);
 	let connected = false;
-	source.onopen = () => {
+	source.addEventListener('open', () => {
 		// Not on the first connect, which the page itself just rendered.
 		if (connected) on.reconnected();
 		connected = true;
-	};
-	const handle = (e: MessageEvent) => {
+	});
+	const handle = (e: MessageEvent<string>) => {
 		try {
-			on.event(JSON.parse(e.data) as CrewLiveEvent);
+			const frame: unknown = JSON.parse(e.data);
+			if (isLiveEvent(frame)) on.event(frame);
 		} catch {
 			// A frame that is not JSON is not one of ours.
 		}
 	};
-	for (const t of liveTypes) source.addEventListener(t, handle as EventListener);
+	for (const t of liveTypes) source.addEventListener(t, handle);
 	return () => source.close();
 }

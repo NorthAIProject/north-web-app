@@ -37,7 +37,7 @@ const FOCUSABLE = 'input:not([type="hidden"]), select, textarea, button, [tabind
  */
 export function focusFirstInvalid(root: ParentNode): HTMLElement | null {
 	for (const el of root.querySelectorAll<HTMLElement>(INVALID)) {
-		if (el.closest('[hidden], [inert]') || (el as HTMLInputElement).disabled) continue;
+		if (el.closest('[hidden], [inert]') || ('disabled' in el && el.disabled)) continue;
 		const target = el.matches(FOCUSABLE) || el.tabIndex >= 0 ? el : el.querySelector<HTMLElement>(FOCUSABLE);
 		if (!target) continue;
 		target.focus();

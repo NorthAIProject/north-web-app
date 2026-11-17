@@ -13,7 +13,7 @@ export const POST: RequestHandler = async (event) => {
 	const { request, cookies, url, locals } = event;
 	const form = await request.formData();
 	const appearance = form.get('appearance');
-	if (!isAppearance(appearance)) error(400, { message: 'Unknown appearance.' });
+	if (!isAppearance(appearance)) error(400, 'Unknown appearance.');
 
 	if (locals.session) {
 		await serverApi(event).PUT('/settings/appearance', { body: { appearance, surface: 'switcher' } });

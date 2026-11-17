@@ -5,6 +5,7 @@
 import type { components } from '#lib/api/generated/schema.js';
 import { formatTime } from '#lib/components/khepri/dates.js';
 import type { Translator } from '#lib/i18n/index.js';
+import { formText } from '#lib/forms.js';
 
 export type CheckIn = components['schemas']['CheckIn'];
 export type CheckInList = components['schemas']['CheckInList'];
@@ -249,9 +250,9 @@ export function formFor(c: CheckIn | undefined): CheckInForm {
 
 /** Go formFrom: the posted fields, trimmed; unparseable numbers are 0. */
 export function formFromData(data: FormData): CheckInForm {
-	const text = (k: string) => String(data.get(k) ?? '').trim();
+	const text = (k: string) => formText(data, k).trim();
 	const int = (k: string) => {
-		const raw = String(data.get(k) ?? '').trim();
+		const raw = formText(data, k).trim();
 		return /^[+-]?\d+$/.test(raw) ? Number(raw) : 0;
 	};
 	return {

@@ -63,7 +63,6 @@
 			>
 				<input type="hidden" name="timezone" id="timezone" value={timezone} />
 				<FormField id="display_name" label={i18n.t('auth.field.name')} error={errors.display_name}>
-					<!-- svelte-ignore a11y_autofocus -->
 					<Input
 						id="display_name"
 						name="display_name"

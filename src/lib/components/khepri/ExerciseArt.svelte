@@ -31,6 +31,8 @@
 	let primed = $state(false);
 	const frames = $derived(primed ? Array.from({ length: FRAME_COUNT }, (_, i) => i + 1) : [1]);
 
+	const onVisibility = () => (pageVisible = !document.hidden);
+
 	// Reduced motion: the first frame is a complete drawing on its own, and the
 	// other two are never fetched.
 	$effect(() => {
@@ -41,7 +43,6 @@
 			if (inView) primed = true;
 		});
 		observer.observe(root);
-		const onVisibility = () => (pageVisible = !document.hidden);
 		onVisibility();
 		document.addEventListener('visibilitychange', onVisibility);
 		return () => {

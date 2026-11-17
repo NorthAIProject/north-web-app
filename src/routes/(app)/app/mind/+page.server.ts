@@ -2,6 +2,7 @@ import { fail, redirect } from '@sveltejs/kit';
 import { isApiError } from '#lib/api/errors.js';
 import { serverApi } from '#lib/server/api.js';
 import type { Actions, PageServerLoad } from './$types';
+import { formText } from '#lib/forms.js';
 
 // Go: internal/mind/handler.go (GET /app/mind, POST /app/mind/journal).
 // The instruments come from the check-ins (Go loadInstruments →
@@ -19,8 +20,8 @@ export const load: PageServerLoad = async (event) => {
 export const actions: Actions = {
 	journal: async (event) => {
 		const form = await event.request.formData();
-		const content = String(form.get('content') ?? '');
-		const raw = String(form.get('mood') ?? '').trim();
+		const content = formText(form, 'content');
+		const raw = formText(form, 'mood').trim();
 		const mood = /^[+-]?\d+$/.test(raw) ? Number(raw) : undefined;
 		try {
 			await serverApi(event).POST('/mind/journal', { body: { content, mood } });

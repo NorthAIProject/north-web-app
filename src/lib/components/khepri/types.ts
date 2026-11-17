@@ -84,7 +84,7 @@ export type AwardArea =
 /** medal.Props. Size is in CSS pixels. */
 export type MedalProps = {
 	badgeId?: string;
-	area?: AwardArea | string;
+	area?: AwardArea | (string & {});
 	size: number;
 	locked?: boolean;
 	monthly?: boolean;
@@ -142,8 +142,8 @@ export type MascotGesture = 'celebrate' | 'nod';
 export type MascotProps = {
 	id?: string;
 	size?: MascotSize;
-	state?: MascotState | string;
-	gesture?: MascotGesture | string;
+	state?: MascotState | (string & {});
+	gesture?: MascotGesture | (string & {});
 	class?: string;
 };
 

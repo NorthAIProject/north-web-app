@@ -5,6 +5,7 @@
 import type { components } from '#lib/api/generated/schema.js';
 import { formatTime } from '#lib/components/khepri/dates.js';
 import type { Translator } from '#lib/i18n/index.js';
+import { formText } from '#lib/forms.js';
 
 export type GoalSummary = components['schemas']['GoalSummary'];
 export type GoalDetail = components['schemas']['GoalDetail'];
@@ -131,7 +132,7 @@ const datePattern = /^\d{4}-\d{2}-\d{2}$/;
 
 /** formFrom + inputFrom: trimmed fields; an unreadable date is no date. */
 export function goalFormFrom(data: FormData): GoalForm {
-	const text = (k: string) => String(data.get(k) ?? '').trim();
+	const text = (k: string) => formText(data, k).trim();
 	return {
 		title: text('title'),
 		motivation: text('motivation'),
@@ -154,8 +155,8 @@ export function goalRequest(f: GoalForm): components['schemas']['GoalRequest'] {
 /** milestoneFrom: the milestone fields; an unreadable date is no date. */
 export function milestoneFrom(data: FormData): { title: string; date: string } {
 	return {
-		title: String(data.get('milestone_title') ?? '').trim(),
-		date: String(data.get('milestone_date') ?? '').trim()
+		title: formText(data, 'milestone_title').trim(),
+		date: formText(data, 'milestone_date').trim()
 	};
 }
 

@@ -2,6 +2,7 @@ import { error, redirect } from '@sveltejs/kit';
 import { serverApi } from '#lib/server/api.js';
 import { noticeOf, recapKey } from '#lib/features/recaps/view.js';
 import type { Actions, PageServerLoad } from './$types';
+import { formText } from '#lib/forms.js';
 
 // Go: internal/recaps/handler.go — GET /app/recap (and /app/recap/panels,
 // which the range links replace by re-running this load client-side).
@@ -26,7 +27,7 @@ export const actions: Actions = {
 	// friends can see it.
 	share: async (event) => {
 		const form = await event.request.formData();
-		const key = recapKey(String(form.get('range') ?? ''));
+		const key = recapKey(formText(form, 'range'));
 		const { data } = await serverApi(event).POST('/recap/share', {
 			body: { range: key, shareTraining: form.get('share_training') === '1' }
 		});

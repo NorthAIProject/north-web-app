@@ -5,6 +5,7 @@ import { formFailure } from '#lib/server/form.js';
 import { writeSession } from '#lib/server/session.js';
 import { fetchAuthOptionsOrUnknown, passwordResetOffered } from '#lib/features/auth/options.js';
 import type { Actions, PageServerLoad } from './$types';
+import { formText } from '#lib/forms.js';
 
 // GET /reset-password?token=… (Go: auth.Handler.showResetPassword). The
 // emailed link is north-client's BASE_URL + /reset-password?token=…, so this
@@ -22,13 +23,13 @@ export const load: PageServerLoad = async (event) => {
 export const actions: Actions = {
 	default: async (event) => {
 		const form = await event.request.formData();
-		const token = String(form.get('token') ?? '');
+		const token = formText(form, 'token');
 		try {
 			const { data } = await serverApi(event).POST('/auth/reset-password', {
 				body: {
 					token,
-					password: String(form.get('password') ?? ''),
-					passwordConfirmation: String(form.get('password_confirmation') ?? '')
+					password: formText(form, 'password'),
+					passwordConfirmation: formText(form, 'password_confirmation')
 				}
 			});
 			writeSession(event.cookies, event.url, data!.token, data!.expiresAt);
@@ -36,6 +37,7 @@ export const actions: Actions = {
 			if (isApiError(err) && err.code === 'invalid_reset_token') {
 				return fail(401, {
 					values: { token },
+					// oxlint-disable-next-line typescript/no-unnecessary-type-assertion -- keeps the action's errors one type for the page
 					errors: {} as Record<string, string>,
 					error: err.message
 				});

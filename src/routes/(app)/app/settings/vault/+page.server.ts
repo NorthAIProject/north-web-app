@@ -2,6 +2,7 @@ import { error, fail, redirect } from '@sveltejs/kit';
 import { isApiError } from '#lib/api/errors.js';
 import { serverApi } from '#lib/server/api.js';
 import type { Actions, PageServerLoad } from './$types';
+import { formText } from '#lib/forms.js';
 
 // Go: internal/vault/handler.go. Dev-only there (a hosted server cannot read a
 // folder on somebody's machine), and the API is the gate here: a deployment
@@ -11,7 +12,7 @@ export const load: PageServerLoad = async (event) => {
 		const { data } = await serverApi(event).GET('/settings/vault');
 		return { vault: data! };
 	} catch (err) {
-		if (isApiError(err) && err.status === 404) error(404, { message: 'Not found.' });
+		if (isApiError(err) && err.status === 404) error(404, 'Not found.');
 		throw err;
 	}
 };
@@ -21,7 +22,7 @@ const back = '/app/settings/vault';
 export const actions: Actions = {
 	connect: async (event) => {
 		const form = await event.request.formData();
-		const rootPath = String(form.get('root_path') ?? '');
+		const rootPath = formText(form, 'root_path');
 		try {
 			await serverApi(event).PUT('/settings/vault', { body: { rootPath } });
 		} catch (err) {

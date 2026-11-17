@@ -57,8 +57,8 @@ export interface Look {
 
 export const ENTRANCE = motion.entrance as Entrance;
 export const IDLE = motion.idle as Track[];
-export const BLINK = motion.blink as Blink;
-export const LOOK_AT = motion.lookAt as LookAt;
+export const BLINK = motion.blink;
+export const LOOK_AT = motion.lookAt;
 
 const clamp = (x: number, low: number, high: number) => Math.min(high, Math.max(low, x));
 
@@ -70,6 +70,7 @@ export function ease(easing: Easing, x: number): number {
 			return (1 - Math.cos(Math.PI * u)) / 2;
 		case 'easeOutCubic':
 			return 1 - (1 - u) ** 3;
+		case 'linear':
 		default:
 			return u;
 	}

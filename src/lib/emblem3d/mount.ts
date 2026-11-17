@@ -33,7 +33,7 @@ export function mount(el: HTMLElement, modelUrl: string): () => void {
 	}
 	const onLeave = () => emblem?.clearPointer();
 
-	(async () => {
+	void (async () => {
 		try {
 			const { createEmblem } = await import('./scene.js');
 			if (!alive) return;

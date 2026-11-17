@@ -245,6 +245,7 @@ const railDayStart = 6 * 60;
 const railDayEnd = 24 * 60;
 const railMinStart = -6 * 60;
 const railMaxEnd = 29 * 60;
+const clampMin = (m: number) => Math.max(railMinStart, Math.min(railMaxEnd, m));
 
 export type RailInput = { at: Date; title: string; detail: string; href: string; color: string; icon: string };
 export type MarkerInput = { at: Date; kind: string; passed: boolean };
@@ -266,7 +267,6 @@ export function buildRail(
 	clock: (t: Date) => string
 ): Rail {
 	const minute = (t: Date) => Math.round((t.getTime() - midnight.getTime()) / 60_000);
-	const clampMin = (m: number) => Math.max(railMinStart, Math.min(railMaxEnd, m));
 
 	let lo = railDayStart;
 	let hi = railDayEnd;
@@ -409,6 +409,9 @@ export function kindColor(kind: string): string {
 /** The screen-time gauge's budget (internal/screentime/screen.DailyLimitMinutes). */
 const screenLimitMinutes = 240;
 
+const hrefFor = (date: string) => `/app?date=${date}`;
+const frac = (val: number, goal: number) => (goal <= 0 ? 0 : val / goal);
+
 export function buildDayView(
 	i18n: Translator,
 	d: DayResponse,
@@ -419,7 +422,6 @@ export function buildDayView(
 	const midnight = zonedMidnight(d.date, timeZone);
 	const now = new Date(d.now);
 	const clock = (t: Date) => formatTime(i18n.locale, t, '15:04', timeZone);
-	const hrefFor = (date: string) => `/app?date=${date}`;
 
 	const v = d.vitals;
 	const vitals: Vital[] = [
@@ -448,7 +450,6 @@ export function buildDayView(
 		trackerVital(d)
 	];
 
-	const frac = (val: number, goal: number) => (goal <= 0 ? 0 : val / goal);
 	const g = d.food.goal;
 	const food: FoodCard = {
 		calories: fixed0(d.food.calories),

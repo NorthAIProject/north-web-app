@@ -6,6 +6,7 @@ import { isApiError } from '#lib/api/errors.js';
 import { createTranslator, loadMessages, type Translator } from '#lib/i18n/index.js';
 import { serverApi } from '#lib/server/api.js';
 import type { Overage } from './view.js';
+import { entryText } from '#lib/forms.js';
 
 /**
  * serverApi plus the body of the last refused response. ApiError keeps only
@@ -37,21 +38,21 @@ export function overageOf(err: unknown, body: unknown): Overage | undefined {
 
 /** Go's parseFloat: unparseable or empty is zero. */
 export function parseNumber(v: FormDataEntryValue | null): number {
-	const s = String(v ?? '').trim();
+	const s = entryText(v).trim();
 	if (!/^[+-]?(\d+\.?\d*|\.\d+)([eE][+-]?\d+)?$/.test(s)) return 0;
 	return Number(s);
 }
 
 /** Go's optionalFloat: blank or unreadable is undefined. */
 export function optionalNumber(v: FormDataEntryValue | null): number | undefined {
-	const s = String(v ?? '').trim();
+	const s = entryText(v).trim();
 	if (!/^[+-]?(\d+\.?\d*|\.\d+)([eE][+-]?\d+)?$/.test(s)) return undefined;
 	return Number(s);
 }
 
 /** Go's strconv.Atoi, undefined when it is not a whole number. */
 export function optionalInt(v: FormDataEntryValue | null): number | undefined {
-	const s = String(v ?? '').trim();
+	const s = entryText(v).trim();
 	return /^[+-]?\d+$/.test(s) ? Number(s) : undefined;
 }
 
@@ -60,7 +61,7 @@ export const NIL_UUID = '00000000-0000-0000-0000-000000000000';
 
 /** A posted id, or the nil UUID (Go: uuid.Parse's zero value), which the service refuses by field. */
 export function uuidOr(v: FormDataEntryValue | null): string {
-	const s = String(v ?? '').trim();
+	const s = entryText(v).trim();
 	return uuidPattern.test(s) ? s : NIL_UUID;
 }
 
