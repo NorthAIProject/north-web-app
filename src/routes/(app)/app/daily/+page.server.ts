@@ -22,7 +22,7 @@ async function kudos(event: Parameters<Actions[string]>[0], give: boolean) {
 		if (give) await api.POST('/daily-posts/{postID}/kudos', params);
 		else await api.DELETE('/daily-posts/{postID}/kudos', params);
 	} catch (err) {
-		if (isApiError(err) && (err.status === 404 || err.status === 422)) error(404, { message: 'The daily post could not be loaded.' });
+		if (isApiError(err) && (err.status === 404 || err.status === 422)) error(404, 'The daily post could not be loaded.');
 		throw err;
 	}
 	redirect(303, `/app/daily#${anchor(postID)}`);

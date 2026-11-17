@@ -11,7 +11,7 @@ export const load: PageServerLoad = async (event) => {
 		const { data } = await serverApi(event).GET('/settings/vault');
 		return { vault: data! };
 	} catch (err) {
-		if (isApiError(err) && err.status === 404) error(404, { message: 'Not found.' });
+		if (isApiError(err) && err.status === 404) error(404, 'Not found.');
 		throw err;
 	}
 };

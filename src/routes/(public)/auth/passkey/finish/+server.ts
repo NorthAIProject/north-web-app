@@ -1,4 +1,3 @@
-import { json } from '@sveltejs/kit';
 import { isApiError } from '#lib/api/errors.js';
 import { serverApi } from '#lib/server/api.js';
 import { safeNext } from '#lib/server/redirect.js';
@@ -21,7 +20,7 @@ export const POST: RequestHandler = async (event) => {
 	try {
 		body = await event.request.json();
 	} catch {
-		return json({ error: { message: 'The request body must be JSON.' } }, { status: 400 });
+		return Response.json({ error: { message: 'The request body must be JSON.' } }, { status: 400 });
 	}
 
 	const api = serverApi(event);
@@ -36,9 +35,9 @@ export const POST: RequestHandler = async (event) => {
 		writeSession(event.cookies, event.url, data!.token, data!.expiresAt);
 	} catch (err) {
 		if (isApiError(err)) {
-			return json({ error: { message: err.message, fields: err.fields } }, { status: err.status });
+			return Response.json({ error: { message: err.message, fields: err.fields } }, { status: err.status });
 		}
 		throw err;
 	}
-	return json({ redirect: safeNext(body.next, '/app') });
+	return Response.json({ redirect: safeNext(body.next, '/app') });
 };

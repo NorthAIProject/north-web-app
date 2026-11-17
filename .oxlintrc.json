@@ -73,6 +73,8 @@
 		"unicorn/consistent-function-scoping": "error",
 		"no-shadow": "error",
 		"unicorn/prefer-add-event-listener": "error",
+		"typescript/no-deprecated": "error",
+		"no-underscore-dangle": "error",
 
 		// BACKLOG. Rules of this profile that the existing code still breaks
 		// (count as of 2026-11-17, with --type-aware). They report as warnings so
@@ -91,9 +93,7 @@
 		"typescript/no-unsafe-argument": "warn", // 19
 		"typescript/no-unsafe-return": "warn", // 14
 		"unicorn/no-array-sort": "warn", // 13
-		"typescript/no-deprecated": "warn", // 13
 		"no-console": ["warn", { "allow": ["warn", "error"] }], // 11
-		"no-underscore-dangle": "warn", // 4
 		"typescript/restrict-template-expressions": "warn", // 4
 		"oxc/no-map-spread": "warn", // 3
 		"typescript/no-redundant-type-constituents": "warn", // 3

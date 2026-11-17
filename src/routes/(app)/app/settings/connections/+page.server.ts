@@ -50,7 +50,7 @@ export const actions: Actions = {
 	revoke: async (event) => {
 		const form = await event.request.formData();
 		const id = text(form, 'id');
-		if (!id) error(404, { message: 'Not found.' });
+		if (!id) error(404, 'Not found.');
 		await serverApi(event).DELETE('/settings/connections/{connectionID}', {
 			params: { path: { connectionID: id } }
 		});

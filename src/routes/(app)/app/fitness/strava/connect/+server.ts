@@ -17,7 +17,7 @@ export const GET: RequestHandler = async (event) => {
 		authorizeUrl = data!.authorizeUrl;
 	} catch (err) {
 		// Unconfigured: Go answered 404 here too.
-		if (isApiError(err) && err.status === 404) error(404, { message: 'Not found.' });
+		if (isApiError(err) && err.status === 404) error(404, 'Not found.');
 		throw err;
 	}
 	redirect(302, authorizeUrl);

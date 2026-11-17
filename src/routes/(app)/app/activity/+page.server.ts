@@ -30,7 +30,7 @@ async function attempt(run: () => Promise<unknown>) {
 
 function sessionID(form: FormData): string {
 	const id = String(form.get('id') ?? '');
-	if (!/^[0-9a-f-]{36}$/i.test(id)) error(404, { message: 'Not found.' });
+	if (!/^[0-9a-f-]{36}$/i.test(id)) error(404, 'Not found.');
 	return id;
 }
 
@@ -63,37 +63,37 @@ export const actions: Actions = {
 	},
 
 	pause: async (event) => {
-		const sessionID_ = sessionID(await event.request.formData());
+		const id = sessionID(await event.request.formData());
 		return attempt(() =>
 			serverApi(event).POST('/activity/{sessionID}/pause', {
-				params: { path: { sessionID: sessionID_ } }
+				params: { path: { sessionID: id } }
 			})
 		);
 	},
 
 	resume: async (event) => {
-		const sessionID_ = sessionID(await event.request.formData());
+		const id = sessionID(await event.request.formData());
 		return attempt(() =>
 			serverApi(event).POST('/activity/{sessionID}/resume', {
-				params: { path: { sessionID: sessionID_ } }
+				params: { path: { sessionID: id } }
 			})
 		);
 	},
 
 	stop: async (event) => {
-		const sessionID_ = sessionID(await event.request.formData());
+		const id = sessionID(await event.request.formData());
 		return attempt(() =>
 			serverApi(event).POST('/activity/{sessionID}/stop', {
-				params: { path: { sessionID: sessionID_ } }
+				params: { path: { sessionID: id } }
 			})
 		);
 	},
 
 	cancel: async (event) => {
-		const sessionID_ = sessionID(await event.request.formData());
+		const id = sessionID(await event.request.formData());
 		return attempt(() =>
 			serverApi(event).DELETE('/activity/{sessionID}', {
-				params: { path: { sessionID: sessionID_ } }
+				params: { path: { sessionID: id } }
 			})
 		);
 	}
