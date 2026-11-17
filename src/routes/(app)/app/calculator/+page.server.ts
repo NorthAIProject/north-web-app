@@ -3,6 +3,7 @@ import { isApiError } from '#lib/api/errors.js';
 import { serverApi } from '#lib/server/api.js';
 import { toMetric, UNITS_METRIC } from '#lib/features/calculator/units.js';
 import type { Actions, PageServerLoad } from './$types';
+import { entryText, formText } from '#lib/forms.js';
 
 // Go: internal/calculator/handler.go — GET /app/calculator, POST
 // /app/calculator/biometrics and /app/calculator/generate. The two posts are
@@ -26,7 +27,7 @@ export const load: PageServerLoad = async (event) => {
 
 /** Go's strconv.ParseFloat with the error dropped: unreadable is 0. */
 function number(v: FormDataEntryValue | null): number {
-	const s = String(v ?? '');
+	const s = entryText(v);
 	return /^[+-]?(\d+\.?\d*|\.\d+)([eE][+-]?\d+)?$/.test(s) ? Number(s) : 0;
 }
 
@@ -42,10 +43,10 @@ export const actions: Actions = {
 	biometrics: async (event) => {
 		const form = await event.request.formData();
 		const values = {
-			weight: String(form.get('weight') ?? ''),
-			height: String(form.get('height') ?? ''),
-			date_of_birth: String(form.get('date_of_birth') ?? ''),
-			sex: String(form.get('sex') ?? '')
+			weight: formText(form, 'weight'),
+			height: formText(form, 'height'),
+			date_of_birth: formText(form, 'date_of_birth'),
+			sex: formText(form, 'sex')
 		};
 		// Converted here, at the edge: biometrics stores metric only.
 		const { kg, cm } = toMetric(number(values.weight), number(values.height), await unitsFor(event));
@@ -65,9 +66,9 @@ export const actions: Actions = {
 	generate: async (event) => {
 		const form = await event.request.formData();
 		const values = {
-			activity_level: String(form.get('activity_level') ?? ''),
-			goal: String(form.get('goal') ?? ''),
-			macro_split: String(form.get('macro_split') ?? '')
+			activity_level: formText(form, 'activity_level'),
+			goal: formText(form, 'goal'),
+			macro_split: formText(form, 'macro_split')
 		};
 		try {
 			await serverApi(event).POST('/calculator/plan', {

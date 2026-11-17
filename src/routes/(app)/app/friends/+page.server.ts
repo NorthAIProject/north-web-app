@@ -3,6 +3,7 @@ import { isApiError } from '#lib/api/errors.js';
 import { serverApi } from '#lib/server/api.js';
 import { shareLinks } from '#lib/features/social/share.js';
 import type { Actions, PageServerLoad } from './$types';
+import { formText } from '#lib/forms.js';
 
 // Go: internal/social/handler.go (GET /app/friends and every POST under it)
 // and handler_finding.go (phone, Facebook). Each Go POST route is a named
@@ -36,7 +37,7 @@ export const load: PageServerLoad = async (event) => {
 
 /** The {userID} a person action is about (Go: chi.URLParam "userID"). */
 async function personID(event: RequestEvent): Promise<string> {
-	const id = String((await event.request.formData()).get('id') ?? '');
+	const id = formText(await event.request.formData(), 'id');
 	if (!/^[0-9a-f-]{36}$/i.test(id)) error(404, 'Not found.');
 	return id;
 }
@@ -67,7 +68,7 @@ const rateLimited = 'Too many codes for now. Try again in an hour.';
 export const actions: Actions = {
 	// POST /app/friends/handle
 	handle: async (event) => {
-		const handle = String((await event.request.formData()).get('handle') ?? '');
+		const handle = formText(await event.request.formData(), 'handle');
 		try {
 			await serverApi(event).PUT('/social/handle', { body: { handle } });
 		} catch (err) {
@@ -78,7 +79,7 @@ export const actions: Actions = {
 
 	// POST /app/friends/follow
 	follow: async (event) => {
-		const follow = String((await event.request.formData()).get('follow') ?? '');
+		const follow = formText(await event.request.formData(), 'follow');
 		try {
 			await serverApi(event).POST('/follows', { body: { handle: follow } });
 		} catch (err) {
@@ -174,8 +175,8 @@ export const actions: Actions = {
 	// POST /app/friends/phone
 	phone: async (event) => {
 		const f = await event.request.formData();
-		const phone = String(f.get('phone') ?? '');
-		const country = String(f.get('countryCode') ?? '');
+		const phone = formText(f, 'phone');
+		const country = formText(f, 'countryCode');
 		try {
 			await serverApi(event).POST('/social/phone/verification', {
 				body: { phone, countryCode: country }
@@ -190,7 +191,7 @@ export const actions: Actions = {
 
 	// POST /app/friends/phone/check
 	phoneCheck: async (event) => {
-		const code = String((await event.request.formData()).get('code') ?? '');
+		const code = formText(await event.request.formData(), 'code');
 		try {
 			await serverApi(event).POST('/social/phone/verification/check', { body: { code } });
 		} catch (err) {

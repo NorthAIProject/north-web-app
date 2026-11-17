@@ -2,6 +2,7 @@ import { error, fail, redirect, type RequestEvent } from '@sveltejs/kit';
 import { isApiError } from '#lib/api/errors.js';
 import { serverApi } from '#lib/server/api.js';
 import type { Actions, PageServerLoad } from './$types';
+import { formText } from '#lib/forms.js';
 
 // Go: internal/memories/handler.go — GET /app/memories and every POST under it.
 // Each Go form posts to its own URL (/app/memories/{id}/pin …); here they are
@@ -17,16 +18,16 @@ type Fields = { category: string; content: string };
 
 async function readFields(event: RequestEvent) {
 	const form = await event.request.formData();
-	const id = String(form.get('id') ?? '');
+	const id = formText(form, 'id');
 	const fields: Fields = {
-		category: String(form.get('category') ?? '').trim(),
-		content: String(form.get('content') ?? '').trim()
+		category: formText(form, 'category').trim(),
+		content: formText(form, 'content').trim()
 	};
 	return { id, fields };
 }
 
 async function memoryId(event: RequestEvent): Promise<string> {
-	const id = String((await event.request.formData()).get('id') ?? '');
+	const id = formText(await event.request.formData(), 'id');
 	if (!id) error(404, 'Not found.');
 	return id;
 }

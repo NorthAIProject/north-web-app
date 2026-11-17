@@ -3,6 +3,7 @@ import { isApiError } from '#lib/api/errors.js';
 import { isUuid, parseNumber, serverI18n, uuidOr } from '#lib/features/nutrition/server.js';
 import { serverApi } from '#lib/server/api.js';
 import type { Actions, PageServerLoad } from './$types';
+import { formText } from '#lib/forms.js';
 
 // Go: internal/meals/handler_log.go — GET /app/nutrition/log and its three
 // POSTs: /log/ingredients (?/ingredient), /log/meals (?/meal) and
@@ -32,7 +33,7 @@ async function write(op: () => Promise<unknown>) {
 export const actions: Actions = {
 	ingredient: async (event) => {
 		const form = await event.request.formData();
-		const id = String(form.get('ingredient_id') ?? '');
+		const id = formText(form, 'ingredient_id');
 		if (!isUuid(id)) error(422, (await serverI18n(event)).t('nutrition.err.read'));
 		await write(() =>
 			serverApi(event).POST('/nutrition/log/ingredients', {
@@ -42,12 +43,12 @@ export const actions: Actions = {
 	},
 	meal: async (event) => {
 		const form = await event.request.formData();
-		const id = String(form.get('meal_id') ?? '');
+		const id = formText(form, 'meal_id');
 		if (!isUuid(id)) error(422, (await serverI18n(event)).t('nutrition.err.read'));
 		await write(() => serverApi(event).POST('/nutrition/log/meals', { body: { mealId: id } }));
 	},
 	delete: async (event) => {
-		const id = String((await event.request.formData()).get('id') ?? '');
+		const id = formText(await event.request.formData(), 'id');
 		if (!isUuid(id)) error(404, (await serverI18n(event)).t('nutrition.err.notfound'));
 		await write(() => serverApi(event).DELETE('/nutrition/log/{entryID}', { params: { path: { entryID: id } } }));
 	}

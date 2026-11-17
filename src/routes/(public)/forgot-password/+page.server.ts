@@ -3,6 +3,7 @@ import { serverApi } from '#lib/server/api.js';
 import { formFailure } from '#lib/server/form.js';
 import { fetchAuthOptionsOrUnknown, passwordResetOffered } from '#lib/features/auth/options.js';
 import type { Actions, PageServerLoad } from './$types';
+import { formText } from '#lib/forms.js';
 
 // GET /forgot-password (Go: auth.Handler.showForgotPassword): 404 when no
 // mailer can deliver the link, as Go hides the journey. When the options
@@ -20,7 +21,7 @@ export const load: PageServerLoad = async (event) => {
 export const actions: Actions = {
 	default: async (event) => {
 		const form = await event.request.formData();
-		const values = { email: String(form.get('email') ?? '') };
+		const values = { email: formText(form, 'email') };
 		try {
 			await serverApi(event).POST('/auth/forgot-password', { body: { email: values.email } });
 		} catch (err) {

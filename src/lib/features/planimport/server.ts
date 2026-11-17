@@ -7,6 +7,7 @@ import { isApiError } from '#lib/api/errors.js';
 import { apiWithBody, overageOf } from '#lib/features/nutrition/server.js';
 import type { components } from '#lib/api/generated/schema.js';
 import { applyMealAction, mealFromForm, normalize, type MealDraft } from './form.js';
+import { formText } from '#lib/forms.js';
 
 /**
  * A sentence to show: the API's own (already in the reader's language), or a
@@ -134,7 +135,7 @@ const atoi = (s: string) => (/^[+-]?\d+$/.test(s.trim()) ? Number(s.trim()) : 0)
 /** POST /app/nutrition/plans/generate: draft the plan and review it as an import. */
 export async function generate(event: RequestEvent) {
 	const form = await event.request.formData();
-	const value = (name: string) => String(form.get(name) ?? '');
+	const value = (name: string) => formText(form, name);
 	const intake = {
 		objective: value('objective').trim(),
 		days: atoi(value('days')),

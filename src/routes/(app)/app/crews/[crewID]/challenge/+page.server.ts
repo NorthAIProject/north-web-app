@@ -3,6 +3,7 @@ import { serverApi } from '#lib/server/api.js';
 import { challengeURL } from '#lib/features/crews/crew.js';
 import { loadSpace, spaceActions } from '#lib/features/crews/space.server.js';
 import type { Actions, PageServerLoad } from './$types';
+import { formText } from '#lib/forms.js';
 
 // Go: crews.Handler.challengePage (GET /app/crews/{id}/challenge) and the
 // owner's and admins' forms on it: role, remove, challenge.
@@ -17,8 +18,8 @@ export const actions: Actions = {
 		const crewID = crewIDOf(event);
 		const form = await event.request.formData();
 		await serverApi(event).PUT('/crews/{crewID}/members/{userID}/role', {
-			params: { path: { crewID, userID: String(form.get('member') ?? '') } },
-			body: { role: String(form.get('role') ?? '') }
+			params: { path: { crewID, userID: formText(form, 'member') } },
+			body: { role: formText(form, 'role') }
 		});
 		redirect(303, challengeURL(crewID));
 	},
@@ -27,7 +28,7 @@ export const actions: Actions = {
 		const crewID = crewIDOf(event);
 		const form = await event.request.formData();
 		await serverApi(event).DELETE('/crews/{crewID}/members/{userID}', {
-			params: { path: { crewID, userID: String(form.get('member') ?? '') } }
+			params: { path: { crewID, userID: formText(form, 'member') } }
 		});
 		redirect(303, challengeURL(crewID));
 	},
@@ -35,14 +36,14 @@ export const actions: Actions = {
 	challenge: async (event) => {
 		const crewID = crewIDOf(event);
 		const form = await event.request.formData();
-		const kind = String(form.get('kind') ?? '');
+		const kind = formText(form, 'kind');
 		const api = serverApi(event);
 		if (kind === 'none') {
 			await api.DELETE('/crews/{crewID}/challenge', { params: { path: { crewID } } });
 		} else {
 			await api.PUT('/crews/{crewID}/challenge', {
 				params: { path: { crewID } },
-				body: { kind: kind as 'checkins' | 'workouts', target: Number.parseInt(String(form.get('target') ?? ''), 10) || 0 }
+				body: { kind: kind as 'checkins' | 'workouts', target: Number.parseInt(formText(form, 'target'), 10) || 0 }
 			});
 		}
 		redirect(303, challengeURL(crewID));

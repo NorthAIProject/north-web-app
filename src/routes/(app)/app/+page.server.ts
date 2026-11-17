@@ -3,6 +3,7 @@ import { isApiError } from '#lib/api/errors.js';
 import { serverApi } from '#lib/server/api.js';
 import type { Api } from '#lib/api/client.js';
 import type { Actions, PageServerLoad } from './$types';
+import { formText } from '#lib/forms.js';
 
 // My Day (Go: internal/day/handler.go show). GET /day is the page; the body
 // figure's heat, its shape and the progress-check chip come from their own
@@ -35,7 +36,7 @@ export const load: PageServerLoad = async (event) => {
 	return { day, rules, map, morph: current?.morph ?? null, progress, firstWeek, soreness, sorenessHistory };
 };
 
-const str = (form: FormData, key: string) => String(form.get(key) ?? '').trim();
+const str = (form: FormData, key: string) => formText(form, key).trim();
 const int = (form: FormData, key: string) => {
 	const n = Number.parseInt(str(form, key), 10);
 	return Number.isFinite(n) ? n : 0;

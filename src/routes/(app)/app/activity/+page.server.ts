@@ -3,6 +3,7 @@ import { isApiError } from '#lib/api/errors.js';
 import { parseLogForm } from '#lib/features/activity/format.js';
 import { serverApi } from '#lib/server/api.js';
 import type { Actions, PageServerLoad } from './$types';
+import { formText } from '#lib/forms.js';
 
 // Go: internal/activity/handler.go (GET /app/activity and its six POSTs).
 export const load: PageServerLoad = async (event) => {
@@ -29,7 +30,7 @@ async function attempt(run: () => Promise<unknown>) {
 }
 
 function sessionID(form: FormData): string {
-	const id = String(form.get('id') ?? '');
+	const id = formText(form, 'id');
 	if (!/^[0-9a-f-]{36}$/i.test(id)) error(404, 'Not found.');
 	return id;
 }
@@ -41,17 +42,17 @@ function timeZoneOf(event: RequestEvent): string {
 export const actions: Actions = {
 	start: async (event) => {
 		const form = await event.request.formData();
-		const activityCode = String(form.get('activity_code') ?? '');
+		const activityCode = formText(form, 'activity_code');
 		return attempt(() => serverApi(event).POST('/activity/start', { body: { activityCode } }));
 	},
 
 	log: async (event) => {
 		const form = await event.request.formData();
 		const values = {
-			activityCode: String(form.get('activity_code') ?? ''),
-			minutes: String(form.get('minutes') ?? ''),
-			distanceKm: String(form.get('distance_km') ?? ''),
-			startedAt: String(form.get('started_at') ?? '')
+			activityCode: formText(form, 'activity_code'),
+			minutes: formText(form, 'minutes'),
+			distanceKm: formText(form, 'distance_km'),
+			startedAt: formText(form, 'started_at')
 		};
 		let body;
 		try {

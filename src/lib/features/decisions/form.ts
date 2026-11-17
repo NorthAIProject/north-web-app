@@ -2,6 +2,7 @@
 
 import type { components } from '#lib/api/generated/schema.js';
 import type { Translator } from '#lib/i18n/index.js';
+import { formText } from '#lib/forms.js';
 
 export type Decision = components['schemas']['Decision'];
 
@@ -39,7 +40,7 @@ export function formFor(d: Decision): DecisionForm {
  * create form, so they arrive empty there — the right value for a call just made.
  */
 export function formFrom(form: FormData): DecisionForm {
-	const field = (name: string) => String(form.get(name) ?? '').trim();
+	const field = (name: string) => formText(form, name).trim();
 	return {
 		title: field('title'),
 		options: field('options'),

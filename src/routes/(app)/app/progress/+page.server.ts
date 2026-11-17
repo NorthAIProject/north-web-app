@@ -3,6 +3,7 @@ import { isApiError } from '#lib/api/errors.js';
 import { serverApi } from '#lib/server/api.js';
 import { formInput, formPhotos, readForm, webFieldErrors } from '#lib/features/progress/view.js';
 import type { Actions, PageServerLoad } from './$types';
+import { formText } from '#lib/forms.js';
 
 // Go: internal/progresschecks/handler.go — GET /app/progress (show) and its
 // form posts, here as named actions on the same page:
@@ -49,14 +50,14 @@ export const actions: Actions = {
 
 	schedule: async (event) => {
 		const data = await event.request.formData();
-		const cadence = String(data.get('cadence') ?? '');
+		const cadence = formText(data, 'cadence');
 		await serverApi(event).PUT('/progress/schedule', { body: { cadence } });
 		redirect(303, '/app/progress');
 	},
 
 	delete: async (event) => {
 		const data = await event.request.formData();
-		const checkID = String(data.get('id') ?? '');
+		const checkID = formText(data, 'id');
 		await serverApi(event).DELETE('/progress/checks/{checkID}', { params: { path: { checkID } } });
 		redirect(303, '/app/progress');
 	},

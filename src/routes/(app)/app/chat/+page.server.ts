@@ -2,6 +2,7 @@ import { redirect } from '@sveltejs/kit';
 import { serverApi } from '#lib/server/api.js';
 import { clipDraft } from '#lib/features/coach/copy.js';
 import type { Actions, PageServerLoad } from './$types';
+import { formText } from '#lib/forms.js';
 
 // GET /app/chat (Go coach.Handler.index): open the most recent conversation,
 // or show the empty coach page when there is none.
@@ -20,9 +21,9 @@ export const load: PageServerLoad = async (event) => {
 export const actions: Actions = {
 	start: async (event) => {
 		const form = await event.request.formData();
-		const kind = String(form.get('kind') ?? '').trim() === 'reflection' ? 'reflection' : 'chat';
+		const kind = formText(form, 'kind').trim() === 'reflection' ? 'reflection' : 'chat';
 		const { data } = await serverApi(event).POST('/conversations', { body: { kind } });
-		const draft = clipDraft(String(form.get('draft') ?? ''));
+		const draft = clipDraft(formText(form, 'draft'));
 		redirect(303, `/app/chat/${data!.id}${draft ? `?draft=${encodeURIComponent(draft)}` : ''}`);
 	}
 };

@@ -3,6 +3,7 @@ import { isApiError } from '#lib/api/errors.js';
 import { optionalInt, optionalNumber } from '#lib/features/nutrition/server.js';
 import { serverApi } from '#lib/server/api.js';
 import type { Actions, PageServerLoad } from './$types';
+import { formText } from '#lib/forms.js';
 
 // Go: internal/meals/handler_plans.go — GET /app/nutrition/plans and
 // POST /app/nutrition/plans (the default action).
@@ -16,7 +17,7 @@ export const load: PageServerLoad = async (event) => {
 export const actions: Actions = {
 	default: async (event) => {
 		const form = await event.request.formData();
-		const value = (name: string) => String(form.get(name) ?? '');
+		const value = (name: string) => formText(form, name);
 		const values = {
 			name: value('name'),
 			description: value('description'),

@@ -3,6 +3,7 @@ import { isApiError } from '#lib/api/errors.js';
 import { serverApi } from '#lib/server/api.js';
 import { text } from '#lib/features/settings/form.js';
 import type { Actions, PageServerLoad } from './$types';
+import { formText } from '#lib/forms.js';
 
 // Go: internal/settings/handler.go renderConnections and the posts under
 // /app/settings/connections, /settings/messaging/telegram,
@@ -32,7 +33,7 @@ export const actions: Actions = {
 	// action's result and a reload will not show it again.
 	create: async (event) => {
 		const form = await event.request.formData();
-		const values = { name: text(form, 'name'), kind: String(form.get('client_kind') ?? '') };
+		const values = { name: text(form, 'name'), kind: formText(form, 'client_kind') };
 		try {
 			const { data } = await serverApi(event).POST('/settings/connections', {
 				body: { name: values.name, kind: values.kind as 'claude_code' }
@@ -74,7 +75,7 @@ export const actions: Actions = {
 		const form = await event.request.formData();
 		try {
 			await serverApi(event).PUT('/settings/calendar', {
-				body: { endpoint: String(form.get('endpoint') ?? ''), token: String(form.get('token') ?? '') }
+				body: { endpoint: formText(form, 'endpoint'), token: formText(form, 'token') }
 			});
 		} catch (err) {
 			if (isApiError(err) && err.status === 422) {
@@ -96,13 +97,13 @@ export const actions: Actions = {
 	ai: async (event) => {
 		const form = await event.request.formData();
 		const values = {
-			provider: String(form.get('provider') ?? ''),
-			model: String(form.get('model') ?? ''),
-			baseUrl: String(form.get('base_url') ?? '')
+			provider: formText(form, 'provider'),
+			model: formText(form, 'model'),
+			baseUrl: formText(form, 'base_url')
 		};
 		try {
 			await serverApi(event).PUT('/settings/ai', {
-				body: { ...values, apiKey: String(form.get('api_key') ?? '') }
+				body: { ...values, apiKey: formText(form, 'api_key') }
 			});
 		} catch (err) {
 			if (isApiError(err) && err.status === 422) {

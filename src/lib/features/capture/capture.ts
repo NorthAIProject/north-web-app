@@ -5,6 +5,7 @@
 
 import type { components } from '#lib/api/generated/schema.js';
 import type { Translator } from '#lib/i18n/index.js';
+import { entryText } from '#lib/forms.js';
 
 export type CaptureItem = components['schemas']['CaptureItem'];
 export type Outcome = components['schemas']['Outcome'];
@@ -73,7 +74,7 @@ const captureKinds = ['water', 'sleep', 'habit', 'weight', 'check_in', 'food'] a
 const isCaptureKind = (kind: string): kind is CaptureItem['kind'] => (captureKinds as readonly string[]).includes(kind);
 
 const num = (v: FormDataEntryValue | null) => {
-	const n = Number(String(v ?? '').trim());
+	const n = Number(entryText(v).trim());
 	return Number.isFinite(n) ? n : 0;
 };
 const int = (v: FormDataEntryValue | null) => Math.trunc(num(v));
@@ -87,7 +88,7 @@ export function itemsFromForm(form: FormData): CaptureItem[] {
 	const items: CaptureItem[] = [];
 	for (let i = 0; i < MAX_ITEMS; i++) {
 		const f = (name: string) => form.get(`items[${i}].${name}`);
-		const s = (name: string) => String(f(name) ?? '');
+		const s = (name: string) => entryText(f(name));
 		const kind = s('kind').trim();
 		if (!kind || !s('include')) continue;
 		if (!isCaptureKind(kind)) throw new CaptureFormError(`Unknown capture kind "${kind}".`);

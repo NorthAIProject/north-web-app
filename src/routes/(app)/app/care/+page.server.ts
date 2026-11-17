@@ -4,6 +4,7 @@ import { serverApi } from '#lib/server/api.js';
 import { splitTimes } from '#lib/features/care/format.js';
 import type { CareFormName } from '#lib/features/care/forms.js';
 import type { Actions, PageServerLoad } from './$types';
+import { entryText, formText } from '#lib/forms.js';
 
 // Go: internal/care/handler.go (GET /app/care and its water, sleep, habit and
 // reminder writes) and internal/medications/handler.go (the medication writes
@@ -41,10 +42,10 @@ async function write(form: CareFormName | null, values: Values, run: () => Promi
 
 async function read(event: RequestEvent) {
 	const f = await event.request.formData();
-	const str = (name: string) => String(f.get(name) ?? '');
+	const str = (name: string) => formText(f, name);
 	const days = f
 		.getAll('days_of_week')
-		.map((d) => Number.parseInt(String(d), 10))
+		.map((d) => Number.parseInt(entryText(d), 10))
 		.filter((d) => Number.isInteger(d));
 	return { f, str, days };
 }

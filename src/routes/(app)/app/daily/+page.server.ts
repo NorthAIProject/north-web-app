@@ -3,6 +3,7 @@ import { isApiError } from '#lib/api/errors.js';
 import { serverApi } from '#lib/server/api.js';
 import { anchor } from '#lib/features/dailyposts/dailyposts.js';
 import type { Actions, PageServerLoad } from './$types';
+import { formText } from '#lib/forms.js';
 
 // GET /app/daily (Go dailyposts.Handler.page): today's post, when there is
 // one, and the ones before it.
@@ -15,7 +16,7 @@ export const load: PageServerLoad = async (event) => {
 // on the post they were given on.
 async function kudos(event: Parameters<Actions[string]>[0], give: boolean) {
 	const form = await event.request.formData();
-	const postID = String(form.get('postID') ?? '');
+	const postID = formText(form, 'postID');
 	const api = serverApi(event);
 	try {
 		const params = { params: { path: { postID } } };

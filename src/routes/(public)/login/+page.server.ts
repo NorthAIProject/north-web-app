@@ -5,6 +5,7 @@ import { safeNext } from '#lib/server/redirect.js';
 import { writeSession } from '#lib/server/session.js';
 import { fetchAuthOptions, googleErrorKeys } from '#lib/features/auth/options.js';
 import type { Actions, PageServerLoad } from './$types';
+import { formText } from '#lib/forms.js';
 
 // GET /login (Go: auth.Handler.showLogin). A signed-in visitor goes home; a
 // next that is not a local path is dropped, as SafeRedirect drops it.
@@ -23,8 +24,8 @@ export const load: PageServerLoad = async (event) => {
 export const actions: Actions = {
 	default: async (event) => {
 		const form = await event.request.formData();
-		const email = String(form.get('email') ?? '');
-		const password = String(form.get('password') ?? '');
+		const email = formText(form, 'email');
+		const password = formText(form, 'password');
 		const next = safeNext(form.get('next'), '/app');
 
 		try {

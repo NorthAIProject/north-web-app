@@ -4,6 +4,7 @@
 import type { components } from '#lib/api/generated/schema.js';
 import { formatTime } from '#lib/components/khepri/dates.js';
 import type { Translator } from '#lib/i18n/index.js';
+import { formText } from '#lib/forms.js';
 
 type Schemas = components['schemas'];
 export type ApiCheck = Schemas['ProgressCheck'];
@@ -222,7 +223,7 @@ export function applyEstimate(form: FormValues, est: ApiEstimate['estimate']): {
 
 /** Values read from a posted form. */
 export function readForm(data: FormData): FormValues {
-	const get = (k: string) => String(data.get(k) ?? '');
+	const get = (k: string) => formText(data, k);
 	return {
 		measured_on: get('measured_on'),
 		weight: get('weight'),

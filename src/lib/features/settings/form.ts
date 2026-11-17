@@ -1,9 +1,11 @@
 // Reading the settings forms the way north-client's handlers did
 // (internal/settings/handler.go: checked, formHour, formSwitch).
 
+import { formText } from '#lib/forms.js';
+
 /** A trimmed text field. */
 export function text(form: FormData, name: string): string {
-	return String(form.get(name) ?? '').trim();
+	return formText(form, name).trim();
 }
 
 /** A checkbox or switch: an unchecked one sends nothing at all. */

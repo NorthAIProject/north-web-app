@@ -5,6 +5,7 @@ import { clearSession } from '#lib/server/session.js';
 import { isAppearance } from '#lib/theme.js';
 import { checked, formHour, formSwitch, text } from '#lib/features/settings/form.js';
 import type { Actions, PageServerLoad } from './$types';
+import { formText } from '#lib/forms.js';
 
 // Go: internal/settings/handler.go (GET /app/settings and its form posts).
 export const load: PageServerLoad = async (event) => {
@@ -89,7 +90,7 @@ export const actions: Actions = {
 			trainingReminders: checked(form, 'training_reminders'),
 			weeklyReportAuto: checked(form, 'weekly_report_auto'),
 			dailyBriefingAuto: checked(form, 'daily_briefing_auto'),
-			statsDigestCadence: String(form.get('stats_digest_cadence') ?? ''),
+			statsDigestCadence: formText(form, 'stats_digest_cadence'),
 			quietHoursEnabled: checked(form, 'quiet_hours_enabled'),
 			quietStart: text(form, 'quiet_start'),
 			quietEnd: text(form, 'quiet_end'),
@@ -114,9 +115,9 @@ export const actions: Actions = {
 	preferences: async (event) => {
 		const form = await event.request.formData();
 		const values = {
-			unitsSystem: String(form.get('units_system') ?? ''),
-			defaultGoal: String(form.get('default_goal') ?? ''),
-			defaultMacroSplit: String(form.get('default_macro_split') ?? '')
+			unitsSystem: formText(form, 'units_system'),
+			defaultGoal: formText(form, 'default_goal'),
+			defaultMacroSplit: formText(form, 'default_macro_split')
 		};
 		try {
 			await serverApi(event).PUT('/settings/preferences', { body: values as never });
