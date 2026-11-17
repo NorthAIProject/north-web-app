@@ -70,6 +70,7 @@ export function ease(easing: Easing, x: number): number {
 			return (1 - Math.cos(Math.PI * u)) / 2;
 		case 'easeOutCubic':
 			return 1 - (1 - u) ** 3;
+		case 'linear':
 		default:
 			return u;
 	}

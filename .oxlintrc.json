@@ -69,6 +69,7 @@
 		"vitest/expect-expect": ["error", { "assertFunctionNames": ["expect", "near"] }],
 		// expect(value, message) is vitest's own API.
 		"vitest/valid-expect": ["error", { "maxArgs": 2 }],
+		"typescript/switch-exhaustiveness-check": "error",
 
 		// BACKLOG. Rules of this profile that the existing code still breaks
 		// (count as of 2026-11-17, with --type-aware). They report as warnings so
@@ -91,7 +92,6 @@
 		"typescript/no-deprecated": "warn", // 13
 		"no-console": ["warn", { "allow": ["warn", "error"] }], // 11
 		"no-shadow": "warn", // 7
-		"typescript/switch-exhaustiveness-check": "warn", // 6
 		"no-underscore-dangle": "warn", // 4
 		"typescript/restrict-template-expressions": "warn", // 4
 		"unicorn/prefer-add-event-listener": "warn", // 3

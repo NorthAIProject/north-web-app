@@ -171,8 +171,12 @@ export class ChatStream {
 				onFail();
 				mascot.streamMessage('failed');
 				break;
-			// exercises and approval are on the stored conversation the
-			// refresh brings back; nothing to do with them mid-stream.
+			case 'exercises':
+			case 'approval':
+			case 'done':
+				// exercises and approval are on the stored conversation the
+				// refresh brings back; nothing to do with them mid-stream.
+				break;
 		}
 	}
 }

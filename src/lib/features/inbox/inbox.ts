@@ -26,6 +26,7 @@ export function suggestionLabel(i18n: Translator, s: Suggestion): string {
 			return i18n.tf('inbox.suggest.goal', s.goalTitle ?? '');
 		case 'knowledge':
 			return s.title ? i18n.tf('inbox.suggest.knowledge_titled', s.title) : i18n.t('inbox.dest.knowledge');
+		case 'journal':
 		default:
 			return i18n.t('inbox.dest.journal');
 	}
