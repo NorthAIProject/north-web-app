@@ -94,6 +94,7 @@ export type ChatStatusKey = 'ready' | 'listening' | 'thinking' | 'writing' | 'sn
 export type ChatCopy = { ready: string; listening: string; thinking: string; writing: string; snag: string };
 
 /** The chat header's phase and status line, reactive. */
+// oxlint-disable-next-line typescript/no-unnecessary-type-assertion -- without it $state infers phase as string
 export const mascotChat = $state({ phase: 'idle' as ChatPhase, status: '' });
 
 let statusKey: ChatStatusKey = 'ready';

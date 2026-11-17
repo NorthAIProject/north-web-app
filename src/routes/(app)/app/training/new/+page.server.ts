@@ -66,6 +66,7 @@ export const actions: Actions = {
 				err.kind === 'unavailable' || err.status === 429
 					? 'The coach is busy right now. Your answers were saved — try again in a moment.'
 					: 'Khepri could not build a plan that fits those constraints. Try widening them slightly, or try again.';
+			// oxlint-disable-next-line typescript/no-unnecessary-type-assertion -- keeps the action's errors one type for the page
 			return fail(503, { values, errors: {} as Record<string, string>, error });
 		}
 		redirect(303, `/app/training/${planID}`);

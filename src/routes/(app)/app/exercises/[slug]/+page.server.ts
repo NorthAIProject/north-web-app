@@ -8,13 +8,12 @@ import type { PageServerLoad } from './$types';
 // Go: internal/exercises/handler.go detail (GET /app/exercises/{slug}).
 export const load: PageServerLoad = async (event) => {
 	const api = serverApi(event);
-	let exercise;
-	try {
-		({ data: exercise } = await api.GET('/exercises/{slug}', { params: { path: { slug: event.params.slug } } }));
-	} catch (err) {
-		if (isApiError(err) && err.status === 404) error(404, 'Not found');
-		throw err;
-	}
+	const { data: exercise } = await api
+		.GET('/exercises/{slug}', { params: { path: { slug: event.params.slug } } })
+		.catch((err: unknown) => {
+			if (isApiError(err) && err.status === 404) error(404, 'Not found');
+			throw err;
+		});
 	const e = exercise!;
 	const [plan, similar] = await Promise.all([planDays(api, e.slug), similarTo(api, e.slug, e.primaryMuscles[0])]);
 	return { exercise: e, planId: plan.id, days: plan.days, similar };

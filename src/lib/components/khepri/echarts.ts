@@ -27,7 +27,7 @@ function withDefaults(base: Obj, defaults: Obj): Obj {
 	const out: Obj = { ...base };
 	for (const [key, value] of Object.entries(defaults)) {
 		if (out[key] === undefined) out[key] = value;
-		else if (isObj(out[key]) && isObj(value)) out[key] = withDefaults(out[key] as Obj, value);
+		else if (isObj(out[key]) && isObj(value)) out[key] = withDefaults(out[key], value);
 	}
 	return out;
 }

@@ -9,15 +9,12 @@ import type { PageServerLoad } from './$types';
 // a cookie to wherever they sign up, and /app redeems it.
 export const load: PageServerLoad = async (event) => {
 	const api = serverApi(event);
-	let preview;
-	try {
-		({ data: preview } = await api.GET('/invites/{code}', {
-			params: { path: { code: event.params.code } }
-		}));
-	} catch (err) {
-		if (isApiError(err) && err.status === 404) error(404, 'Not found.');
-		throw err;
-	}
+	const { data: preview } = await api
+		.GET('/invites/{code}', { params: { path: { code: event.params.code } } })
+		.catch((err: unknown) => {
+			if (isApiError(err) && err.status === 404) error(404, 'Not found.');
+			throw err;
+		});
 	if (event.locals.session?.user) {
 		await api.POST('/invites/{code}/redeem', { params: { path: { code: preview!.code } } });
 		redirect(303, '/app/friends');

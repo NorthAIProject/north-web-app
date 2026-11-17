@@ -27,9 +27,8 @@ export const load: PageServerLoad = async (event) => {
 	const requestId = url.searchParams.get('request_id');
 	if (!requestId) {
 		const q = (name: string) => url.searchParams.get(name) ?? '';
-		let begun;
-		try {
-			({ data: begun } = await api.POST('/auth/oauth/authorize', {
+		const { data: begun } = await api
+			.POST('/auth/oauth/authorize', {
 				body: {
 					clientId: q('client_id'),
 					redirectUri: q('redirect_uri'),
@@ -41,12 +40,12 @@ export const load: PageServerLoad = async (event) => {
 					resource: q('resource'),
 					signedIn: Boolean(locals.session?.user)
 				}
-			}));
-		} catch (err) {
-			// Fatal: the destination is unvalidated, so show the reason, never redirect.
-			if (isApiError(err) && err.status < 500) error(400, err.message);
-			throw err;
-		}
+			})
+			.catch((err: unknown) => {
+				// Fatal: the destination is unvalidated, so show the reason, never redirect.
+				if (isApiError(err) && err.status < 500) error(400, err.message);
+				throw err;
+			});
 		// The client's own registered callback, validated by north-client.
 		if (begun?.redirect) redirect(303, begun.redirect, { external: true });
 		writeOAuthVerifier(cookies, url, begun!.verifier!);

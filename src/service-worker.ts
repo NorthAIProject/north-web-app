@@ -218,7 +218,7 @@ async function openNotificationTarget(clients: Clients, target: string) {
 	const windows = await clients.matchAll({ type: 'window', includeUncontrolled: true });
 	for (const client of windows) {
 		if (!('focus' in client) || !('navigate' in client)) continue;
-		const win = client as WindowClient;
+		const win = client;
 		try {
 			const focused = await win.focus();
 			await (focused || win).navigate(target);

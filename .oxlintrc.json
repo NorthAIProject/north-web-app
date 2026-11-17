@@ -133,6 +133,7 @@
 		"typescript/prefer-nullish-coalescing": ["error", { "ignorePrimitives": { "string": true } }],
 		// Off: every hit awaits in order on purpose (reading a stream, a typing animation, trying one window after another, writes that stop at the first refusal, ordered test steps). None is a batch that could run at once.
 		"no-await-in-loop": "off",
+		"typescript/no-unnecessary-type-assertion": "error",
 
 		// BACKLOG. Rules of this profile that the existing code still breaks
 		// (count as of 2026-11-17, with --type-aware). They report as warnings so
@@ -140,7 +141,6 @@
 		// retire one: fix its hits, then delete the line (category rules) or
 		// move it to "error" (pedantic rules). Never add a rule here.
 		"typescript/no-unsafe-type-assertion": "warn", // 125
-		"typescript/no-unnecessary-type-assertion": "warn", // 30
 		"typescript/no-unnecessary-type-conversion": "warn", // 2
 	}
 }

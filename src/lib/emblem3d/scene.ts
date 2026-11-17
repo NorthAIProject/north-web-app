@@ -142,7 +142,7 @@ export async function createEmblem(
 		pivot.rotation.y = THREE.MathUtils.degToRad(entrance.rotateYDegrees + yaw);
 		pivot.rotation.x = THREE.MathUtils.degToRad(pitch);
 
-		if (sun && SUN) (sun as THREE.MeshStandardMaterial).emissiveIntensity = sunBase * sampleTrack(SUN, seconds);
+		if (sun && SUN) sun.emissiveIntensity = sunBase * sampleTrack(SUN, seconds);
 		const azimuth = THREE.MathUtils.degToRad(SWEEP ? sampleTrack(SWEEP, seconds) : 0);
 		key.position.set(Math.sin(azimuth) * KEY_RADIUS, KEY_ELEVATION * KEY_RADIUS, Math.cos(azimuth) * KEY_RADIUS);
 

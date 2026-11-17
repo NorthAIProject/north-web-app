@@ -37,6 +37,7 @@ export const actions: Actions = {
 			if (isApiError(err) && err.code === 'invalid_reset_token') {
 				return fail(401, {
 					values: { token },
+					// oxlint-disable-next-line typescript/no-unnecessary-type-assertion -- keeps the action's errors one type for the page
 					errors: {} as Record<string, string>,
 					error: err.message
 				});

@@ -38,7 +38,7 @@ export interface Pointer {
 
 export const ENTRANCE = motion.entrance as Entrance;
 export const IDLE = motion.idle as Track[];
-export const POINTER = motion.pointer as Pointer;
+export const POINTER = motion.pointer;
 
 const clamp = (x: number, low: number, high: number) => Math.min(high, Math.max(low, x));
 

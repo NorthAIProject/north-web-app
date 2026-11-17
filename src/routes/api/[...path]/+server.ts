@@ -50,7 +50,7 @@ export const fallback: RequestHandler = async (event) => {
 		...(hasBody ? { duplex: 'half' } : {}),
 		signal: request.signal,
 		redirect: 'manual'
-	} as RequestInit);
+	});
 
 	if (upstream.status === 401 && locals.session) {
 		// The token died between page load and this call. Drop it so the next

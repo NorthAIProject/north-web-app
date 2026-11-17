@@ -57,8 +57,8 @@ export interface Look {
 
 export const ENTRANCE = motion.entrance as Entrance;
 export const IDLE = motion.idle as Track[];
-export const BLINK = motion.blink as Blink;
-export const LOOK_AT = motion.lookAt as LookAt;
+export const BLINK = motion.blink;
+export const LOOK_AT = motion.lookAt;
 
 const clamp = (x: number, low: number, high: number) => Math.min(high, Math.max(low, x));
 

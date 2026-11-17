@@ -87,7 +87,7 @@ describe('runPasskey', () => {
 			email: ' ana@example.com ',
 			next: '/app/goals',
 			fetch: fetchImpl as unknown as typeof fetch,
-			credentials: credentials as unknown as CredentialsContainer
+			credentials
 		});
 
 		expect(destination).toBe('/app/goals');
@@ -99,7 +99,7 @@ describe('runPasskey', () => {
 
 	it('asks for a name and email before registering', async () => {
 		const fetchImpl = vi.fn<() => Promise<Response>>();
-		await expect(runPasskey({ mode: 'register', email: 'a@b.c', fetch: fetchImpl as unknown as typeof fetch })).rejects.toThrow(
+		await expect(runPasskey({ mode: 'register', email: 'a@b.c', fetch: fetchImpl })).rejects.toThrow(
 			/name and email/
 		);
 		expect(fetchImpl).not.toHaveBeenCalled();
@@ -107,7 +107,7 @@ describe('runPasskey', () => {
 
 	it('surfaces the API error message', async () => {
 		const fetchImpl = vi.fn<() => Promise<Response>>(() => Promise.resolve(jsonResponse({ error: { message: 'Passkeys are off.' } }, 404)));
-		await expect(runPasskey({ mode: 'login', fetch: fetchImpl as unknown as typeof fetch })).rejects.toThrow(
+		await expect(runPasskey({ mode: 'login', fetch: fetchImpl })).rejects.toThrow(
 			'Passkeys are off.'
 		);
 	});

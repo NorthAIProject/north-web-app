@@ -9,13 +9,12 @@ import type { RequestHandler } from './$types';
 // OAuth flow and keeps the state in a short-lived HttpOnly cookie.
 export const GET: RequestHandler = async (event) => {
 	if (!event.locals.session) redirect(303, `/login?next=${encodeURIComponent(event.url.pathname)}`);
-	let start;
-	try {
-		({ data: start } = await serverApi(event).POST('/social/facebook/web'));
-	} catch (err) {
-		if (isApiError(err) && err.status === 404) error(404, 'Not found.');
-		throw err;
-	}
+	const { data: start } = await serverApi(event)
+		.POST('/social/facebook/web')
+		.catch((err: unknown) => {
+			if (isApiError(err) && err.status === 404) error(404, 'Not found.');
+			throw err;
+		});
 	event.cookies.set(facebookStateCookie, start!.state, {
 		path: facebookCookiePath,
 		maxAge: start!.expiresIn,

@@ -87,6 +87,7 @@ test('a browserApi write is detected without the page announcing it', async ({ p
 	// Any successful non-GET through the /api proxy, here from page script.
 	await page.evaluate(async () => {
 		const { browserApi } = await import('/src/lib/api/client.ts');
+		// oxlint-disable-next-line typescript/no-unnecessary-type-assertion -- this import path resolves only in the browser, so lint sees `any` and calls the cast redundant
 		await browserApi().PUT('/check-ins/today', { body: { mood: 3, energy: 3 } } as never);
 	});
 	await expect(page.getByTestId('awards-unlock')).toBeVisible();
