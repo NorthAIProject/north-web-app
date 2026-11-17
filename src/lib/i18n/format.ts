@@ -12,7 +12,7 @@ const verb = /%(?:\[(\d+)\])?([-+# 0]*)(\d+)?(?:\.(\d+))?(?:\[(\d+)\])?([sdvqgfe
 
 export function sprintf(locale: string, format: string, args: unknown[]): string {
 	let next = 0;
-	return format.replace(verb, (match, lead, _flags, _width, precision, trail, kind: string) => {
+	return format.replace(verb, (match, lead: string | undefined, _flags, _width, precision: string | undefined, trail: string | undefined, kind: string) => {
 		if (kind === '%') return '%';
 		const index = trail ?? lead;
 		const at = index ? Number(index) - 1 : next;

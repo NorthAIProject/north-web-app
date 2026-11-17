@@ -7,6 +7,8 @@
 // SvelteKit server may turn that into the HttpOnly session cookie — page
 // JavaScript never sees the token.
 
+import { isJsonObject, type JsonObject } from '#lib/json.js';
+
 export type PasskeyMode = 'login' | 'register';
 
 /** What the API's begin routes return (PasskeyCeremonyResponse). */
@@ -115,6 +117,16 @@ export function passkeysSupported(): boolean {
 	return typeof window !== 'undefined' && 'PublicKeyCredential' in window && !!navigator.credentials;
 }
 
+/** The per-field messages of an error body: the entries that are text. */
+function stringFields(fields: unknown): Record<string, string> {
+	const out: Record<string, string> = {};
+	if (!isJsonObject(fields)) return out;
+	for (const [name, message] of Object.entries(fields)) {
+		if (typeof message === 'string') out[name] = message;
+	}
+	return out;
+}
+
 async function postJSON<T>(fetchImpl: typeof fetch, path: string, body: unknown): Promise<T> {
 	const res = await fetchImpl(path, {
 		method: 'POST',
@@ -122,15 +134,18 @@ async function postJSON<T>(fetchImpl: typeof fetch, path: string, body: unknown)
 		credentials: 'same-origin',
 		body: JSON.stringify(body ?? {})
 	});
-	let data: { error?: { message?: string; fields?: Record<string, string> } | string } & Record<string, unknown> = {};
+	// { error: { message, fields } } or { error: "..." } on a failure.
+	let data: JsonObject = {};
 	try {
-		data = await res.json();
+		const parsed: unknown = await res.json();
+		if (isJsonObject(parsed)) data = parsed;
 	} catch {
 		/* empty body */
 	}
 	if (!res.ok) {
-		const detail = typeof data.error === 'string' ? { message: data.error } : data.error;
-		throw new PasskeyError(detail?.message || res.statusText || 'Request failed', res.status, detail?.fields ?? {});
+		const detail = typeof data.error === 'string' ? { message: data.error } : isJsonObject(data.error) ? data.error : {};
+		const message = typeof detail.message === 'string' ? detail.message : '';
+		throw new PasskeyError(message || res.statusText || 'Request failed', res.status, stringFields(detail.fields));
 	}
 	return data as T;
 }

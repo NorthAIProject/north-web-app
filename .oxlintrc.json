@@ -30,7 +30,34 @@
 		// nothing to export yet.
 		{ "files": ["src/lib/index.ts"], "rules": { "unicorn/no-empty-file": "off" } },
 		// Command-line scripts and the e2e provider stub report on stdout.
-		{ "files": ["scripts/**", "tests/e2e/stubs/**"], "rules": { "no-console": "off" } }
+		{ "files": ["scripts/**", "tests/e2e/stubs/**"], "rules": { "no-console": "off" } },
+		// Plain JavaScript has no types to be unsafe about: everything it reads
+		// from a JSON file or a module without declarations is `any`.
+		{
+			"files": ["**/*.mjs", "**/*.js"],
+			"rules": {
+				"typescript/no-unsafe-member-access": "off",
+				"typescript/no-unsafe-assignment": "off",
+				"typescript/no-unsafe-call": "off",
+				"typescript/no-unsafe-argument": "off",
+				"typescript/no-unsafe-return": "off"
+			}
+		},
+		// BACKLOG (e2e only; count as of 2026-11-17). The Playwright suite reads
+		// the API's JSON through helpers.ts `api()`, which returns `any`, and
+		// asserts on it untyped. Typing it means moving the suite to the
+		// generated client, which cannot be checked without the Go API running.
+		// Everywhere else these rules are errors.
+		{
+			"files": ["tests/e2e/**"],
+			"rules": {
+				"typescript/no-unsafe-member-access": "warn", // 156
+				"typescript/no-unsafe-assignment": "warn", // 106
+				"typescript/no-unsafe-call": "warn", // 22
+				"typescript/no-unsafe-argument": "warn", // 9
+				"typescript/no-unsafe-return": "warn" // 8
+			}
+		}
 	],
 	"rules": {
 		// Type-aware bug rules that oxlint files under pedantic.
@@ -94,23 +121,23 @@
 		"unicorn/no-array-reverse": "off",
 		// Off: the hits copy small config and fixture rows on purpose, so the\nsource objects are not mutated; there is no hot path to save.
 		"oxc/no-map-spread": "off",
+		"typescript/no-unsafe-member-access": "error",
+		"typescript/no-unsafe-assignment": "error",
+		"typescript/no-unsafe-call": "error",
+		"typescript/no-unsafe-argument": "error",
+		"typescript/no-unsafe-return": "error",
 
 		// BACKLOG. Rules of this profile that the existing code still breaks
 		// (count as of 2026-11-17, with --type-aware). They report as warnings so
 		// CI stays green while every clean rule above is already enforced. To
 		// retire one: fix its hits, then delete the line (category rules) or
 		// move it to "error" (pedantic rules). Never add a rule here.
-		"typescript/no-unsafe-member-access": "warn", // 197
 		"typescript/no-base-to-string": "warn", // 150
-		"typescript/no-unsafe-assignment": "warn", // 137
 		"typescript/no-unsafe-type-assertion": "warn", // 125
 		"typescript/consistent-return": "warn", // 56
 		"typescript/prefer-nullish-coalescing": "warn", // 42
-		"typescript/no-unsafe-call": "warn", // 42
 		"typescript/no-unnecessary-type-assertion": "warn", // 30
 		"no-await-in-loop": "warn", // 28
-		"typescript/no-unsafe-argument": "warn", // 19
-		"typescript/no-unsafe-return": "warn", // 14
 		"typescript/no-unnecessary-type-conversion": "warn", // 2
 	}
 }

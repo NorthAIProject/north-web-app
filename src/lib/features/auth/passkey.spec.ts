@@ -73,10 +73,11 @@ describe('runPasskey', () => {
 	};
 
 	it('begins through the /api proxy and finishes through this server, never seeing a token', async () => {
-		const calls: { url: string; body: Record<string, unknown> }[] = [];
-		const fetchImpl = vi.fn<(url: string | URL | Request, init?: RequestInit) => Promise<Response>>((url, init) => {
-			calls.push({ url: String(url), body: JSON.parse(String(init?.body)) });
-			if (String(url).startsWith('/api/')) return Promise.resolve(jsonResponse({ challengeId: 'c1', publicKey: { challenge: 'AQ' } }));
+		const calls: { url: string; body: unknown }[] = [];
+		const fetchImpl = vi.fn<(url: string, init?: RequestInit) => Promise<Response>>((url, init) => {
+			const sent: unknown = JSON.parse(typeof init?.body === 'string' ? init.body : 'null');
+			calls.push({ url, body: sent });
+			if (url.startsWith('/api/')) return Promise.resolve(jsonResponse({ challengeId: 'c1', publicKey: { challenge: 'AQ' } }));
 			return Promise.resolve(jsonResponse({ redirect: '/app/goals' }));
 		});
 		const credentials = { get: vi.fn<() => Promise<typeof assertion>>(() => Promise.resolve(assertion)), create: vi.fn<() => Promise<null>>() };

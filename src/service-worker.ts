@@ -148,6 +148,15 @@ sw.addEventListener('fetch', (event) => {
 
 type PushPayload = { title?: string; body?: string; href?: string };
 
+const isObject = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null;
+const textOf = (value: unknown) => (typeof value === 'string' ? value : undefined);
+
+// The payload's text fields; a payload that is not an object has none.
+function pushPayload(parsed: unknown): PushPayload {
+	if (!isObject(parsed)) return {};
+	return { title: textOf(parsed.title), body: textOf(parsed.body), href: textOf(parsed.href) };
+}
+
 // A nudge arriving. The payload is the JSON internal/push encrypted for this
 // browser: a title, a body, and the /open link that attributes the tap. A push
 // with no readable payload still shows something — a silent push is how a
@@ -156,7 +165,7 @@ type PushPayload = { title?: string; body?: string; href?: string };
 sw.addEventListener('push', (event) => {
 	let data: PushPayload;
 	try {
-		data = event.data ? event.data.json() : {};
+		data = event.data ? pushPayload(event.data.json()) : {};
 	} catch {
 		data = { title: 'Khepri', body: event.data ? event.data.text() : '' };
 	}
@@ -186,8 +195,8 @@ sw.addEventListener('push', (event) => {
 // page the nudge was about (a chat thread for a coach reply or a briefing).
 // Anything that is not a same-origin path falls back to /app, so a malformed
 // payload cannot send somebody off-site.
-function notificationTarget(action: string, data: { href?: string } | null | undefined, origin: string): string {
-	const href = action === 'capture' ? '/app/capture' : (data && data.href) || '/app';
+function notificationTarget(action: string, data: unknown, origin: string): string {
+	const href = action === 'capture' ? '/app/capture' : (isObject(data) && textOf(data.href)) || '/app';
 	let url: URL;
 	try {
 		url = new URL(href, origin);

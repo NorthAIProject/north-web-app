@@ -10,6 +10,7 @@
 import { invalidate } from '$app/navigation';
 import { isApiError } from '#lib/api/errors.js';
 import { mascot } from '#lib/components/khepri/mascot.svelte.js';
+import { isJsonObject } from '#lib/json.js';
 import { openStream, type StreamEvent } from './stream.js';
 import { announcement } from './transcript.js';
 
@@ -65,12 +66,14 @@ export class ChatStream {
 			form.append('file', file);
 			try {
 				const response = await fetch(`/api/conversations/${id}/attachments`, { method: 'POST', body: form });
-				const body = await response.json().catch(() => ({}));
+				const parsed: unknown = await response.json().catch(() => ({}));
+				const body = isJsonObject(parsed) ? parsed : {};
 				if (!response.ok) {
-					this.composerError = body?.error?.message || 'could not store that file';
+					const message = isJsonObject(body.error) ? body.error.message : undefined;
+					this.composerError = (typeof message === 'string' && message) || 'could not store that file';
 					return { sent: false };
 				}
-				mediaId = body.mediaId;
+				mediaId = typeof body.mediaId === 'string' ? body.mediaId : undefined;
 			} catch {
 				this.composerError = 'could not store that file';
 				return { sent: false };

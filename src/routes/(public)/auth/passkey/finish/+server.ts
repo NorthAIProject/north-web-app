@@ -1,4 +1,5 @@
 import { isApiError } from '#lib/api/errors.js';
+import { isJsonObject, type JsonObject } from '#lib/json.js';
 import { serverApi } from '#lib/server/api.js';
 import { safeNext } from '#lib/server/redirect.js';
 import { writeSession } from '#lib/server/session.js';
@@ -16,16 +17,19 @@ import type { RequestHandler } from './$types';
 // this app never answers, and the credential is bound to this origin by the
 // authenticator anyway.
 export const POST: RequestHandler = async (event) => {
-	let body: { mode?: string; challengeId?: string; credential?: unknown; next?: string };
+	// mode, challengeId, credential and next, none of them checked yet. A body
+	// that is JSON but not an object has none of them, and the API refuses it.
+	let body: JsonObject;
 	try {
-		body = await event.request.json();
+		const parsed: unknown = await event.request.json();
+		body = isJsonObject(parsed) ? parsed : {};
 	} catch {
 		return Response.json({ error: { message: 'The request body must be JSON.' } }, { status: 400 });
 	}
 
 	const api = serverApi(event);
 	const finish = {
-		body: { challengeId: String(body.challengeId ?? ''), credential: (body.credential ?? {}) as Record<string, never> }
+		body: { challengeId: typeof body.challengeId === 'string' ? body.challengeId : '', credential: (body.credential ?? {}) as Record<string, never> }
 	};
 	try {
 		const { data } =
@@ -39,5 +43,5 @@ export const POST: RequestHandler = async (event) => {
 		}
 		throw err;
 	}
-	return Response.json({ redirect: safeNext(body.next, '/app') });
+	return Response.json({ redirect: safeNext(typeof body.next === 'string' ? body.next : null, '/app') });
 };

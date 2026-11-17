@@ -93,6 +93,9 @@ type Colours = {
 	sore: THREE.Color;
 };
 type Rim = { color: { value: THREE.Color }; strength: { value: number } };
+/** instanceof narrows to Mesh<any, any, any>; this keeps the default (typed) parameters. */
+const isMesh = (obj: THREE.Object3D): obj is THREE.Mesh => obj instanceof THREE.Mesh;
+
 type RegionEntry = { mesh: THREE.Mesh; material: THREE.MeshStandardMaterial };
 type Shell = {
 	geometry: THREE.BufferGeometry;
@@ -216,9 +219,9 @@ export async function createViewer(canvas: HTMLCanvasElement, options: ViewerOpt
 	const studio = createStudioEnvironment();
 	const envTexture = pmrem.fromScene(studio, 0.03).texture;
 	studio.traverse((obj) => {
-		if (obj instanceof THREE.Mesh) {
+		if (isMesh(obj)) {
 			obj.geometry.dispose();
-			(obj.material as THREE.Material).dispose();
+			for (const material of [obj.material].flat()) material.dispose();
 		}
 	});
 	pmrem.dispose();
@@ -553,7 +556,7 @@ async function loadFigure(colours: Colours, rim: Rim, model?: string) {
 
 	const meshes: THREE.Mesh[] = [];
 	figure.traverse((obj) => {
-		if (obj instanceof THREE.Mesh) meshes.push(obj);
+		if (isMesh(obj)) meshes.push(obj);
 	});
 	// gltfpack moves each mesh onto an unnamed child of the named node (shell,
 	// quads, …), which GLTFLoader calls mesh_<n>; the key is then the parent's

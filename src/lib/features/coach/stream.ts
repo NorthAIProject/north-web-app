@@ -17,6 +17,7 @@
 
 import { apiErrorFrom, ApiError } from '#lib/api/errors.js';
 import type { components } from '#lib/api/generated/schema.js';
+import { isJsonObject, type JsonObject } from '#lib/json.js';
 
 export type Approval = components['schemas']['Approval'];
 
@@ -74,27 +75,35 @@ export function createFrameParser(onFrame: (frame: RawFrame) => void) {
 	};
 }
 
+/** A frame's text field: a missing one is empty, and so is one that is not a plain value. */
+function fieldText(value: unknown): string {
+	if (typeof value === 'string') return value;
+	return typeof value === 'number' || typeof value === 'boolean' ? String(value) : '';
+}
+
 /** Maps one frame onto a typed event; unknown names are skipped, as on iOS. */
 export function toEvent(frame: RawFrame): StreamEvent | null {
-	let payload: Record<string, unknown> = {};
+	let payload: JsonObject = {};
 	try {
-		payload = frame.data ? JSON.parse(frame.data) : {};
+		const parsed: unknown = frame.data ? JSON.parse(frame.data) : {};
+		// Data that is not an object (null, a bare string) carries no fields.
+		if (isJsonObject(parsed)) payload = parsed;
 	} catch {
 		return null;
 	}
 	switch (frame.event) {
 		case 'token':
-			return { type: 'token', text: String(payload.text ?? '') };
+			return { type: 'token', text: fieldText(payload.text) };
 		case 'status':
-			return { type: 'status', line: String(payload.line ?? '') };
+			return { type: 'status', line: fieldText(payload.line) };
 		case 'error':
-			return { type: 'error', message: String(payload.message ?? '') };
+			return { type: 'error', message: fieldText(payload.message) };
 		case 'exercises':
-			return { type: 'exercises', slugs: (payload.slugs as string[]) ?? [] };
+			return { type: 'exercises', slugs: Array.isArray(payload.slugs) ? payload.slugs.filter((s: unknown) => typeof s === 'string') : [] };
 		case 'approval':
 			return { type: 'approval', approval: payload as unknown as Approval };
 		case 'done':
-			return { type: 'done', messageId: payload.messageId as string | undefined };
+			return { type: 'done', messageId: typeof payload.messageId === 'string' ? payload.messageId : undefined };
 		default:
 			return null;
 	}
