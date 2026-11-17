@@ -53,7 +53,7 @@ export function todayPosition(nextWeek: boolean, todayWeekday: string): number {
 /** Whether a weekday can no longer change: past, or already trained. */
 export function isClosed(week: TrainingWeek, weekday: string, today: number): boolean {
 	if (week.days.some((d) => d.weekday === weekday && d.completed)) return true;
-	return WEEKDAYS.indexOf(weekday as (typeof WEEKDAYS)[number]) < today;
+	return (WEEKDAYS as readonly string[]).indexOf(weekday) < today;
 }
 
 /** The days a change would keep: those trained, and those not yet past (Go: stillOpen). */

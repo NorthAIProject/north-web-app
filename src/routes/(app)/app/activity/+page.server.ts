@@ -58,7 +58,8 @@ export const actions: Actions = {
 		try {
 			body = parseLogForm(values, timeZoneOf(event));
 		} catch (err) {
-			return fail(422, { error: (err as Error).message });
+			if (!(err instanceof Error)) throw err;
+			return fail(422, { error: err.message });
 		}
 		return attempt(() => serverApi(event).POST('/activity/log', { body }));
 	},

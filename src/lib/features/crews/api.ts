@@ -37,7 +37,7 @@ export async function getMessage(crewID: string, messageID: string): Promise<Cre
 		});
 		return data!;
 	} catch (err) {
-		if ((err as { status?: number }).status === 404) return null;
+		if (isJsonObject(err) && err.status === 404) return null;
 		throw err;
 	}
 }
