@@ -75,11 +75,11 @@ export function sleepDuration(minutes: number): string {
 	return m === 0 ? `${h}h` : `${h}h ${m}m`;
 }
 
-const knownStatuses = ['taken', 'skipped', 'due', 'upcoming'];
+const knownStatuses = new Set(['taken', 'skipped', 'due', 'upcoming']);
 
 /** A dose status in the reader's language; an unknown one shown as sent. */
 export function slotStatusLabel(i18n: Translator, status: string): string {
-	return knownStatuses.includes(status) ? i18n.t('care.meds.status.' + status) : status;
+	return knownStatuses.has(status) ? i18n.t('care.meds.status.' + status) : status;
 }
 
 export function slotBadge(status: string): BadgeVariant {

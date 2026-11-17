@@ -13,7 +13,9 @@
 </script>
 
 {#if className}
+	<!-- eslint-disable-next-line svelte/no-at-html-tags -- escaped by renderMarkdown(), see above -->
 	<div class={className}>{@html html}</div>
 {:else}
+	<!-- eslint-disable-next-line svelte/no-at-html-tags -- escaped by renderMarkdown(), see above -->
 	{@html html}
 {/if}

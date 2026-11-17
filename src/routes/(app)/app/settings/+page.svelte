@@ -32,14 +32,14 @@
 	// other forms keep showing what is saved (Go: render with one form filled).
 	const failed = (name: string) => (form?.form === name ? form : undefined);
 	const errorsFor = (name: string): Record<string, string> => failed(name)?.errors ?? {};
-	const profileValues = $derived({ ...data.profile, ...(failed('profile')?.values ?? {}) });
+	const profileValues = $derived({ ...data.profile, ...failed('profile')?.values });
 	const notificationValues = $derived({
 		...data.notifications,
-		...(failed('notifications')?.values ?? {})
+		...failed('notifications')?.values
 	});
 	const preferenceValues = $derived({
 		...data.preferences,
-		...(failed('preferences')?.values ?? {})
+		...failed('preferences')?.values
 	});
 	const posthogCapture = () => {
 		const ph = (window as { posthog?: { capture: (e: string, p: object) => void } }).posthog;

@@ -61,11 +61,11 @@ export function countryName(i18n: Translator, c: { dial: string; name: string })
 	return i18n.has(key) ? i18n.t(key) : c.name;
 }
 
-const facebookResults = ['connected', 'cancelled', 'expired', 'taken', 'failed'];
+const facebookResults = new Set(['connected', 'cancelled', 'expired', 'taken', 'failed']);
 
 /** The alert after a Facebook connection, empty for anything else (Go: facebookNotice). */
 export function facebookNotice(i18n: Translator, result: string): string {
-	return facebookResults.includes(result) ? i18n.t('social.fb.notice.' + result) : '';
+	return facebookResults.has(result) ? i18n.t('social.fb.notice.' + result) : '';
 }
 
 /** connected and cancelled are news; the rest went wrong (Go: facebookNoticeVariant). */

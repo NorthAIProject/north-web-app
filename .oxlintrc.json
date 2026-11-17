@@ -1,0 +1,105 @@
+{
+	"$schema": "./node_modules/oxlint/configuration_schema.json",
+	// Profile: "bug-finding max", shared with norviq-web-v2. Every rule in the
+	// correctness, suspicious and perf categories, plus the type-aware rules
+	// from pedantic that catch real defects. pedantic/style/restriction as
+	// whole categories stay off: they are mostly taste (no-ternary,
+	// no-magic-numbers, sort-keys) or mutually exclusive (no-named-export vs
+	// SvelteKit's required named exports).
+	// Svelte template rules still run in ESLint (eslint.config.js).
+	"plugins": ["typescript", "unicorn", "oxc", "import", "promise", "vitest", "node"],
+	"categories": {
+		"correctness": "error",
+		"suspicious": "error",
+		"perf": "error"
+	},
+	"env": { "browser": true, "node": true, "es2024": true },
+	"ignorePatterns": [
+		".svelte-kit/**",
+		"build/**",
+		".wrangler/**",
+		// Vendored, minified third-party bundles.
+		"static/**",
+		"storybook-static/**",
+		"src/lib/paraglide/**"
+	],
+	"overrides": [
+		// `export {}` is what makes an ambient declaration file a module.
+		{ "files": ["**/*.d.ts"], "rules": { "unicorn/require-module-specifiers": "off" } }
+	],
+	"rules": {
+		// Type-aware bug rules that oxlint files under pedantic.
+		"typescript/only-throw-error": "error",
+		"typescript/prefer-promise-reject-errors": "error",
+		"typescript/return-await": "error",
+		"typescript/no-mixed-enums": "error",
+		// Non-type-aware pedantic rules that catch defects rather than style.
+		"eqeqeq": ["error", "always", { "null": "ignore" }],
+		"array-callback-return": "error",
+		"no-self-compare": "error",
+		"no-constructor-return": "error",
+
+		"no-unused-vars": [
+			"error",
+			{ "argsIgnorePattern": "^_", "varsIgnorePattern": "^_", "caughtErrorsIgnorePattern": "^_" }
+		],
+
+		// Rules of the profile from outside the three categories that this tree
+		// already passes, so they are enforced from day one.
+		"typescript/restrict-plus-operands": "error",
+		"typescript/unbound-method": "error",
+		"typescript/no-unnecessary-type-parameters": "error",
+		"vitest/no-conditional-expect": "error",
+		"vitest/valid-title": "error",
+		"no-fallthrough": "error",
+		"no-new": "error",
+		"no-useless-concat": "error",
+		"promise/no-promise-in-callback": "error",
+		"import/no-named-as-default": "error",
+		"import/namespace": "error",
+
+		// BACKLOG. Rules of this profile that the existing code still breaks
+		// (count as of 2026-11-17, with --type-aware). They report as warnings so
+		// CI stays green while every clean rule above is already enforced. To
+		// retire one: fix its hits, then delete the line (category rules) or
+		// move it to "error" (pedantic rules). Never add a rule here.
+		"typescript/no-unsafe-member-access": "warn", // 197
+		"typescript/no-base-to-string": "warn", // 150
+		"typescript/no-unsafe-assignment": "warn", // 137
+		"typescript/no-unsafe-type-assertion": "warn", // 125
+		"typescript/consistent-return": "warn", // 56
+		"typescript/prefer-nullish-coalescing": "warn", // 42
+		"typescript/no-unsafe-call": "warn", // 42
+		"typescript/no-unnecessary-type-assertion": "warn", // 30
+		"no-await-in-loop": "warn", // 28
+		"typescript/no-unsafe-argument": "warn", // 19
+		"unicorn/consistent-function-scoping": "warn", // 17
+		"typescript/no-unsafe-return": "warn", // 14
+		"unicorn/no-array-sort": "warn", // 13
+		"typescript/no-deprecated": "warn", // 13
+		"vitest/require-mock-type-parameters": "warn", // 11
+		"vitest/expect-expect": "warn", // 11
+		"no-console": ["warn", { "allow": ["warn", "error"] }], // 11
+		"typescript/require-await": "warn", // 10
+		"promise/always-return": "warn", // 8
+		"no-shadow": "warn", // 7
+		"typescript/switch-exhaustiveness-check": "warn", // 6
+		"no-underscore-dangle": "warn", // 4
+		"typescript/restrict-template-expressions": "warn", // 4
+		"unicorn/prefer-add-event-listener": "warn", // 3
+		"oxc/no-map-spread": "warn", // 3
+		"vitest/valid-expect": "warn", // 3
+		"typescript/no-redundant-type-constituents": "warn", // 3
+		"no-promise-executor-return": "warn", // 2
+		"typescript/no-unnecessary-type-conversion": "warn", // 2
+		"typescript/no-floating-promises": "warn", // 2
+		"typescript/no-misused-spread": "warn", // 2
+		"unicorn/no-array-reverse": "warn", // 1
+		"import/no-unassigned-import": "warn", // 1
+		"unicorn/no-empty-file": "warn", // 1
+		"typescript/triple-slash-reference": "warn", // 1
+		"typescript/await-thenable": "warn", // 1
+		"typescript/no-misused-promises": "warn", // 1
+		"typescript/require-array-sort-compare": "warn" // 1
+	}
+}

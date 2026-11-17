@@ -52,8 +52,8 @@ export const WEEK_ORDER = [1, 2, 3, 4, 5, 6, 0];
 /** meal.Categories, in the order the form offers them. */
 export const CATEGORIES = ['protein', 'carb', 'fat', 'dairy', 'vegetable', 'fruit', 'beverage', 'snack', 'other'];
 
-const PRESETS = ['no_carb', 'low_carb', 'mid_carb', 'high_carb'];
-const isPreset = (t: string) => PRESETS.includes(t);
+const PRESETS = new Set(['no_carb', 'low_carb', 'mid_carb', 'high_carb']);
+const isPreset = (t: string) => PRESETS.has(t);
 
 /** A food category's name; an unknown one reads as Other, as in Go. */
 export function categoryLabel(i18n: Translator, c: string | undefined): string {
