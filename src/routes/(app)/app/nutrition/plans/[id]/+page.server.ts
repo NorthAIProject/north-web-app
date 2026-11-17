@@ -213,10 +213,14 @@ export const actions: Actions = {
 		await api.POST('/nutrition/meals/{mealID}/ingredients/batch', {
 			params: { path: { mealID } },
 			body: {
-				portions: form.getAll('line').map((n) => ({
-					ingredientId: uuidOr(form.get(`ingredient_id_${n}`)),
-					quantityGrams: parseNumber(form.get(`quantity_grams_${n}`))
-				})),
+				// A "line" that is a file names no row; it posts as a blank portion.
+				portions: form.getAll('line').map((line) => {
+					const n = typeof line === 'string' ? line : '';
+					return {
+						ingredientId: uuidOr(form.get(`ingredient_id_${n}`)),
+						quantityGrams: parseNumber(form.get(`quantity_grams_${n}`))
+					};
+				}),
 				confirmOverage: confirmed(form)
 			}
 		});

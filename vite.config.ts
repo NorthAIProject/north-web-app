@@ -1,4 +1,3 @@
-/// <reference types="vitest/config" />
 import { mdsvex } from 'mdsvex';
 import { enhancedImages } from '@sveltejs/enhanced-img';
 import tailwindcss from '@tailwindcss/vite';

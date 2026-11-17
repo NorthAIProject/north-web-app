@@ -25,7 +25,12 @@
 	],
 	"overrides": [
 		// `export {}` is what makes an ambient declaration file a module.
-		{ "files": ["**/*.d.ts"], "rules": { "unicorn/require-module-specifiers": "off" } }
+		{ "files": ["**/*.d.ts"], "rules": { "unicorn/require-module-specifiers": "off" } },
+		// The `#lib` alias target (package.json "imports"): a placeholder with
+		// nothing to export yet.
+		{ "files": ["src/lib/index.ts"], "rules": { "unicorn/no-empty-file": "off" } },
+		// Command-line scripts and the e2e provider stub report on stdout.
+		{ "files": ["scripts/**", "tests/e2e/stubs/**"], "rules": { "no-console": "off" } }
 	],
 	"rules": {
 		// Type-aware bug rules that oxlint files under pedantic.
@@ -57,24 +62,38 @@
 		"promise/no-promise-in-callback": "error",
 		"import/no-named-as-default": "error",
 		"import/namespace": "error",
+		"typescript/switch-exhaustiveness-check": "error",
 		"typescript/no-floating-promises": "error",
 		"typescript/no-misused-promises": "error",
 		"typescript/await-thenable": "error",
+		"typescript/no-misused-spread": "error",
 		"no-promise-executor-return": "error",
-		// A then() that ends a chain has nobody to return to.
-		"promise/always-return": ["error", { "ignoreLastCallback": true }],
+		"typescript/triple-slash-reference": "error",
+		"unicorn/no-empty-file": "error",
+		"no-underscore-dangle": "error",
+		"no-shadow": "error",
+		"unicorn/consistent-function-scoping": "error",
+		"unicorn/prefer-add-event-listener": "error",
+		"typescript/no-deprecated": "error",
 		"typescript/require-await": "error",
 		"vitest/require-mock-type-parameters": "error",
 		// `near` in the motion tests wraps expect().toBeCloseTo().
 		"vitest/expect-expect": ["error", { "assertFunctionNames": ["expect", "near"] }],
 		// expect(value, message) is vitest's own API.
 		"vitest/valid-expect": ["error", { "maxArgs": 2 }],
-		"typescript/switch-exhaustiveness-check": "error",
-		"unicorn/consistent-function-scoping": "error",
-		"no-shadow": "error",
-		"unicorn/prefer-add-event-listener": "error",
-		"typescript/no-deprecated": "error",
-		"no-underscore-dangle": "error",
+		// A stylesheet is imported for its side effect.
+		"import/no-unassigned-import": ["error", { "allow": ["**/*.css"] }],
+		// A then() that ends a chain has nobody to return to.
+		"promise/always-return": ["error", { "ignoreLastCallback": true }],
+		"no-console": ["error", { "allow": ["warn", "error"] }],
+		"typescript/require-array-sort-compare": "error",
+		"typescript/no-redundant-type-constituents": "error",
+		"typescript/restrict-template-expressions": "error",
+		// Off: every hit sorts or reverses an array made on that line (a spread,\na filter, Object.keys), so nothing shared is mutated. toSorted() and\ntoReversed() are ES2023, newer than the build target, and nothing here\npolyfills them.
+		"unicorn/no-array-sort": "off",
+		"unicorn/no-array-reverse": "off",
+		// Off: the hits copy small config and fixture rows on purpose, so the\nsource objects are not mutated; there is no hot path to save.
+		"oxc/no-map-spread": "off",
 
 		// BACKLOG. Rules of this profile that the existing code still breaks
 		// (count as of 2026-11-17, with --type-aware). They report as warnings so
@@ -92,17 +111,6 @@
 		"no-await-in-loop": "warn", // 28
 		"typescript/no-unsafe-argument": "warn", // 19
 		"typescript/no-unsafe-return": "warn", // 14
-		"unicorn/no-array-sort": "warn", // 13
-		"no-console": ["warn", { "allow": ["warn", "error"] }], // 11
-		"typescript/restrict-template-expressions": "warn", // 4
-		"oxc/no-map-spread": "warn", // 3
-		"typescript/no-redundant-type-constituents": "warn", // 3
 		"typescript/no-unnecessary-type-conversion": "warn", // 2
-		"typescript/no-misused-spread": "warn", // 2
-		"unicorn/no-array-reverse": "warn", // 1
-		"import/no-unassigned-import": "warn", // 1
-		"unicorn/no-empty-file": "warn", // 1
-		"typescript/triple-slash-reference": "warn", // 1
-		"typescript/require-array-sort-compare": "warn" // 1
 	}
 }

@@ -69,6 +69,9 @@ export const tryAgain = 'Something went wrong reading that. Try again.';
 
 class CaptureFormError extends Error {}
 
+const captureKinds = ['water', 'sleep', 'habit', 'weight', 'check_in', 'food'] as const satisfies readonly CaptureItem['kind'][];
+const isCaptureKind = (kind: string): kind is CaptureItem['kind'] => (captureKinds as readonly string[]).includes(kind);
+
 const num = (v: FormDataEntryValue | null) => {
 	const n = Number(String(v ?? '').trim());
 	return Number.isFinite(n) ? n : 0;
@@ -85,8 +88,9 @@ export function itemsFromForm(form: FormData): CaptureItem[] {
 	for (let i = 0; i < MAX_ITEMS; i++) {
 		const f = (name: string) => form.get(`items[${i}].${name}`);
 		const s = (name: string) => String(f(name) ?? '');
-		const kind = s('kind').trim() as CaptureItem['kind'];
+		const kind = s('kind').trim();
 		if (!kind || !s('include')) continue;
+		if (!isCaptureKind(kind)) throw new CaptureFormError(`Unknown capture kind "${kind}".`);
 		const item: CaptureItem = { kind, source: s('source') };
 		if (s('problem')) item.problem = s('problem');
 		switch (kind) {
@@ -116,8 +120,6 @@ export function itemsFromForm(form: FormData): CaptureItem[] {
 					ingredient_id: s('ingredient_id').trim() || undefined
 				};
 				break;
-			default:
-				throw new CaptureFormError(`Unknown capture kind "${kind}".`);
 		}
 		items.push(item);
 	}

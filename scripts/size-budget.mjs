@@ -63,7 +63,7 @@ const walk = (dir) => {
 };
 walk('_app/immutable');
 const totalJs = all.reduce((sum, f) => sum + size(f), 0);
-const current = { routes: Object.fromEntries(Object.entries(routes).sort()), totalJs };
+const current = { routes: Object.fromEntries(Object.entries(routes).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))), totalJs };
 
 if (process.argv.includes('--write')) {
 	writeFileSync(BUDGET, JSON.stringify(current, null, '\t') + '\n');

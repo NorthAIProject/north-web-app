@@ -12,7 +12,7 @@ export function initials(name: string): string {
 	let out = '';
 	for (const f of name.split(/\s+/).filter(Boolean)) {
 		if (out.length === 2) break;
-		out += [...f][0].toUpperCase();
+		out += Array.from(f)[0].toUpperCase();
 	}
 	return out || '?';
 }

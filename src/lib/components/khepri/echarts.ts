@@ -68,6 +68,12 @@ function categories(axis: unknown): string[] {
 	return isObj(first) && Array.isArray(first.data) ? first.data.map(String) : [];
 }
 
+/** "Name: " for a named point; a name that is not text or a number is left out. */
+function pointName(point: unknown): string {
+	if (!isObj(point)) return '';
+	return typeof point.name === 'string' || typeof point.name === 'number' ? `${point.name}: ` : '';
+}
+
 function pointValue(point: unknown): unknown {
 	return isObj(point) ? point.value : point;
 }
@@ -90,7 +96,7 @@ export function describeOption(option: EChartsOption, locale: string): string {
 		let items: string[];
 		if (s.type === 'pie' || s.type === 'gauge') {
 			const unit = isObj(s.detail) && typeof s.detail.formatter === 'string' && s.detail.formatter.includes('%') ? '%' : '';
-			items = data.map((d) => `${isObj(d) && d.name != null ? `${d.name}: ` : ''}${fmt(pointValue(d))}${unit}`);
+			items = data.map((d) => `${pointName(d)}${fmt(pointValue(d))}${unit}`);
 			parts.push(items.slice(0, MAX_POINTS).join('; ') + (items.length > MAX_POINTS ? '…' : ''));
 			continue;
 		}
