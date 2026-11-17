@@ -54,7 +54,6 @@
 				{/if}
 				<div class="space-y-2">
 					<Label for="email">{i18n.t('auth.field.email')}</Label>
-					<!-- svelte-ignore a11y_autofocus -->
 					<Input id="email" name="email" type="email" bind:value={email} required autocomplete="email" autofocus />
 				</div>
 				<div class="space-y-2">

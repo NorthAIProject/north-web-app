@@ -63,6 +63,8 @@ function reducedMotion(): boolean {
 
 type Instance = { id: string; apply(name: string): void };
 
+// A registry that nothing renders from, so it stays a plain Set.
+// eslint-disable-next-line svelte/prefer-svelte-reactivity
 const instances = new Set<Instance>();
 let sustained = 'idle';
 let lastGesture: string | null = null;

@@ -11,11 +11,7 @@
 	}: { id: string; name: string; placeholder: string; value?: string; options: { value: string; label: string }[] } =
 		$props();
 
-	// svelte-ignore state_referenced_locally
-	let selected = $state(value);
-	$effect.pre(() => {
-		selected = value;
-	});
+	let selected = $derived(value);
 </script>
 
 <SearchSelect {id} {name} bind:value={selected} items={options} {placeholder} aria-label={placeholder} />

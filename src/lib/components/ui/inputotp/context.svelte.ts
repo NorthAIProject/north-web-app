@@ -4,6 +4,8 @@ const KEY = Symbol("input-otp");
 
 export class InputOTPState {
 	chars = $state<string[]>([]);
+	// Element references for focus moves; nothing renders from it.
+	// eslint-disable-next-line svelte/prefer-svelte-reactivity
 	#slots = new Map<number, HTMLInputElement>();
 
 	constructor(private readonly onChange: (value: string) => void) {}
