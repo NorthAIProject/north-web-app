@@ -74,12 +74,12 @@ describe('runPasskey', () => {
 
 	it('begins through the /api proxy and finishes through this server, never seeing a token', async () => {
 		const calls: { url: string; body: Record<string, unknown> }[] = [];
-		const fetchImpl = vi.fn(async (url: string | URL | Request, init?: RequestInit) => {
+		const fetchImpl = vi.fn<(url: string | URL | Request, init?: RequestInit) => Promise<Response>>((url, init) => {
 			calls.push({ url: String(url), body: JSON.parse(String(init?.body)) });
-			if (String(url).startsWith('/api/')) return jsonResponse({ challengeId: 'c1', publicKey: { challenge: 'AQ' } });
-			return jsonResponse({ redirect: '/app/goals' });
+			if (String(url).startsWith('/api/')) return Promise.resolve(jsonResponse({ challengeId: 'c1', publicKey: { challenge: 'AQ' } }));
+			return Promise.resolve(jsonResponse({ redirect: '/app/goals' }));
 		});
-		const credentials = { get: vi.fn(async () => assertion), create: vi.fn() };
+		const credentials = { get: vi.fn<() => Promise<typeof assertion>>(() => Promise.resolve(assertion)), create: vi.fn<() => Promise<null>>() };
 
 		const destination = await runPasskey({
 			mode: 'login',
@@ -97,7 +97,7 @@ describe('runPasskey', () => {
 	});
 
 	it('asks for a name and email before registering', async () => {
-		const fetchImpl = vi.fn();
+		const fetchImpl = vi.fn<() => Promise<Response>>();
 		await expect(runPasskey({ mode: 'register', email: 'a@b.c', fetch: fetchImpl as unknown as typeof fetch })).rejects.toThrow(
 			/name and email/
 		);
@@ -105,7 +105,7 @@ describe('runPasskey', () => {
 	});
 
 	it('surfaces the API error message', async () => {
-		const fetchImpl = vi.fn(async () => jsonResponse({ error: { message: 'Passkeys are off.' } }, 404));
+		const fetchImpl = vi.fn<() => Promise<Response>>(() => Promise.resolve(jsonResponse({ error: { message: 'Passkeys are off.' } }, 404)));
 		await expect(runPasskey({ mode: 'login', fetch: fetchImpl as unknown as typeof fetch })).rejects.toThrow(
 			'Passkeys are off.'
 		);

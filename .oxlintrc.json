@@ -63,6 +63,12 @@
 		"no-promise-executor-return": "error",
 		// A then() that ends a chain has nobody to return to.
 		"promise/always-return": ["error", { "ignoreLastCallback": true }],
+		"typescript/require-await": "error",
+		"vitest/require-mock-type-parameters": "error",
+		// `near` in the motion tests wraps expect().toBeCloseTo().
+		"vitest/expect-expect": ["error", { "assertFunctionNames": ["expect", "near"] }],
+		// expect(value, message) is vitest's own API.
+		"vitest/valid-expect": ["error", { "maxArgs": 2 }],
 
 		// BACKLOG. Rules of this profile that the existing code still breaks
 		// (count as of 2026-11-17, with --type-aware). They report as warnings so
@@ -83,17 +89,13 @@
 		"typescript/no-unsafe-return": "warn", // 14
 		"unicorn/no-array-sort": "warn", // 13
 		"typescript/no-deprecated": "warn", // 13
-		"vitest/require-mock-type-parameters": "warn", // 11
-		"vitest/expect-expect": "warn", // 11
 		"no-console": ["warn", { "allow": ["warn", "error"] }], // 11
-		"typescript/require-await": "warn", // 10
 		"no-shadow": "warn", // 7
 		"typescript/switch-exhaustiveness-check": "warn", // 6
 		"no-underscore-dangle": "warn", // 4
 		"typescript/restrict-template-expressions": "warn", // 4
 		"unicorn/prefer-add-event-listener": "warn", // 3
 		"oxc/no-map-spread": "warn", // 3
-		"vitest/valid-expect": "warn", // 3
 		"typescript/no-redundant-type-constituents": "warn", // 3
 		"typescript/no-unnecessary-type-conversion": "warn", // 2
 		"typescript/no-misused-spread": "warn", // 2
