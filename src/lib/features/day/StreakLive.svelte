@@ -46,8 +46,8 @@
 		client.setQueryData(key, tile);
 	});
 
+	const refresh = () => client.invalidateQueries({ queryKey: key });
 	$effect(() => {
-		const refresh = () => client.invalidateQueries({ queryKey: key });
 		document.addEventListener(CHECKIN_SAVED, refresh);
 		return () => document.removeEventListener(CHECKIN_SAVED, refresh);
 	});

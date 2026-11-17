@@ -51,8 +51,9 @@ export const keepsQuery = (path: string) => pathOf(path) === '/';
  * posthog's autocapture url_allowlist: regexes matched against location.href
  * at click time, so the set above holds after client-side navigation too.
  */
+const escape = (s: string) => s.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&');
+
 export function autocaptureAllowlist(): string[] {
-	const escape = (s: string) => s.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&');
 	return [...autocapturePages].map((p) => `^https?://[^/]+${p === '/' ? '' : escape(p)}/?(?:[?#].*)?$`);
 }
 
@@ -114,11 +115,11 @@ export function loadScript(src: string): Promise<boolean> {
 			const script = document.createElement('script');
 			script.src = src;
 			script.async = true;
-			script.onload = () => resolve(true);
-			script.onerror = () => {
+			script.addEventListener('load', () => resolve(true));
+			script.addEventListener('error', () => {
 				scripts.delete(src);
 				resolve(false);
-			};
+			});
 			document.head.appendChild(script);
 		});
 		scripts.set(src, pending);

@@ -190,6 +190,12 @@ function addRim(material: THREE.Material, rim: Rim, rimAlpha = 0, rimPower = 2.5
 	material.customProgramCacheKey = () => 'north-body-rim';
 }
 
+// The selected muscle glows in its own colour, so a tap is seen to land.
+function highlight(region: RegionEntry, on: boolean) {
+	if (on) region.material.emissive.copy(region.material.color).multiplyScalar(0.45);
+	else region.material.emissive.setScalar(0);
+}
+
 export async function createViewer(canvas: HTMLCanvasElement, options: ViewerOptions = {}): Promise<MuscleViewerHandle> {
 	if (!hasWebGL()) throw new Error('WebGL unavailable');
 
@@ -319,23 +325,17 @@ export async function createViewer(canvas: HTMLCanvasElement, options: ViewerOpt
 		pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
 		raycaster.setFromCamera(pointer, camera);
 		const hit = raycaster.intersectObjects(meshes, false)[0];
-		const key = hit ? hit.object.name : null;
-		select(key);
-		options.onMuscleClick?.(key, key ? (MUSCLE_INFO[key] ?? null) : null, {
+		const muscle = hit ? hit.object.name : null;
+		select(muscle);
+		options.onMuscleClick?.(muscle, muscle ? (MUSCLE_INFO[muscle] ?? null) : null, {
 			x: (e.clientX - rect.left) / rect.width,
 			y: (e.clientY - rect.top) / rect.height
 		});
 	}
 
-	// The selected muscle glows in its own colour, so a tap is seen to land.
-	function highlight(region: RegionEntry, on: boolean) {
-		if (on) region.material.emissive.copy(region.material.color).multiplyScalar(0.45);
-		else region.material.emissive.setScalar(0);
-	}
-
-	function select(key: string | null) {
+	function select(muscle: string | null) {
 		if (selected && regions[selected]) highlight(regions[selected], false);
-		selected = key;
+		selected = muscle;
 		if (selected && regions[selected]) highlight(regions[selected], true);
 		wake();
 	}
@@ -545,6 +545,8 @@ function loadModel(url: string): Promise<GLTF> {
  * region with its own material, keyed by the mesh's name. The file stands on
  * the origin (soles at y = 0, centred).
  */
+const isKey = (name?: string) => name === SHELL_REGION || (!!name && name in MUSCLE_INFO);
+
 async function loadFigure(colours: Colours, rim: Rim, model?: string) {
 	const gltf = await loadModel(model || MODEL_PATH);
 	const figure = gltf.scene.clone(true);
@@ -556,7 +558,6 @@ async function loadFigure(colours: Colours, rim: Rim, model?: string) {
 	// gltfpack moves each mesh onto an unnamed child of the named node (shell,
 	// quads, …), which GLTFLoader calls mesh_<n>; the key is then the parent's
 	// name. Copied onto the mesh, so a tap resolves by hit.object.name.
-	const isKey = (name?: string) => name === SHELL_REGION || (!!name && name in MUSCLE_INFO);
 	for (const obj of meshes) {
 		if (!isKey(obj.name) && isKey(obj.parent?.name)) obj.name = obj.parent!.name;
 	}

@@ -5,13 +5,14 @@ import type { PageServerLoad } from './$types';
 // Go: internal/documents/handler.go search (the dedicated page). The inline
 // box on /app/knowledge and "Show more" fetch from the browser instead.
 
+const int = (v: string | null, min: number) => {
+	const n = Number(v ?? '');
+	return v && Number.isInteger(n) && n >= min ? n : undefined;
+};
+
 export const load: PageServerLoad = async (event) => {
 	const params = event.url.searchParams;
 	const query = (params.get('q') ?? '').trim();
-	const int = (v: string | null, min: number) => {
-		const n = Number(v ?? '');
-		return v && Number.isInteger(n) && n >= min ? n : undefined;
-	};
 	const limit = int(params.get('limit'), 1) ?? searchPageLimit;
 	const offset = int(params.get('offset'), 0) ?? 0;
 	// A no-JS "Show more" lands here with append=1: the next rows, without the count.

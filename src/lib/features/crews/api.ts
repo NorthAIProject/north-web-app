@@ -133,11 +133,11 @@ const liveTypes = ['message', 'update', 'channels', 'removed', 'resync'];
 export function connectLive(crewID: string, on: LiveHandlers): () => void {
 	const source = new EventSource(`/api/crews/${crewID}/live`);
 	let connected = false;
-	source.onopen = () => {
+	source.addEventListener('open', () => {
 		// Not on the first connect, which the page itself just rendered.
 		if (connected) on.reconnected();
 		connected = true;
-	};
+	});
 	const handle = (e: MessageEvent) => {
 		try {
 			on.event(JSON.parse(e.data) as CrewLiveEvent);

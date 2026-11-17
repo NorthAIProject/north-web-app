@@ -52,8 +52,8 @@
 	// One row per label, one column per dataset (s0, s1…): LayerChart's shape.
 	const keys = $derived(data.datasets.map((_, i) => `s${i}`));
 	const rows = $derived(
-		data.labels.map((label, i) => {
-			const row: Record<string, string | number | null> = { label };
+		data.labels.map((name, i) => {
+			const row: Record<string, string | number | null> = { label: name };
 			data.datasets.forEach((d, j) => (row[`s${j}`] = d.data[i] ?? null));
 			return row;
 		})

@@ -8,28 +8,28 @@ import type { Actions, PageServerLoad } from './$types';
 // figure's heat, its shape and the progress-check chip come from their own
 // endpoints and, as in Go, a chip that cannot load is left out rather than
 // failing the page. The rules and the first week's card load alongside.
+const optional = async <T>(p: Promise<{ data?: T }>): Promise<T | null> => {
+	try {
+		return (await p).data ?? null;
+	} catch {
+		return null;
+	}
+};
+
 export const load: PageServerLoad = async (event) => {
 	event.depends('north:day');
-	const api = serverApi(event);
+	const client = serverApi(event);
 	const date = event.url.searchParams.get('date') ?? undefined;
 
-	const optional = async <T>(p: Promise<{ data?: T }>): Promise<T | null> => {
-		try {
-			return (await p).data ?? null;
-		} catch {
-			return null;
-		}
-	};
-
 	const [day, rules, map, current, progress, firstWeek, soreness, sorenessHistory] = await Promise.all([
-		api.GET('/day', { params: { query: { date } } }).then((r) => r.data!),
-		optional(api.GET('/day/rules')),
-		optional(api.GET('/body/map', { params: { query: { days: 7 } } })),
-		optional(api.GET('/body/current')),
-		optional(api.GET('/progress/checks')),
-		optional(api.GET('/first-week')),
-		optional(api.GET('/soreness')),
-		optional(api.GET('/soreness/history', { params: { query: { days: 14 } } }))
+		client.GET('/day', { params: { query: { date } } }).then((r) => r.data!),
+		optional(client.GET('/day/rules')),
+		optional(client.GET('/body/map', { params: { query: { days: 7 } } })),
+		optional(client.GET('/body/current')),
+		optional(client.GET('/progress/checks')),
+		optional(client.GET('/first-week')),
+		optional(client.GET('/soreness')),
+		optional(client.GET('/soreness/history', { params: { query: { days: 14 } } }))
 	]);
 
 	return { day, rules, map, morph: current?.morph ?? null, progress, firstWeek, soreness, sorenessHistory };

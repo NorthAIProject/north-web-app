@@ -70,6 +70,9 @@
 		// expect(value, message) is vitest's own API.
 		"vitest/valid-expect": ["error", { "maxArgs": 2 }],
 		"typescript/switch-exhaustiveness-check": "error",
+		"unicorn/consistent-function-scoping": "error",
+		"no-shadow": "error",
+		"unicorn/prefer-add-event-listener": "error",
 
 		// BACKLOG. Rules of this profile that the existing code still breaks
 		// (count as of 2026-11-17, with --type-aware). They report as warnings so
@@ -86,15 +89,12 @@
 		"typescript/no-unnecessary-type-assertion": "warn", // 30
 		"no-await-in-loop": "warn", // 28
 		"typescript/no-unsafe-argument": "warn", // 19
-		"unicorn/consistent-function-scoping": "warn", // 17
 		"typescript/no-unsafe-return": "warn", // 14
 		"unicorn/no-array-sort": "warn", // 13
 		"typescript/no-deprecated": "warn", // 13
 		"no-console": ["warn", { "allow": ["warn", "error"] }], // 11
-		"no-shadow": "warn", // 7
 		"no-underscore-dangle": "warn", // 4
 		"typescript/restrict-template-expressions": "warn", // 4
-		"unicorn/prefer-add-event-listener": "warn", // 3
 		"oxc/no-map-spread": "warn", // 3
 		"typescript/no-redundant-type-constituents": "warn", // 3
 		"typescript/no-unnecessary-type-conversion": "warn", // 2

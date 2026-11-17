@@ -40,11 +40,11 @@
 	const label = $derived(i18n.t('appearance.switch.' + current));
 
 	// Another switcher on the page (or anything else) changed it.
+	const onChange = (event: Event) => {
+		const chosen = (event as CustomEvent<{ appearance?: string }>).detail?.appearance;
+		if (isAppearance(chosen)) current = chosen;
+	};
 	$effect(() => {
-		const onChange = (event: Event) => {
-			const chosen = (event as CustomEvent<{ appearance?: string }>).detail?.appearance;
-			if (isAppearance(chosen)) current = chosen;
-		};
 		document.addEventListener('theme-changed', onChange);
 		return () => document.removeEventListener('theme-changed', onChange);
 	});
