@@ -86,8 +86,8 @@ export async function toWav(blob: Blob): Promise<Blob> {
 		OfflineAudioContext?: typeof OfflineAudioContext;
 		webkitOfflineAudioContext?: typeof OfflineAudioContext;
 	};
-	const Ctx = w.AudioContext || w.webkitAudioContext;
-	const Offline = w.OfflineAudioContext || w.webkitOfflineAudioContext;
+	const Ctx = w.AudioContext ?? w.webkitAudioContext;
+	const Offline = w.OfflineAudioContext ?? w.webkitOfflineAudioContext;
 	if (!Ctx) throw new Error('no audio context');
 
 	const ctx = new Ctx();

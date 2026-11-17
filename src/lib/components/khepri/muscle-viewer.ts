@@ -148,7 +148,7 @@ function createStudioEnvironment(): THREE.Scene {
 function hasWebGL(): boolean {
 	try {
 		const probe = document.createElement('canvas');
-		return Boolean(window.WebGLRenderingContext && (probe.getContext('webgl2') || probe.getContext('webgl')));
+		return Boolean(window.WebGLRenderingContext && (probe.getContext('webgl2') ?? probe.getContext('webgl')));
 	} catch {
 		return false;
 	}
@@ -605,7 +605,7 @@ function skinLayers(obj: THREE.Mesh, colours: Colours, rim: Rim): Shell {
 	addRim(ghost, rim, SHELL_EDGE_ALPHA, SHELL_EDGE_POWER);
 	obj.material = ghost;
 	obj.renderOrder = 1;
-	const targets = obj.morphTargetDictionary || {};
+	const targets = obj.morphTargetDictionary ?? {};
 
 	// The body under the muscles: the same geometry with the core key on, so
 	// it lies just below each muscle and at the surface where there is none

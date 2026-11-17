@@ -105,7 +105,7 @@ sw.addEventListener('fetch', (event) => {
 				} catch {
 					const cached = await caches.match(OFFLINE_URL);
 					return (
-						cached ||
+						cached ??
 						new Response(offlineText(), {
 							status: 503,
 							headers: { 'Content-Type': 'text/plain; charset=utf-8' }
@@ -137,7 +137,7 @@ sw.addEventListener('fetch', (event) => {
 
 				// Falling back to the network result when there is nothing cached, and
 				// to a plain failure when both are unavailable.
-				return cached || (await network) || Response.error();
+				return cached ?? (await network) ?? Response.error();
 			})()
 		);
 	}
