@@ -22,7 +22,7 @@ export type NavGroup = {
 };
 
 /** The rail items a first week keeps in view (Go: firstWeekNav). */
-const firstWeekNav = ['/app', '/app/chat', '/app/check-ins', '/app/goals'];
+const firstWeekNav = new Set(['/app', '/app/chat', '/app/check-ins', '/app/goals']);
 
 export function groupLabel(i18n: Translator, group: Group | 'more'): string {
 	return i18n.t(`nav.group.${group.toLowerCase()}`);
@@ -114,7 +114,7 @@ function foldUnderMore(i18n: Translator, nav: NavGroup[]): NavGroup[] {
 	for (const group of nav) {
 		const keep: NavGroup = { label: group.label, items: [] };
 		for (const item of group.items) {
-			if (firstWeekNav.includes(item.href)) {
+			if (firstWeekNav.has(item.href)) {
 				keep.items.push(item);
 				continue;
 			}

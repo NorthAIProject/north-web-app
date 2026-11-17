@@ -154,11 +154,11 @@ export function entryTimes(i18n: Translator, c: CheckIn, timeZone: string): stri
 	return out;
 }
 
-const labelledSources = ['web', 'ios', 'siri', 'coach', 'mcp', 'capture'];
+const labelledSources = new Set(['web', 'ios', 'siri', 'coach', 'mcp', 'capture']);
 
 /** SourceLabel: unknown and unrecognised sources get no label. */
 export function sourceLabel(i18n: Translator, source: string): string {
-	return labelledSources.includes(source) ? i18n.t(`checkins.source.${source}`) : '';
+	return labelledSources.has(source) ? i18n.t(`checkins.source.${source}`) : '';
 }
 
 function streakSaved(i18n: Translator, streak: number): string {
@@ -180,10 +180,10 @@ export function restsHeld(i18n: Translator, n: number): string {
 	return i18n.tf('checkins.rests.held.many', n);
 }
 
-const knownStates = ['checked', 'rest', 'today', 'upcoming'];
+const knownStates = new Set(['checked', 'rest', 'today', 'upcoming']);
 
 export function dayStateLabel(i18n: Translator, state: string): string {
-	return i18n.t(knownStates.includes(state) ? `checkins.week.${state}` : 'checkins.week.none');
+	return i18n.t(knownStates.has(state) ? `checkins.week.${state}` : 'checkins.week.none');
 }
 
 /** dotClass: a perfect week turns the checked days ember. */

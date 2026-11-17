@@ -6,8 +6,12 @@
 # deployment's message is the commit SHA, so `wrangler deployments list` says
 # which commit is live.
 #
+# lint, typecheck, test and build are independent jobs so they run at the same
+# time; the slowest one sets the wall time.
+#
 # Prettier and the e2e suite are not run here: the tree is not yet
-# prettier-clean, and e2e needs the Go API, Postgres and the provider stubs.
+# prettier-clean (`bun run format:check` is for local use), and e2e needs the
+# Go API, Postgres and the provider stubs.
 
 name: CI
 
@@ -19,25 +23,60 @@ on:
 permissions:
   contents: read
 
+# A newer push to a pull request replaces the run in progress. Runs on main are
+# never cancelled from here; the deploy job has its own group below.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
-  check:
+  lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: 1.4.2
       - name: Emblem motion copies match design/
         run: scripts/brand/emblem-guard.sh
-      - run: bun install --frozen-lockfile
+      - uses: ./.github/actions/setup
+      # oxlint runs everything except Svelte template rules, type-aware rules
+      # included. Its backlog rules report as warnings; only errors fail.
+      - run: bun run lint:ox
+      # ESLint: Svelte-specific rules only (eslint.config.js).
+      - run: bun run lint:svelte
+
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
       - run: bun run check
-      - run: bun run test
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # --changed needs the base branch to diff against.
+          fetch-depth: 0
+      - uses: ./.github/actions/setup
+      # Same project selection as `bun run test`: every vitest project.
+      # On a PR, run only the tests whose import graph reaches a changed file.
+      # A change to package.json or the vite config reruns everything.
+      - if: github.event_name == 'pull_request'
+        run: bunx vitest run --changed "origin/${{ github.base_ref }}" --passWithNoTests
+      - if: github.event_name != 'pull_request'
+        run: bun run test
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
       - run: bun run build
       - name: Route size budget (size-budget.json)
         run: node scripts/size-budget.mjs
 
   deploy:
-    needs: check
+    needs: [lint, typecheck, test, build]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     # One deploy at a time, and the newest push wins.
