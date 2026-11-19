@@ -1971,6 +1971,12 @@ export interface paths {
         /**
          * Upload a clip of a set to be analysed
          * @description Answers 202 with the check; poll it until done or failed.
+         *
+         *     The check is read from stills the client cuts out of the clip, not from
+         *     the video, which is kept for playback only. Send the stills as JPEG, in
+         *     clip order, with one time each. A request with no stills is refused
+         *     with a 422 on `video` wherever nothing can read video, which includes
+         *     production.
          */
         post: operations["uploadFormCheck"];
         delete?: never;
@@ -9492,6 +9498,11 @@ export interface components {
                     severity: string;
                     observation: string;
                     correction: string;
+                    /**
+                     * Format: uri
+                     * @description Short-lived signed link to the still this was seen in. Set by GET /form-checks/{analysisID} only, for a check read from stills.
+                     */
+                    frameUrl?: string;
                 }[];
             };
             error?: string;
@@ -9502,6 +9513,17 @@ export interface components {
              * @description Short-lived signed link to the clip. Set by GET /form-checks/{analysisID} only; seek to each issue's at.
              */
             playbackUrl?: string;
+            /** @description Length of the clip in seconds; place an issue on a timeline at at/durationSeconds. Absent on checks made before stills. */
+            durationSeconds?: number;
+            /** @description How the clip was read. An open string: "stills" (positions only, never tempo or bar speed) or "video". Absent until the check is done, and on older checks. */
+            method?: string;
+            /** @description The stills the check was read from, in clip order. Set by GET /form-checks/{analysisID} only. */
+            frames?: {
+                /** @description Seconds into the clip. */
+                at: number;
+                /** Format: uri */
+                url: string;
+            }[];
         };
         FormCheckList: {
             checks: components["schemas"]["FormCheck"][];
@@ -14009,6 +14031,17 @@ export interface operations {
                      * @description A video up to 90 MB.
                      */
                     video: string;
+                    /** @description JPEG stills cut from the clip, in clip order. At most 24, each at most 1024 pixels on its longer side, 4 MB together. */
+                    frames?: string[];
+                    /**
+                     * @description The second of the clip each still was cut at, comma separated, one per still, strictly increasing and no later than durationSeconds.
+                     * @example 0.5,1.0,1.5
+                     */
+                    frameTimes?: string;
+                    /** @description Length of the clip in seconds. Required with frames. */
+                    durationSeconds?: number;
+                    /** @description The catalogue exercise filmed, when the person said. */
+                    exerciseSlug?: string;
                 };
             };
         };

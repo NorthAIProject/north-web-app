@@ -42,6 +42,20 @@ export function timestamp(seconds: number): string {
 	return `${Math.trunc(total / 60)}:${String(total % 60).padStart(2, '0')}`;
 }
 
+/**
+ * Where a moment sits on the timeline, as a percentage of its width. Clamped:
+ * a clip whose length is unknown or wrong must not push a marker off the line.
+ */
+export function markerLeft(at: number, durationSeconds: number): number {
+	if (!(durationSeconds > 0) || !Number.isFinite(at)) return 0;
+	return Math.min(100, Math.max(0, (at / durationSeconds) * 100));
+}
+
+/** Read from stills: positions can be judged, tempo and bar speed cannot. */
+export function readFromStills(c: Pick<FormCheck, 'method'>): boolean {
+	return c.method === 'stills';
+}
+
 /** The singular spelled out: "1 things" reads as a bug (Go: issuesHeading). */
 export function issuesHeading(i18n: Translator, n: number): string {
 	return n === 1 ? i18n.t('form.result.issues.one') : i18n.tf('form.result.issues.many', n);

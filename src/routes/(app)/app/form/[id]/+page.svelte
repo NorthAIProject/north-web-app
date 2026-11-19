@@ -4,6 +4,7 @@
 	import { browserApi } from '#lib/api/client.js';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import AnalysisStatus from '#lib/features/formcheck/AnalysisStatus.svelte';
+	import Timeline from '#lib/features/formcheck/Timeline.svelte';
 	import { POLL_MS, inProgress, type FormCheck } from '#lib/features/formcheck/view.js';
 	import { useI18n } from '#lib/i18n/index.js';
 	import type { PageProps } from './$types';
@@ -36,11 +37,25 @@
 	const playbackUrl = $derived(data.check.playbackUrl);
 
 	let clip: HTMLVideoElement | undefined = $state();
+	let currentTime = $state(0);
+	let selected: number | null = $state(null);
+
+	// Pauses on the moment itself: the still the model named is one frame, and
+	// playing on would move past it before it could be looked at.
 	function seek(seconds: number) {
 		if (!clip) return;
+		clip.pause();
 		clip.currentTime = seconds;
-		void clip.play();
 	}
+	function select(index: number) {
+		const issue = check.result?.issues[index];
+		if (!issue) return;
+		selected = index;
+		seek(issue.at);
+	}
+
+	const issues = $derived(check.result?.issues ?? []);
+	const durationSeconds = $derived(check.durationSeconds ?? 0);
 </script>
 
 <svelte:head><title>{pageTitle(i18n.t('form.title'))}</title></svelte:head>
@@ -61,7 +76,11 @@
 		controls
 		playsinline
 		preload="metadata"
-		class="border-border mb-6 w-full rounded-lg border bg-black"
+		bind:currentTime
+		class={['border-border w-full rounded-lg border bg-black', durationSeconds > 0 && issues.length > 0 ? 'mb-3' : 'mb-6']}
 	></video>
-	<AnalysisStatus {check} {seek} />
+	{#if durationSeconds > 0 && issues.length > 0}
+		<Timeline {issues} {durationSeconds} {currentTime} {selected} onselect={select} />
+	{/if}
+	<AnalysisStatus {check} {selected} onselect={select} />
 </div>

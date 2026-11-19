@@ -1,7 +1,8 @@
 <!--
 	One description of each analysis state: watching, failed, or the result
 	(north-client web/form StatusFragment + result + issueCard). The page polls
-	and hands the latest check in; seek moves the clip to an issue's moment.
+	and hands the latest check in; onselect moves the clip to an issue's moment,
+	and the still the issue was seen in sits beside its cue.
 -->
 <script lang="ts">
 	import * as Alert from '#lib/components/ui/alert/index.js';
@@ -13,13 +14,18 @@
 		inProgress,
 		isFailed,
 		issuesHeading,
+		readFromStills,
 		severityBadge,
 		timestamp,
 		trustworthy,
 		type FormCheck
 	} from './view.js';
 
-	let { check, seek }: { check: FormCheck; seek: (seconds: number) => void } = $props();
+	let {
+		check,
+		selected = null,
+		onselect
+	}: { check: FormCheck; selected?: number | null; onselect: (index: number) => void } = $props();
 	const i18n = useI18n();
 </script>
 
@@ -52,6 +58,11 @@
 			</Card.Header>
 			<Card.Content>
 				<p class="text-muted-foreground text-sm">{a.summary}</p>
+				{#if readFromStills(check)}
+					<p class="text-muted-foreground mt-3 text-xs">
+						{i18n.tf('form.result.stills', check.frames?.length ?? 0)}
+					</p>
+				{/if}
 			</Card.Content>
 		</Card.Root>
 		{#if !trustworthy(a)}
@@ -71,12 +82,12 @@
 			<div class="space-y-3">
 				{#each a.issues as issue, i (i)}
 					{@const severity = severityBadge(i18n, issue.severity)}
-					<Card.Root>
+					<Card.Root class={selected === i ? 'border-signal' : ''}>
 						<Card.Content>
 							<div class="flex items-start gap-3 pt-6">
 								<button
 									type="button"
-									onclick={() => seek(issue.at)}
+									onclick={() => onselect(i)}
 									class="border-border hover:bg-accent shrink-0 rounded-md border px-2 py-1 font-mono text-xs transition-colors"
 								>
 									{timestamp(issue.at)}
@@ -88,6 +99,14 @@
 									<p class="text-sm">{issue.observation}</p>
 									<p class="text-muted-foreground mt-1 text-sm">{issue.correction}</p>
 								</div>
+								{#if issue.frameUrl}
+									<img
+										src={issue.frameUrl}
+										alt={i18n.tf('form.result.still.alt', timestamp(issue.at))}
+										loading="lazy"
+										class="border-border hidden h-24 w-auto shrink-0 rounded-md border object-contain sm:block"
+									/>
+								{/if}
 							</div>
 						</Card.Content>
 					</Card.Root>

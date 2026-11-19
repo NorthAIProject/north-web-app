@@ -53,3 +53,24 @@ badge choices, `issuesHeading`, quota `DelayLabel`), `upload.ts`, `AnalysisStatu
 
 None needed. Polling uses `@tanstack/svelte-query` (already installed) through the app-wide
 `QueryClient` the root layout provides (`src/lib/query.ts`).
+
+## Stills (2026-11-18)
+
+The API no longer reads the video. The browser cuts JPEG stills out of the clip
+(`src/lib/features/formcheck/frames.ts`: about sixteen, 768 px on the longer side,
+each in the middle of its slice of the clip) and sends them with it as `frames`,
+`frameTimes` and `durationSeconds`. The clip is stored for playback only; the
+stills are what the model sees, and they go to the Anthropic client alone, like
+progress photos.
+
+- The model names the still an issue is visible in; the API turns that into the
+  exact second the still was cut at, so a marker always lands on a real frame.
+- `Timeline.svelte` draws one marker per issue at `at / durationSeconds`. Shape
+  carries severity (diamond, filled dot, ring); the selected marker is the only
+  gold on the page. Choosing an issue pauses on that moment rather than playing
+  on past it, and the still it was seen in sits beside the cue.
+- Stills show positions, not motion. The result says so ("It judges positions,
+  not speed"), and copy elsewhere must not promise tempo or bar-speed feedback.
+- A browser that cannot decode the clip (HEVC `.mov` outside Safari) cannot cut
+  stills; the page says to convert to MP4 instead of uploading a check that
+  could not be read.
