@@ -35,6 +35,7 @@ import SettingsIcon from '@lucide/svelte/icons/settings';
 import SmileIcon from '@lucide/svelte/icons/smile';
 import SparklesIcon from '@lucide/svelte/icons/sparkles';
 import TargetIcon from '@lucide/svelte/icons/target';
+import TelescopeIcon from '@lucide/svelte/icons/telescope';
 import TimerIcon from '@lucide/svelte/icons/timer';
 import TrophyIcon from '@lucide/svelte/icons/trophy';
 import UsersIcon from '@lucide/svelte/icons/users';
@@ -334,6 +335,16 @@ export const destinations: Destination[] = [
 		group: 'Progress',
 		description: 'Review the week and choose a focus for the next one.',
 		keywords: ['weekly', 'review', 'plan', 'priorities', 'focus', 'deload'],
+		nav: { show: true }
+	},
+	{
+		key: 'nav.horizon',
+		label: 'Horizon',
+		href: '/app/horizon',
+		icon: TelescopeIcon,
+		group: 'Progress',
+		description: 'Where your training is heading, as ranges.',
+		keywords: ['forecast', 'predict', 'future', 'plateau', 'trend', 'what if', 'deload', 'projection'],
 		nav: { show: true }
 	},
 	{

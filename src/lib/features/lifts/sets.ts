@@ -6,6 +6,7 @@ import type { Translator } from '#lib/i18n/index.js';
 
 export type LiftSet = components['schemas']['LiftSet'];
 export type LiftSetInput = components['schemas']['LiftSetInput'];
+export type NextSet = components['schemas']['HorizonNextSets']['sets'][number];
 
 /**
  * The form's values, kept between sets (Go: pages.SetForm). Number inputs
@@ -16,7 +17,13 @@ export type SetForm = { exercise: string; weightKg: Field; reps: Field; kind: st
 
 const str = (v: Field) => (v === null || v === undefined ? '' : String(v)).trim();
 
-export const emptyForm = (): SetForm => ({ exercise: '', weightKg: '', reps: '', kind: '', rir: '' });
+export const emptyForm = (): SetForm => ({
+	exercise: '',
+	weightKg: '',
+	reps: '',
+	kind: '',
+	rir: ''
+});
 
 export const kinds = ['work', 'warmup', 'drop'] as const;
 
@@ -32,12 +39,19 @@ export function parseSetForm(f: SetForm): { input: LiftSetInput } | { error: str
 	const w = str(f.weightKg);
 	if (w) {
 		const normal = w.replaceAll(',', '.');
-		if (!/^[-+]?(\d+\.?\d*|\.\d+)([eE][-+]?\d+)?$/.test(normal)) return { error: 'lifts.err.weight' };
+		if (!/^[-+]?(\d+\.?\d*|\.\d+)([eE][-+]?\d+)?$/.test(normal))
+			return { error: 'lifts.err.weight' };
 		weightKg = Number(normal);
 	}
 	const r = str(f.reps);
 	if (!/^[-+]?\d+$/.test(r)) return { error: 'lifts.err.reps' };
-	const input: LiftSetInput = { exerciseName, setNumber: 0, weightKg, reps: Number(r), kind: (f.kind || undefined) as LiftSetInput['kind'] };
+	const input: LiftSetInput = {
+		exerciseName,
+		setNumber: 0,
+		weightKg,
+		reps: Number(r),
+		kind: (f.kind || undefined) as LiftSetInput['kind']
+	};
 	const rir = str(f.rir);
 	if (rir) {
 		if (!/^[-+]?\d+$/.test(rir)) return { error: 'lifts.err.rir' };
@@ -63,4 +77,23 @@ export function loadLabel(i18n: Translator, s: LiftSet): string {
 export function rirLabel(i18n: Translator, s: LiftSet): string {
 	if (s.rir === undefined || s.rir === null) return '';
 	return s.rir === 0 ? i18n.t('lifts.list.failure') : i18n.tf('lifts.list.rir', s.rir);
+}
+
+/** How the server keys a lift asked for by name (Go: lift.KeyFor("", name)). */
+export const liftKey = (name: string) => name.trim().toLowerCase();
+
+/**
+ * Whether to offer a suggested set for the exercise in the form. Only before
+ * the first set of it today: after that the form already holds what was just
+ * lifted, which is the better guide to the next set.
+ */
+export function wantsSuggestion(sets: LiftSet[], exercise: string): boolean {
+	const key = liftKey(exercise);
+	return key !== '' && !sets.some((s) => liftKey(s.exerciseName) === key);
+}
+
+/** "62.5 kg × 8" for a suggestion or the set it grew from. */
+export function nextLoad(i18n: Translator, weightKg: number, reps: number): string {
+	if (weightKg <= 0) return i18n.tf('lifts.list.bodyweight', reps);
+	return `${shortDecimal(i18n, weightKg)} kg × ${reps}`;
 }

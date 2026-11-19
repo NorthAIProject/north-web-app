@@ -8,10 +8,20 @@ export const password = 'correct horse battery staple';
 
 export type TestUser = { email: string; token: string; id: string };
 
-/** A fresh account through the API, onboarded unless told otherwise. */
+/**
+ * A fresh account through the API, onboarded unless told otherwise, and with
+ * AI data sharing already answered: left unset, the question opens over every
+ * signed-in page and nothing under it can be clicked. Pass aiConsent 'unset'
+ * to test the question itself.
+ */
 export async function createUser(
 	request: APIRequestContext,
-	opts: { onboarded?: boolean; locale?: string; name?: string } = {}
+	opts: {
+		onboarded?: boolean;
+		locale?: string;
+		name?: string;
+		aiConsent?: 'granted' | 'unset';
+	} = {}
 ): Promise<TestUser> {
 	const email = `e2e-${Date.now()}-${Math.random().toString(36).slice(2, 8)}@khepri.local`;
 	const signup = await request.post(`${apiUrl}/auth/signup`, {
@@ -34,11 +44,25 @@ export async function createUser(
 		});
 		if (!done.ok()) throw new Error(`onboarding failed: ${done.status()} ${await done.text()}`);
 	}
+	if ((opts.aiConsent ?? 'granted') === 'granted') {
+		const consent = await request.put(`${apiUrl}/ai-consent`, {
+			headers: { authorization: `Bearer ${user.token}` },
+			data: { decision: 'granted' }
+		});
+		if (!consent.ok())
+			throw new Error(`ai consent failed: ${consent.status()} ${await consent.text()}`);
+	}
 	return user;
 }
 
 /** Calls the API as user, for arranging state a test needs. */
-export async function api(request: APIRequestContext, user: TestUser, method: string, path: string, data?: unknown) {
+export async function api(
+	request: APIRequestContext,
+	user: TestUser,
+	method: string,
+	path: string,
+	data?: unknown
+) {
 	const res = await request.fetch(`${apiUrl}${path}`, {
 		method,
 		headers: { authorization: `Bearer ${user.token}` },
