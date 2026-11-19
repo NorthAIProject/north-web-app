@@ -9,6 +9,7 @@
 	import * as Card from '#lib/components/ui/card/index.js';
 	import { Input } from '#lib/components/ui/input/index.js';
 	import QuotaRefused from '#lib/features/formcheck/QuotaRefused.svelte';
+	import { extractStills, type Stills } from '#lib/features/formcheck/frames.js';
 	import { uploadFormCheck } from '#lib/features/formcheck/upload.js';
 	import { issueCountBadge } from '#lib/features/formcheck/view.js';
 	import { useI18n } from '#lib/i18n/index.js';
@@ -21,6 +22,7 @@
 	let errMsg = $state('');
 	let refusedFor: number | null = $state(null);
 	let submitting = $state(false);
+	let preparing = $state(false);
 
 	const when = (t: string) => formatTime(i18n.locale, t, '2 January, 15:04', data.user.timezone);
 
@@ -30,7 +32,21 @@
 		submitting = true;
 		errMsg = '';
 		refusedFor = null;
-		const result = await uploadFormCheck(files?.item(0) ?? null);
+		const video = files?.item(0) ?? null;
+		// The check is read from stills cut here; the clip itself only plays back.
+		let stills: Stills;
+		try {
+			if (!video) throw new Error('no clip');
+			preparing = true;
+			stills = await extractStills(video);
+		} catch {
+			submitting = false;
+			preparing = false;
+			errMsg = i18n.t('form.upload.unreadable');
+			return;
+		}
+		preparing = false;
+		const result = await uploadFormCheck(video, stills);
 		if (result.ok) {
 			await goto(`/app/form/${result.check.id}`);
 			return;
@@ -66,7 +82,7 @@
 				</p>
 				<Button type="submit" class="w-full" disabled={submitting}>
 					<UploadIcon class="size-4" />
-					{i18n.t('form.upload.submit')}
+					{submitting ? i18n.t(preparing ? 'form.upload.preparing' : 'form.upload.sending') : i18n.t('form.upload.submit')}
 				</Button>
 			</form>
 		</Card.Content>

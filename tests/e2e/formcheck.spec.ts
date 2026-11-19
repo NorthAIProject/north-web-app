@@ -46,6 +46,12 @@ test('upload a clip, watch it, then read the result', async ({ page, request }) 
 	await expect(page.getByText('2 things to work on')).toBeVisible();
 	await expect(page.getByText('Fix before adding load')).toBeVisible();
 
+	// The stills were cut in the browser, so the check knows the clip's length
+	// and each issue has a marker on the timeline.
+	const timeline = page.getByTestId('form-timeline');
+	await expect(timeline.getByRole('button')).toHaveCount(2);
+	await expect(timeline.getByRole('button', { name: /Fix before adding load: Knees move inward/ })).toBeVisible();
+
 	// A timestamp moves the clip to that moment (once the clip's metadata is in).
 	await expect.poll(() => page.locator('video').evaluate((v: HTMLVideoElement) => v.readyState)).toBeGreaterThan(0);
 	await page.getByRole('button', { name: '0:04' }).click();

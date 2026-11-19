@@ -5,6 +5,7 @@
 // and the typed client's error does not keep.
 
 import { apiErrorFrom } from '#lib/api/errors.js';
+import type { Stills } from './frames.js';
 import type { FormCheck } from './view.js';
 
 export type UploadResult =
@@ -17,10 +18,26 @@ export const CHOOSE_VIDEO = 'Choose a video to upload. Clips must be under 90 MB
 /** Go: the sentence for a storage failure. */
 export const STORE_FAILED = 'Something went wrong storing that video. Try again.';
 
-export async function uploadFormCheck(video: File | null, fetchImpl: typeof fetch = fetch): Promise<UploadResult> {
-	if (!video || video.size === 0) return { ok: false, refused: false, message: CHOOSE_VIDEO };
+/**
+ * The clip goes up for playback; the stills cut from it are what is read
+ * (Go: media.FormUpload). One time per still, comma separated.
+ */
+export function formCheckBody(video: File, stills: Stills): FormData {
 	const body = new FormData();
 	body.set('video', video);
+	stills.frames.forEach((frame, i) => body.append('frames', frame, `frame-${String(i + 1).padStart(2, '0')}.jpg`));
+	body.set('frameTimes', stills.times.join(','));
+	body.set('durationSeconds', String(stills.durationSeconds));
+	return body;
+}
+
+export async function uploadFormCheck(
+	video: File | null,
+	stills: Stills,
+	fetchImpl: typeof fetch = fetch
+): Promise<UploadResult> {
+	if (!video || video.size === 0) return { ok: false, refused: false, message: CHOOSE_VIDEO };
+	const body = formCheckBody(video, stills);
 	let res: Response;
 	try {
 		res = await fetchImpl('/api/form-checks', { method: 'POST', body, headers: { accept: 'application/json' } });
@@ -33,7 +50,7 @@ export async function uploadFormCheck(video: File | null, fetchImpl: typeof fetc
 		return { ok: false, refused: true, retryAfterSeconds: Number.isFinite(retry) && retry > 0 ? retry : 1 };
 	}
 	const err = await apiErrorFrom(res);
-	if (err.status === 422) return { ok: false, refused: false, message: err.fields.video || CHOOSE_VIDEO };
+	if (err.status === 422) return { ok: false, refused: false, message: err.fields.video || err.fields.frames || CHOOSE_VIDEO };
 	if (err.status === 413) return { ok: false, refused: false, message: CHOOSE_VIDEO };
 	return { ok: false, refused: false, message: STORE_FAILED };
 }
