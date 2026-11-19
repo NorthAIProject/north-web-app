@@ -37,6 +37,7 @@
 		<MonoLabel text={i18n.t('progress.label')} />
 		<h1 class="mt-2 text-2xl font-medium tracking-tight">{i18n.t('progress.title')}</h1>
 		<p class="text-muted-foreground mt-1 text-sm">{i18n.t('progress.intro')}</p>
+		<p class="mt-2 text-sm"><a href="/app/horizon" class="text-muted-foreground underline underline-offset-4" data-testid="horizon-link">{i18n.t('horizon.link')}</a></p>
 	</header>
 	{#if schedule.due}
 		<Alert.Root data-testid="progress-due">

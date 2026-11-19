@@ -15,6 +15,7 @@
 		offsetDays,
 		note,
 		measure,
+		href,
 		children
 	}: {
 		label: string;
@@ -23,6 +24,8 @@
 		note?: string;
 		/** What the number is, when the label alone would mislead: a lift's row is its estimated max, not the bar's weight. */
 		measure?: string;
+		/** Where the row's detail lives; the label becomes the link. */
+		href?: string;
 		children?: Snippet;
 	} = $props();
 	const i18n = useI18n();
@@ -42,7 +45,9 @@
 <div class="py-3" data-testid="horizon-row" data-status={series.status}>
 	<div class="flex items-baseline justify-between gap-3">
 		<p class="min-w-0 truncate text-sm font-medium">
-			{label}
+			{#if href}<a {href} class="underline-offset-4 hover:underline" data-testid="horizon-row-link"
+					>{label}</a
+				>{:else}{label}{/if}
 			{#if note}<span class="ml-1.5 text-xs font-normal text-muted-foreground">{note}</span>{/if}
 		</p>
 		{#if series.status === 'ready' && point}

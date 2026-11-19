@@ -122,6 +122,7 @@
 							series={lift}
 							offsetDays={offset}
 							note={lift.status === 'ready' ? lift.plateauText : undefined}
+							href="/app/horizon/lifts/{encodeURIComponent(lift.key)}"
 							measure={i18n.t('insights.lifting.col.e1rm')}
 						/>
 					{/each}
