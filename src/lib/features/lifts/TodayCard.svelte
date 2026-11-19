@@ -16,7 +16,18 @@
 	import { Label } from '#lib/components/ui/label/index.js';
 	import { radioClass } from '#lib/features/weekly/radio.js';
 	import { useI18n } from '#lib/i18n/index.js';
-	import { emptyForm, kinds, loadLabel, parseSetForm, rirLabel, type LiftSet } from './sets.js';
+	import {
+		emptyForm,
+		kinds,
+		liftKey,
+		loadLabel,
+		nextLoad,
+		parseSetForm,
+		rirLabel,
+		wantsSuggestion,
+		type LiftSet,
+		type NextSet
+	} from './sets.js';
 
 	const i18n = useI18n();
 	const api = browserApi();
@@ -27,6 +38,40 @@
 	let form = $state(emptyForm());
 	let error = $state('');
 	let busy = $state(false);
+	/** A starting point for the exercise in the form (GET /horizon/next-sets). */
+	let next = $state<NextSet | null>(null);
+	let asked = 0;
+
+	/**
+	 * Looks up a suggested set for the exercise named in the form. It is only
+	 * offered, with a button: nothing typed is ever replaced on its own. A
+	 * lift with too little history has none, and a failed lookup is the same
+	 * as none, since the form works without it.
+	 */
+	async function suggest() {
+		const turn = ++asked;
+		const exercise = form.exercise;
+		if (!wantsSuggestion(sets, exercise)) {
+			next = null;
+			return;
+		}
+		try {
+			const { data } = await api.GET('/horizon/next-sets', {
+				params: { query: { keys: liftKey(exercise) } }
+			});
+			// A slower answer for a name since changed is dropped.
+			if (turn === asked) next = data?.sets[0] ?? null;
+		} catch {
+			if (turn === asked) next = null;
+		}
+	}
+
+	function useSuggestion() {
+		if (!next) return;
+		form.weightKg = next.weightKg > 0 ? next.weightKg : '';
+		form.reps = next.reps;
+		next = null;
+	}
 
 	const kindLabel: Record<string, string> = {
 		work: 'lifts.kind.work',
@@ -68,6 +113,7 @@
 			await api.POST('/lifts/sets', { body: parsed.input });
 			form.rir = '';
 			error = '';
+			next = null;
 			await refresh();
 		} catch (err) {
 			error = messageFor(err);
@@ -90,6 +136,7 @@
 		}
 		form = emptyForm();
 		error = '';
+		next = null;
 		try {
 			await refresh();
 		} finally {
@@ -108,7 +155,7 @@
 					<Card.Title class="text-base">{i18n.t('lifts.today.title')}</Card.Title>
 					<a
 						href="/app/lifts/import"
-						class="text-muted-foreground hover:text-foreground text-xs underline-offset-4 hover:underline"
+						class="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
 						>{i18n.t('lifts.today.import')}</a
 					>
 				</div>
@@ -125,6 +172,7 @@
 							placeholder={i18n.t('lifts.form.exercise.ph')}
 							required
 							list="set-exercise-recent"
+							onchange={suggest}
 							autocomplete="off"
 							maxlength={120}
 						/>
@@ -135,6 +183,27 @@
 							{/each}
 						</datalist>
 					</div>
+					{#if next}
+						<!-- From the person's own last sessions; offered, never filled in for them. -->
+						<div
+							class="flex items-start justify-between gap-3 border-l-2 border-agent/40 pl-3"
+							data-testid="next-set"
+							role="status"
+						>
+							<p class="text-sm leading-relaxed">
+								<span class="font-medium tabular-nums"
+									>{i18n.tf('lifts.next.try', nextLoad(i18n, next.weightKg, next.reps))}</span
+								>
+								<span class="block text-xs text-muted-foreground">
+									{next.reasonText}
+									{i18n.tf('lifts.next.last', nextLoad(i18n, next.lastWeightKg, next.lastReps))}
+								</span>
+							</p>
+							<Button type="button" variant="outline" size="sm" onclick={useSuggestion}
+								>{i18n.t('lifts.next.use')}</Button
+							>
+						</div>
+					{/if}
 					<div class="grid grid-cols-3 gap-2">
 						<div class="space-y-1.5">
 							<Label for="set-weight">{i18n.t('lifts.form.kg')}</Label>
@@ -179,7 +248,9 @@
 							/>
 						</div>
 					</div>
-					<p id="set-rir-help" class="text-muted-foreground text-xs">{i18n.t('lifts.form.rir.help')}</p>
+					<p id="set-rir-help" class="text-xs text-muted-foreground">
+						{i18n.t('lifts.form.rir.help')}
+					</p>
 					<fieldset class="flex flex-wrap gap-4">
 						<legend class="sr-only">{i18n.t('lifts.form.kind')}</legend>
 						{#each kinds as value (value)}
@@ -193,30 +264,40 @@
 									onchange={() => (form.kind = value)}
 									class={radioClass}
 								/>
-								<Label for="set-kind-{value}" class="text-sm font-normal">{i18n.t(kindLabel[value])}</Label>
+								<Label for="set-kind-{value}" class="text-sm font-normal"
+									>{i18n.t(kindLabel[value])}</Label
+								>
 							</div>
 						{/each}
 					</fieldset>
 					{#if error}
-						<p class="text-destructive text-sm" role="alert">{error}</p>
+						<p class="text-sm text-destructive" role="alert">{error}</p>
 					{/if}
-					<Button type="submit" class="w-full" disabled={busy}>{i18n.t('lifts.form.submit')}</Button>
+					<Button type="submit" class="w-full" disabled={busy}>{i18n.t('lifts.form.submit')}</Button
+					>
 				</form>
 				{#if sets.length > 0}
-					<ul class="divide-border divide-y" aria-label={i18n.t('lifts.list.aria')}>
+					<ul class="divide-y divide-border" aria-label={i18n.t('lifts.list.aria')}>
 						{#each sets as s (s.id)}
 							{@const load = loadLabel(i18n, s)}
 							{@const rir = rirLabel(i18n, s)}
 							<li
-								class={['flex items-center justify-between gap-3 py-2 text-sm', s.kind === 'warmup' && 'text-muted-foreground']}
+								class={[
+									'flex items-center justify-between gap-3 py-2 text-sm',
+									s.kind === 'warmup' && 'text-muted-foreground'
+								]}
 							>
 								<span class="min-w-0 truncate">
 									<span class="font-medium">{s.exerciseName}</span>
 									<span class="tabular-nums"> · {load}</span>
 									{#if s.kind === 'warmup'}
-										<span class="font-mono text-[10px] tracking-[0.14em] uppercase"> · {i18n.t('lifts.kind.warmup')}</span>
+										<span class="font-mono text-[10px] tracking-[0.14em] uppercase">
+											· {i18n.t('lifts.kind.warmup')}</span
+										>
 									{:else if s.kind === 'drop'}
-										<span class="font-mono text-[10px] tracking-[0.14em] uppercase"> · {i18n.t('lifts.list.drop')}</span>
+										<span class="font-mono text-[10px] tracking-[0.14em] uppercase">
+											· {i18n.t('lifts.list.drop')}</span
+										>
 									{/if}
 									{#if rir}
 										<span class="text-muted-foreground"> · {rir}</span>

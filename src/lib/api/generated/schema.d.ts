@@ -3592,6 +3592,63 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/horizon": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Where training is heading, as ranges over the next twelve weeks
+         * @description Lifts, body weight and waist forecast from the person's own history, the body figure on each day ahead, and a suggestion to take a lighter week. Every number is a range, never a point. Arithmetic, with no model call: the same history always gives the same answer. The query parameters are a what-if; they change how fatigued each muscle is and when progress resumes. Time off pauses a strength trend with no loss claimed, and an extra session never raises a strength forecast. Every label is an open string.
+         */
+        get: operations["getHorizon"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/horizon/lifts/{key}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One lift's forecast with the history behind it */
+        get: operations["getHorizonLift"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/horizon/next-sets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A suggested next working set for each lift
+         * @description Double progression from the last session: more reps at a load until every set reaches the top of the plan's rep range with reps in reserve, then more load. A lift with fewer than two earlier sessions, or never loaded, gets no entry. A starting point for the set-entry form.
+         */
+        get: operations["getHorizonNextSets"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/today/lighter": {
         parameters: {
             query?: never;
@@ -6354,6 +6411,10 @@ export interface components {
             trainingShared: boolean;
         };
         WeeklyReview: {
+            /** @description A volume worth considering for the planned week — "deload" when the forecast's lighter-week rule fires. Absent otherwise. An open string; never applied for the person. */
+            suggestedVolume?: string;
+            /** @description Why, in the reader's language. Present with suggestedVolume. */
+            suggestedReason?: string;
             /**
              * Format: date
              * @description Monday of the week that happened.
@@ -6430,6 +6491,134 @@ export interface components {
             /** @description A suggested knowledge-note title. */
             title?: string;
             why: string;
+        };
+        HorizonPoint: {
+            /** @description Days from today. Daily to 14, then weekly to 84. */
+            offsetDays: number;
+            low: number;
+            mid: number;
+            high: number;
+        };
+        HorizonNeed: {
+            /** @description lift_sessions, lift_recent, weigh_ins or waist_checks. An open string. */
+            code: string;
+            have: number;
+            want: number;
+            text: string;
+        };
+        HorizonTrackRecord: {
+            horizonWeeks: number;
+            hits: number;
+            total: number;
+            /** @description backtest (what the method would have forecast, recomputed) or recorded (forecasts stored at the time). An open string. */
+            kind: string;
+            text: string;
+        };
+        HorizonSeries: {
+            /** @description ready or insufficient. An open string. */
+            status: string;
+            /** @description kg or cm. */
+            unit: string;
+            needs: components["schemas"]["HorizonNeed"][];
+            /** @description The fitted level today. Absent when insufficient. */
+            now?: number;
+            /** @description From day 0. May stop before day 84 — never further ahead than the history is long. */
+            points: components["schemas"]["HorizonPoint"][];
+            trackRecord?: components["schemas"]["HorizonTrackRecord"];
+        };
+        HorizonLift: components["schemas"]["HorizonSeries"] & {
+            key: string;
+            name: string;
+            slug?: string;
+            /** @description progressing, holding, plateau, sliding or insufficient. An open string. */
+            plateau: string;
+            plateauText: string;
+        };
+        HorizonLiftDetail: components["schemas"]["HorizonLift"] & {
+            /** @description The best estimated one-rep max of each day the lift was trained. */
+            history: {
+                /** Format: date */
+                date: string;
+                value: number;
+            }[];
+            /** @description Four-week forecasts the method would have made, and what then happened. */
+            past: {
+                /** Format: date */
+                madeOn: string;
+                predicted: number;
+                actual: number;
+            }[];
+        };
+        HorizonFrame: {
+            offsetDays: number;
+            /** Format: date */
+            date: string;
+            /** @description The body figure's four morphs, as GET /body/current gives them. */
+            shape: {
+                waist: number;
+                hips: number;
+                chest: number;
+                overall: number;
+            };
+            regions: {
+                /** @description A body-figure region key. */
+                id: string;
+                /** @description 0 (fresh) to 1 (spent). */
+                fatigue: number;
+                /** @description The body map's detraining shade, 1 (trained within two weeks) down to 0.5. For drawing the figure; not a share of any lift's strength. */
+                retained: number;
+            }[];
+        };
+        Horizon: {
+            /** @description ready when at least one series could be forecast, else insufficient. An open string. */
+            status: string;
+            /** Format: date-time */
+            generatedAt: string;
+            scenario: {
+                skipWeeks: number;
+                extraSessions: number;
+                deloadNow: boolean;
+            };
+            needs: components["schemas"]["HorizonNeed"][];
+            summary: string[];
+            disclaimer: string;
+            /** @description False when no plan is followed; the frames then show training stopping. */
+            hasPlan: boolean;
+            frames: components["schemas"]["HorizonFrame"][];
+            lifts: components["schemas"]["HorizonLift"][];
+            bodyWeight: components["schemas"]["HorizonSeries"];
+            waist: components["schemas"]["HorizonSeries"];
+            goalEta?: {
+                targetKg: number;
+                /** @description reached, window, open or unreachable. An open string. */
+                state: string;
+                /** Format: date */
+                earliest?: string;
+                /** Format: date */
+                latest?: string;
+                text: string;
+            };
+            deload: {
+                suggested: boolean;
+                /** @description deload when suggested — the volume PUT /weekly/review takes. Never applied for the person. */
+                suggestedVolume?: string;
+                reasons: {
+                    code: string;
+                    text: string;
+                }[];
+            };
+        };
+        HorizonNextSets: {
+            sets: {
+                key: string;
+                weightKg: number;
+                reps: number;
+                /** @description add_load, add_rep, repeat or lighter. An open string. */
+                reason: string;
+                reasonText: string;
+                lastWeightKg: number;
+                lastReps: number;
+            }[];
         };
         LighterDay: {
             /** @description Ask now — a low morning, a session still to do, no answer yet. */
@@ -16485,6 +16674,84 @@ export interface operations {
             };
             401: components["responses"]["Unauthorized"];
             404: components["responses"]["NotFound"];
+        };
+    };
+    getHorizon: {
+        parameters: {
+            query?: {
+                /** @description Weeks from today with no training, 0 to 4. Out of range is clamped. */
+                skipWeeks?: number;
+                /** @description Sessions a week added to the plan, 0 or 1. */
+                extraSessions?: number;
+                /** @description Make the next week of training a lighter one. */
+                deloadNow?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Horizon"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    getHorizonLift: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The lift's key from GET /horizon — its catalog slug, or its name in lower case. */
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HorizonLiftDetail"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    getHorizonNextSets: {
+        parameters: {
+            query: {
+                /** @description Lift keys, or the names the lifts were logged under (case ignored), comma separated, at most 20. Each entry comes back under the key as asked, lower-cased. */
+                keys: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HorizonNextSets"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            422: components["responses"]["ValidationError"];
         };
     };
     getLighterDay: {

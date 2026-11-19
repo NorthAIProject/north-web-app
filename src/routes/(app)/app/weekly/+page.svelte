@@ -122,6 +122,16 @@
 				<Card.Title>{i18n.t('weekly.training')}</Card.Title>
 			</Card.Header>
 			<Card.Content class="space-y-3">
+				{#if review.suggestedVolume === 'deload' && review.suggestedReason}
+					<!-- From the forecast (GET /horizon). Shown, never chosen for them. -->
+					<div class="border-agent/40 border-l-2 pl-3" data-testid="weekly-suggestion">
+						<p class="text-agent text-sm font-medium">{i18n.t('weekly.suggest.deload')}</p>
+						<p class="text-muted-foreground mt-0.5 text-xs leading-relaxed">
+							{review.suggestedReason}
+							<a href="/app/horizon" class="underline underline-offset-4">{i18n.t('weekly.suggest.why')}</a>
+						</p>
+					</div>
+				{/if}
 				{#each volumes as v (v.value)}
 					<div class="flex items-start gap-3">
 						<input
