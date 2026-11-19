@@ -162,4 +162,49 @@ test.describe('Horizon', () => {
 		await expect(card.getByLabel('Kg', { exact: true })).not.toHaveValue('');
 		await expect(next).toHaveCount(0);
 	});
+
+	test('a lift opens onto its history, its range and a table of both', async ({
+		page,
+		request
+	}) => {
+		const user = await createUser(request);
+		await seedHistory(request, user);
+		await settle(request, user);
+		await signIn(page, user, '/app/horizon');
+
+		await page
+			.getByTestId('horizon-row')
+			.filter({ hasText: 'Barbell Squat' })
+			.getByTestId('horizon-row-link')
+			.click();
+		await expect(page).toHaveURL(/\/app\/horizon\/lifts\//);
+		await expect(page.getByRole('heading', { level: 1 })).toHaveText('Barbell Squat');
+		// What was logged, then a range: never one number for the future.
+		await expect(page.getByTestId('horizon-lift-summary')).toContainText('between');
+		await expect(page.getByTestId('horizon-fan-band')).toBeVisible();
+		await expect(page.getByTestId('horizon-record')).toHaveAttribute('data-kind', 'backtest');
+		// Nobody filmed this lift: no form note, and no empty box for one.
+		await expect(page.getByTestId('horizon-form-note')).toHaveCount(0);
+
+		// The same numbers without the drawing.
+		const table = page.getByTestId('horizon-lift-table');
+		await table.locator('summary').click();
+		await expect(table.getByRole('table', { name: 'Forecast range' })).toBeVisible();
+		await expect(
+			table.getByRole('table', { name: 'What you logged' }).getByRole('row')
+		).toHaveCount(25);
+		await page.screenshot({ path: test.info().outputPath('horizon-lift.png'), fullPage: true });
+
+		await page
+			.getByRole('link', { name: /Horizon$/ })
+			.first()
+			.click();
+		await expect(page).toHaveURL(/\/app\/horizon$/);
+	});
+
+	test('a lift nobody logged is not found', async ({ page, request }) => {
+		const user = await createUser(request);
+		await signIn(page, user, '/app/horizon/lifts/never-done');
+		await expect(page.getByText('That lift has no history.')).toBeVisible();
+	});
 });

@@ -113,16 +113,15 @@
 			{#if !b.hasWeight}
 				<p class="text-muted-foreground mt-2 text-sm">{i18n.t('day.body.none')}</p>
 			{/if}
-			{#if b.progressDue || b.lastWaist}
-				<div class="mt-3 flex flex-wrap items-center gap-2 text-xs">
-					{#if b.progressDue}
-						<a href="/app/progress" class="border-signal/40 bg-signal/10 rounded-full border px-2 py-0.5 font-medium" data-testid="progress-due-chip">{i18n.t('day.progress.due')}</a>
-					{/if}
-					{#if b.lastWaist}
-						<a href="/app/progress" class="text-muted-foreground tabular-nums" data-testid="progress-last">{i18n.tf('day.progress.last', b.lastWaist, b.lastCheckOn)}</a>
-					{/if}
-				</div>
-			{/if}
+			<div class="mt-3 flex flex-wrap items-center gap-2 text-xs">
+				{#if b.progressDue}
+					<a href="/app/progress" class="border-signal/40 bg-signal/10 rounded-full border px-2 py-0.5 font-medium" data-testid="progress-due-chip">{i18n.t('day.progress.due')}</a>
+				{/if}
+				{#if b.lastWaist}
+					<a href="/app/progress" class="text-muted-foreground tabular-nums" data-testid="progress-last">{i18n.tf('day.progress.last', b.lastWaist, b.lastCheckOn)}</a>
+				{/if}
+				<a href="/app/horizon" class="text-muted-foreground underline underline-offset-4" data-testid="horizon-link">{i18n.t('horizon.link')}</a>
+			</div>
 			<div class="mt-3 flex flex-wrap gap-1.5" data-testid="soreness">
 				{#each b.soreness as so (so.region)}
 					<span class={cn('rounded-full px-2 py-0.5 text-xs font-medium', sorenessClass(so.severity))}>

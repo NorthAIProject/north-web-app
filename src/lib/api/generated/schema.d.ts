@@ -6548,6 +6548,18 @@ export interface components {
                 predicted: number;
                 actual: number;
             }[];
+            /** @description What the newest form check of this lift said. Absent when the lift has none. */
+            formNote?: {
+                /** @description The form check, as GET /form-checks/{id} takes it. */
+                analysisId: string;
+                /** Format: date */
+                date: string;
+                summary: string;
+                /** @description high, medium or low — how clearly the clip showed the lift. A plain string; treat an unknown value as low. */
+                confidence: string;
+                /** @description The correction for the most serious thing seen. Absent when nothing was. */
+                cue?: string;
+            };
         };
         HorizonFrame: {
             offsetDays: number;
