@@ -21,11 +21,9 @@ export function planCta(signedIn: boolean, label: string, t: T): string {
 	return signedIn ? t('land.cta.open') : label;
 }
 
-// The store links. Each is one line to change when a listing goes live:
-// appStoreURL is empty until Khepri ships, so the Apple badge points at the
-// TestFlight invite and says so underneath; Android has no build yet, so the
-// Play badge renders muted and is not a link.
-export const appStoreURL = '';
+// The store links. Each is one line to change when a listing goes live.
+// Android has no build yet, so the Play badge renders muted and is not a link.
+export const appStoreURL = 'https://apps.apple.com/pt/app/khepri/id6815721581?l=en-GB';
 export const iosBetaURL = 'https://testflight.apple.com/join/MCwG7x6H';
 export const playStoreURL = '';
 

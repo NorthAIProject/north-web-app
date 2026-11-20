@@ -1,15 +1,16 @@
 <!--
 	Full-bleed so the card wall can run edge to edge; its text sits in the same
 	column as every other section. Centred: the emblem and motto, a two-line
-	headline, the lede and one row of calls to action, with the wall fanned out
-	underneath (north-client web/landing/page.templ hero). The store badges live
-	in the iPhone section, where the app is the subject.
+	headline, the lede and one row of calls to action, with the store badges
+	underneath and the wall fanned out below (north-client web/landing/page.templ
+	hero).
 -->
 <script lang="ts">
 	import ArrowRightIcon from '@lucide/svelte/icons/arrow-right';
 	import CheckIcon from '@lucide/svelte/icons/check';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import { useI18n } from '#lib/i18n/index.js';
+	import AppButtons from './AppButtons.svelte';
 	import HeroWall from './HeroWall.svelte';
 	import Waypoint from './Waypoint.svelte';
 	import type { Cta } from './cta.js';
@@ -62,6 +63,7 @@
 						{i18n.t('land.hero.see')}
 					</Button>
 				</div>
+				<AppButtons class="mt-7 items-center" />
 				<!-- The tick sits inside the sentence so it stays with the first word when the line centres and wraps. -->
 				<p class="mt-4 max-w-sm text-sm text-balance text-muted-foreground">
 					<CheckIcon class="mr-1 inline-block size-3.5 -translate-y-px text-signal" aria-hidden="true" />{i18n.t('land.hero.free')}
